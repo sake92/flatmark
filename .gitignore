@@ -1,0 +1,26 @@
+
+
+# scala
+*.class
+*.log
+.bloop/
+.bsp/
+.metals/
+.scala-build/
+target/
+out/
+
+# js
+node_modules/
+
+# other
+.env
+.vscode/
+.idea/
+
+
+# project specific
+nodejs-helpers/bundle.min.mjs
+
+
+

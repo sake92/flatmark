@@ -1,0 +1,7 @@
+{
+    "dependencies": {
+        "@hpcc-js/wasm-graphviz": "^1.7.0",
+        "highlight.js": "^11.11.1",
+        "katex": "^0.16.22"
+    }
+}
