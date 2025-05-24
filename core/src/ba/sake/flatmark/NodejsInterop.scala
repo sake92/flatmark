@@ -3,8 +3,14 @@ package ba.sake.flatmark
 import java.nio.file.Paths
 import org.graalvm.polyglot.*
 import org.graalvm.polyglot.proxy.*
+import java.time.Instant
+
+// TODO optimize
+// https://kmsquare.in/blog/running-graaljs-and-optimizing-for-performance/
+// umjesto contexta reusat engine
 
 object NodejsInterop {
+  println("Initializing GraalVM Node.js interop...")
   private val context = Context
     .newBuilder("js", "wasm")
     .allowAllAccess(true)
@@ -14,8 +20,13 @@ object NodejsInterop {
     .option("js.esm-eval-returns-exports", "true")
     .build()
 
+// TODO loadanje je sporooooooo
   private val nodejsBundleSource = Source.newBuilder("js", getClass.getClassLoader.getResource("bundle.min.mjs")).build
+  println("GraalVM Node.js loading script.. " + Instant.now())
+
   private val nodejsModule = context.eval(nodejsBundleSource)
+
+  println("GraalVM Node.js interop initialized. " + Instant.now())
 
   def highlightCode(codeStr: String, codeLang: Option[String] = None) =
     codeLang match

@@ -1,9 +1,16 @@
 
 # Flatmark
 
+## Design goals
+
+Minimal setup:
+- one command to install
+- no dependencies
+
+
+## Templating
 
 https://github.com/jknack/handlebars.java/tree/master
-
 
 https://jekyllrb.com/docs/variables/
 

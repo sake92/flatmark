@@ -1,32 +1,83 @@
 package build
 
-import mill._, scalalib._
+import coursier.MavenRepository
+import mill._
+import scalalib._
+import mill.util.Jvm
+import mill.define.ModuleRef
 
-object core extends ScalaModule  {
+object core extends ScalaModule with NativeImageModule {
 
   def scalaVersion = "3.7.0"
-  
+
+  // def mainClass = Some("ba.sake.flatmark.cli")
+
   def ivyDeps = Agg(
     ivy"org.graalvm.polyglot:polyglot:24.2.1",
-    ivy"org.graalvm.polyglot:js:24.2.1",
-    ivy"org.graalvm.polyglot:wasm:24.2.1",
-    ivy"com.vladsch.flexmark:flexmark-all:0.64.8"
+    // ivy"org.graalvm.polyglot:js:24.2.1",
+    // ivy"org.graalvm.polyglot:wasm:24.2.1",
+    ivy"org.graalvm.polyglot:js-community:24.2.1",
+    ivy"org.graalvm.polyglot:wasm-community:24.2.1",
+    //ivy"com.vladsch.flexmark:flexmark-all:0.64.8", // old, graalvm fails
+    ivy"com.github.vsch.flexmark-java:flexmark-all:-SNAPSHOT",
+    ivy"com.lihaoyi::os-lib:0.11.4"
   )
+
+  def repositoriesTask = Task.Anon {
+    super.repositoriesTask() ++ Seq(MavenRepository("https://jitpack.io"))
+  }
+  
+  // graalvm
+  
+  //def nativeImageOptions = Seq("--no-fallback", "-H:IncludeResources=.*/.*js$")
+  /*def zincWorker = ModuleRef(ZincWorkerGraalvm)
+  def nativeImage2: T[PathRef] = Task {
+    val dest = Task.dest
+    val executableName = "native-executable"
+    val argsFile = dest / "native-image-args.txt"
+    val args: Seq[String] = 
+      nativeImageOptions() ++
+      Seq(
+      "-cp",
+      nativeImageClasspath().iterator.map(_.path).mkString(java.io.File.pathSeparator),
+      finalMainClass(),
+      (dest / executableName).toString()
+    )
+    os.write.over(argsFile, args.mkString("\n"))
+    val command = Seq.newBuilder[String]
+      .+=(nativeImageTool().path.toString)
+      .+=(s"@${argsFile}")
+      .result()
+    os.proc(command).call(cwd = dest, stdout = os.Inherit)
+    val ext = if (mill.main.client.Util.isWindows) ".exe" else ""
+    val executable = dest / s"$executableName$ext"
+    assert(os.exists(executable))
+    PathRef(executable)
+  }
+*/
 }
+
+/*
+object ZincWorkerGraalvm extends ZincWorkerModule {
+  def jvmId = "graalvm-community:24.0.1"
+  def jvmIndexVersion = "latest.release"
+}
+*/
 
 object flatmark extends ScalaModule with CustomJpackageModule {
 
   def scalaVersion = "3.7.0"
-  
+
   def moduleDeps = Seq(core)
-  
+
   // samo za windows zasad
   def jpackageType = "msi"
 }
 
+
 import mill.util.Jvm
 trait CustomJpackageModule extends JpackageModule {
-    def jpackageAppImage2: T[PathRef] = Task {
+  def jpackageAppImage2: T[PathRef] = Task {
     // materialize all jars into a "lib" dir
     val libs = Task.dest / "lib"
     val cp = jpackageRunClasspath().map(_.path)
@@ -53,7 +104,7 @@ trait CustomJpackageModule extends JpackageModule {
       mainJarName,
       "--main-class",
       mainClass,
-      "--win-console"
+      "--win-console" // TODO windows only
     )
 
     // run jpackage tool
