@@ -26,7 +26,8 @@ object core extends ScalaModule with NativeImageModule {
     ivy"org.commonmark:commonmark-ext-image-attributes:0.24.0",
     ivy"org.commonmark:commonmark-ext-task-list-items:0.24.0",
     //stari commonmark.. ivy"fr.brouillard.oss:commonmark-ext-notifications:1.1.0",
-    ivy"com.github.jknack:handlebars:4.4.0"
+    ivy"com.github.jknack:handlebars:4.4.0",
+    ivy"org.virtuslab::scala-yaml:0.3.0"
   )
   
 /*

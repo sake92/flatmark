@@ -4,6 +4,7 @@ import java.security.MessageDigest
 import java.util.Base64
 import org.graalvm.polyglot.*
 
+// TODO maybe make this a long-running service
 class NodejsInterop(cacheFolder: os.Path) {
 
   private lazy val context = Context

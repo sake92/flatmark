@@ -1,6 +1,8 @@
 package ba.sake.flatmark
 
-@main def cli() =
+import org.virtuslab.yaml.*
+
+@main def cli() = {
   val siteRootFolder = os.pwd / "site1"
   val outputFolder = siteRootFolder / "_site"
   val layoutsFolder = siteRootFolder / "_layouts"
@@ -19,10 +21,10 @@ package ba.sake.flatmark
     .toMap
 
   os.walk(siteRootFolder).filter(_.ext == "md").foreach { file =>
-    // render markdown file
-    // TODO read YAML front matter and pass it to the template
-    val mdContentTemplate = os.read(file)
-    val mdContent = mdTemplateHandler.render(mdContentTemplate, Map("title" -> "Flatmark Example"))
+    // render markdown content
+    val mdContentTemplateRaw = os.read(file)
+    val (mdContentTemplate, frontMatter) = parseMd(mdContentTemplateRaw)
+    val mdContent = mdTemplateHandler.render(mdContentTemplate, frontMatter)
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
 
     // render final HTML file
@@ -32,26 +34,40 @@ package ba.sake.flatmark
 
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
-      genHtml(htmlContent),
+      htmlContent,
       createFolders = true
     )
   }
 
-def genHtml(bodyContent: String): String = {
-  s"""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Flatmark</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
-    </head>
-    <body>
-        ${bodyContent}
-    </body>
-    </html>
-    """
+  def parseMd(mdTemplateRaw: String): (String, Map[String, String]) = {
+    var firstTripleDashIndex = -1
+    var secondTripleDashIndex = -1
+    locally {
+      val iter = mdTemplateRaw.linesIterator
+      var i = 0
+      while iter.hasNext && (firstTripleDashIndex == -1 || secondTripleDashIndex == -1) do {
+        val line = iter.next()
+        if (line.trim == "---") {
+          if (firstTripleDashIndex == -1) firstTripleDashIndex = i
+          else secondTripleDashIndex = i
+        }
+        i += 1
+      }
+    }
+    if (firstTripleDashIndex != -1 && secondTripleDashIndex != -1) {
+      val t = mdTemplateRaw.linesIterator
+        .drop(secondTripleDashIndex + 1)
+        .mkString("\n")
+        .trim
+      val fm = mdTemplateRaw.linesIterator
+        .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
+        .mkString("\n")
+        .as[Map[String, String]]
+        .toOption
+        .getOrElse(Map())
+      (t, fm)
+    } else {
+      (mdTemplateRaw, Map())
+    }
+  }
 }
