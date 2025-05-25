@@ -1,34 +1,13 @@
 package ba.sake.flatmark
 
-val mdSource = """
-# Hello World
-This is a **markdown** example with *italic* and `code`.
-
----
-
-```scala
-val x = 1
-```
-
----
-
-```math
-x = 5
-```
-
----
-
-```diagram:graphviz
-digraph G {Hello->World}
-```
-
-"""
 
 @main def cli() =
   val wd = os.pwd / "site1"
-  val markdownHtml = MarkdownRenderer.renderMarkdown(mdSource)
+  val templateHandler = new TemplateHandler()
+  val res = templateHandler.render()
+  val markdownHtml = MarkdownRenderer.renderMarkdown(res)
   os.write.over(
-    wd / "dest" / "index.html",
+    wd / "_site" / "index.html",
     genHtml(markdownHtml),
     createFolders = true
   )
@@ -41,7 +20,10 @@ def genHtml(bodyContent: String): String = {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Flatmark</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+
     </head>
     <body>
         ${bodyContent}

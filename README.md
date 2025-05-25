@@ -23,17 +23,17 @@ A imaju cli, tako da ne mogu bundle-at i cli unutar JS minified skripte, niđe v
 Ovako iz jave more se shellout šta hoš.
 
 const counter = mermaidCounter++;
-            const mermaidInputFileName = `${siteFolder}/tmp/mermaid/diagram-${counter}.mmd`;
-            const mermaidSvgFileName = `${siteFolder}/tmp/mermaid/diagram-${counter}.svg`;
-            fs.writeFileSync(mermaidInputFileName, codeStr);
-            const shell = process.platform === 'win32' ? 'powershell' : 'bash';
-            execFileSync(
-                './node_modules/.bin/mmdc',
-                ['-i', mermaidInputFileName, '-o', mermaidSvgFileName, '-t', 'dark', '-b', 'transparent'],
-                { shell: shell, encoding: 'utf-8' }
-            );
-            const svg = fs.readFileSync(mermaidSvgFileName, 'utf8');
-            return `<pre class="diagram-mermaid">${svg}</pre>`; // avoid <code> wrapper
+const mermaidInputFileName = `${siteFolder}/tmp/mermaid/diagram-${counter}.mmd`;
+const mermaidSvgFileName = `${siteFolder}/tmp/mermaid/diagram-${counter}.svg`;
+fs.writeFileSync(mermaidInputFileName, codeStr);
+const shell = process.platform === 'win32' ? 'powershell' : 'bash';
+execFileSync(
+    './node_modules/.bin/mmdc',
+    ['-i', mermaidInputFileName, '-o', mermaidSvgFileName, '-t', 'dark', '-b', 'transparent'],
+    { shell: shell, encoding: 'utf-8' }
+);
+const svg = fs.readFileSync(mermaidSvgFileName, 'utf8');
+return `<pre class="diagram-mermaid">${svg}</pre>`; // avoid <code> wrapper
 
 
 

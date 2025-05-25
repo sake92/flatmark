@@ -5,13 +5,12 @@ import org.graalvm.polyglot.*
 import org.graalvm.polyglot.proxy.*
 import java.time.Instant
 
-// TODO optimize
 // https://kmsquare.in/blog/running-graaljs-and-optimizing-for-performance/
-// umjesto contexta reusat engine
+// TODO optimize umjesto contexta reusat engine
 
 object NodejsInterop {
   println("Initializing GraalVM Node.js interop...")
-  private val context = Context
+  private lazy val context = Context
     .newBuilder("js", "wasm")
     .allowAllAccess(true)
     .allowPolyglotAccess(PolyglotAccess.ALL)

@@ -1,57 +1,53 @@
 
 
-Files layout mirrors URLs.
+File system layout mirrors URLs.
 
 ```bash
+
+# config
 _config.yaml        <-- global config
+_layouts/           <-- templates
+    default.html    <-- default layout: for index page, about page etc
+    post.html       <-- layout for posts
+_site/              <-- result of rendering, this will be deployed
+
+# content
 index.md
 mypost.md
 404.md              <-- 404 not found page
+bs/                 <-- translations live in lang-code folders
+    index.md
+    mypost.md
+
+# resources
 images/favicon.ico
 styles/main.css
 scripts/main.js
-bs/                 <-- translations live here, kao zasebna web stranica haman
-    index.md
-    mojpost.md
 
-_site/              <- result of rendering, this will be deployed
 ```
 
-`_config.yaml`
+## _config.yaml
 title:
 url: sake.ba
 description: SEO
 lang: en
 github_handle:
 twitter_handle:
-....
+
+It can only be in the root folder.
 
 
-Možda dozvolit `_config.yaml` u BILO KOM folderu.
-Tu metnut npr `lang: bs` da overridea.
+## Front matter
 
-I možda metnut isto kao Jekyll defaulte neke za layout, datum, naslov itd...
 ```yaml
-defaults:
-    draft: true
-    layout: post
-    tags: [scala, java]
-```
-
-
-## front matter
-```yaml
-draft: true (published but NOT listed or searched, thus not google indexed)
-layout: post
 title: Hello
 date: 2025-01-01 11:11 +02:00
+layout: post
 tags: [scala, java]
+publish: yes | no | hide # hide means published but not listed or searched, thus not google indexed
 
 custom_variable: whatever
 ```
-
-Draftove ne rendat nikako kad deployamo.
-AAAAAAA, ima `jekyll serve --draft` npr, kad lokalno devaš.
 
 
 ## templating
@@ -59,9 +55,6 @@ AAAAAAA, ima `jekyll serve --draft` npr, kad lokalno devaš.
 
 Kontammm moždaaaa `_layouts/post.html` za layout "post".  #stonks
 Jer mislio sam obične `*.html` fajlove dozvolit isto, YOLO.
-IIIIIII možda čak metnut `_layouts` u translation folder, što da ne.
-Onda tražit samo u najbližem parentu `_layouts` i to je to.
-Hmm, kae more i layout imat layout u Jekyllu, rekurzija... no bueno
 
 includes
 {{ include _header.html }}
@@ -101,8 +94,13 @@ Zgodno kad imaš neki externi data koji hoćeš da metneš u sajt.
 - virtual hosts i domene
 
 
-- serve i watch ??
+## Dev loop
+- `flatmark serve` to build, watch and serve the site
+- it will show a label down below with a warning that this is a dev server
+- it will render even the posts that are not published! (and show a nice warning)
 
+
+## Migrating from other platforms
 - import from wordpress, jekyll itd
 
 - RSS
