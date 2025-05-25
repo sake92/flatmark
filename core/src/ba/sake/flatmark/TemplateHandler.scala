@@ -1,23 +1,17 @@
 package ba.sake.flatmark
 
+import java.nio.file.Path
 import scala.jdk.CollectionConverters.*
-import com.github.jknack.handlebars.Handlebars
+import com.github.jknack.handlebars.{EscapingStrategy, Handlebars}
 import com.github.jknack.handlebars.io.FileTemplateLoader
 
-import java.nio.file.Paths
-
-class TemplateHandler {
-
-  def render(): String = {
-    val templateLoader = new FileTemplateLoader(Paths.get("site1").toFile)
-    templateLoader.setSuffix(".md") // Set the suffix for markdown files
-    val handlebars = new Handlebars(templateLoader)
-
-    val template = handlebars.compile("index")
-
-    template.apply(Map(
-      "title" -> "Flatmark Example",
-      "content" -> "This is a sample content rendered from a Handlebars template."
-    ).asJava)
+class TemplateHandler(templatesFolder: Path) {
+  private val templateLoader = FileTemplateLoader(templatesFolder.toFile)
+  templateLoader.setSuffix("")
+  private val handlebars = Handlebars(templateLoader).`with`(EscapingStrategy.NOOP)
+  
+  def render(templateValue: String, variables: Map[String, String]): String = {
+    val template = handlebars.compileInline(templateValue)
+    template.apply(variables.asJava)
   }
 }
