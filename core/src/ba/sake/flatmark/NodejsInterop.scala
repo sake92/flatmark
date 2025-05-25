@@ -2,11 +2,14 @@ package ba.sake.flatmark
 
 import java.time.Instant
 import org.graalvm.polyglot.*
+
+import java.security.MessageDigest
+import java.util.Base64
 // https://kmsquare.in/blog/running-graaljs-and-optimizing-for-performance/
 // TODO optimize umjesto contexta reusat engine
 
-object NodejsInterop {
-  println("Initializing GraalVM Node.js interop...")
+class NodejsInterop(cacheFolder: os.Path) {
+
   private lazy val context = Context
     .newBuilder("js", "wasm")
     .allowAllAccess(true)
@@ -16,29 +19,48 @@ object NodejsInterop {
     .option("js.esm-eval-returns-exports", "true")
     .build()
 
-// TODO loadanje je sporooooooo
   private lazy val nodejsBundleSource = Source.newBuilder("js", getClass.getClassLoader.getResource("bundle.min.mjs")).build
-  //println("GraalVM Node.js loading script.. " + Instant.now())
-
   private lazy val nodejsModule = context.eval(nodejsBundleSource)
-
-  //println("GraalVM Node.js interop initialized. " + Instant.now())
-
-  def highlightCode(codeStr: String, codeLang: Option[String] = None): String =
-    codeLang match
-      case Some(lang) =>
-        nodejsModule.getMember("highlightCode").execute(codeStr, lang).asString()
-      case None =>
-        nodejsModule.getMember("highlightCodeAuto").execute(codeStr).asString()
+  
+  def highlightCode(codeStr: String, codeLang: Option[String] = None): String = 
+    withFileCache(s"highlightCode-${codeLang.getOrElse("unknown")}-${getMd5B64(codeStr)}") {
+      codeLang match
+        case Some(lang) =>
+          nodejsModule.getMember("highlightCode").execute(codeStr, lang).asString()
+        case None =>
+          nodejsModule.getMember("highlightCodeAuto").execute(codeStr).asString()
+    }
 
   def highlightMath(mathStr: String): String =
-    val highlightMathFun = nodejsModule.getMember("highlightMath")
-    highlightMathFun.execute(mathStr).asString()
+    withFileCache(s"highlightMath-${getMd5B64(mathStr)}") {
+      val highlightMathFun = nodejsModule.getMember("highlightMath")
+      highlightMathFun.execute(mathStr).asString()
+    }
 
   def renderGraphviz(dotStr: String, engine: String = "dot"): String =
-    val renderGraphvizFun = nodejsModule.getMember("renderGraphviz")
-    renderGraphvizFun.execute(dotStr, engine).asString()
+    withFileCache(s"renderGraphviz-${engine}-${getMd5B64(dotStr)}") {
+      val renderGraphvizFun = nodejsModule.getMember("renderGraphviz")
+      renderGraphvizFun.execute(dotStr, engine).asString()
+    }
+    
+  private def withFileCache(cacheKey: String)(code: => String) = {
+    val cachedResultFileName = cacheFolder / "cached-results" / s"${cacheKey}.txt"
+    if os.exists(cachedResultFileName) then {
+      os.read(cachedResultFileName)
+    } else {
+      val finalResult = code
+      os.write.over(cachedResultFileName, finalResult, createFolders = true)
+      finalResult
+    }
+  }
 
+  private def getMd5B64(str: String): String = {
+    val bytesOfMessage = str.getBytes("UTF-8")
+    val md = MessageDigest.getInstance("MD5")
+    val theMD5digest = md.digest(bytesOfMessage)
+    val b64 = Base64.getEncoder.encode(theMD5digest)
+    new String(b64, "UTF-8").replace('/', '-').replace('=', '_').replace('+', '$')
+  }
 }
 
 // AKO NEKAD ZATREBA PROMISE/ASYNC

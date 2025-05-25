@@ -4,8 +4,10 @@ package ba.sake.flatmark
   val siteRootFolder = os.pwd / "site1"
   val outputFolder = siteRootFolder / "_site"
   val layoutsFolder = siteRootFolder / "_layouts"
+  val cacheFolder = siteRootFolder / ".flatmark-cache"
   val layoutTemplateHandler = new TemplateHandler(layoutsFolder.wrapped)
   val mdTemplateHandler = new TemplateHandler(siteRootFolder.wrapped)
+  val markdownRenderer = new FlatmarkMarkdownRenderer(new NodejsInterop(cacheFolder))
 
   val layoutTemplatesMap = os
     .list(layoutsFolder)
@@ -21,7 +23,7 @@ package ba.sake.flatmark
     // TODO read YAML front matter and pass it to the template
     val mdContentTemplate = os.read(file)
     val mdContent = mdTemplateHandler.render(mdContentTemplate, Map("title" -> "Flatmark Example"))
-    val mdHtmlContent = MarkdownRenderer.renderMarkdown(mdContent)
+    val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
 
     // render final HTML file
     val layoutTemplate = layoutTemplatesMap("default")

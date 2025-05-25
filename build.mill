@@ -28,10 +28,11 @@ object core extends ScalaModule with NativeImageModule {
     //stari commonmark.. ivy"fr.brouillard.oss:commonmark-ext-notifications:1.1.0",
     ivy"com.github.jknack:handlebars:4.4.0"
   )
-
+  
+/*
   def repositoriesTask = Task.Anon {
     super.repositoriesTask() ++ Seq(MavenRepository("https://jitpack.io"))
-  }
+  }*/
 
 }
 
