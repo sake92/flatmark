@@ -1,5 +1,4 @@
 
-
 # scala
 *.class
 *.log
@@ -18,9 +17,8 @@ node_modules/
 .vscode/
 .idea/
 
-
 # project specific
 nodejs-helpers/bundle.min.mjs
 
-
-
+.flatmark-cache
+_site/

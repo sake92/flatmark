@@ -5,8 +5,8 @@ package ba.sake.flatmark
   val outputFolder = siteRootFolder / "_site"
   val layoutsFolder = siteRootFolder / "_layouts"
   val cacheFolder = siteRootFolder / ".flatmark-cache"
-  val layoutTemplateHandler = new TemplateHandler(layoutsFolder.wrapped)
-  val mdTemplateHandler = new TemplateHandler(siteRootFolder.wrapped)
+  val layoutTemplateHandler = new FlatmarkTemplateHandler(layoutsFolder.wrapped)
+  val mdTemplateHandler = new FlatmarkTemplateHandler(siteRootFolder.wrapped)
   val markdownRenderer = new FlatmarkMarkdownRenderer(new NodejsInterop(cacheFolder))
 
   val layoutTemplatesMap = os

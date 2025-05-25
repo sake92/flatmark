@@ -5,7 +5,8 @@ import scala.jdk.CollectionConverters.*
 import com.github.jknack.handlebars.{EscapingStrategy, Handlebars}
 import com.github.jknack.handlebars.io.FileTemplateLoader
 
-class TemplateHandler(templatesFolder: Path) {
+class FlatmarkTemplateHandler(templatesFolder: Path) {
+  
   private val templateLoader = FileTemplateLoader(templatesFolder.toFile)
   templateLoader.setSuffix("")
   private val handlebars = Handlebars(templateLoader).`with`(EscapingStrategy.NOOP)

@@ -1,12 +1,8 @@
 package ba.sake.flatmark
 
-import java.time.Instant
-import org.graalvm.polyglot.*
-
 import java.security.MessageDigest
 import java.util.Base64
-// https://kmsquare.in/blog/running-graaljs-and-optimizing-for-performance/
-// TODO optimize umjesto contexta reusat engine
+import org.graalvm.polyglot.*
 
 class NodejsInterop(cacheFolder: os.Path) {
 
@@ -19,10 +15,11 @@ class NodejsInterop(cacheFolder: os.Path) {
     .option("js.esm-eval-returns-exports", "true")
     .build()
 
-  private lazy val nodejsBundleSource = Source.newBuilder("js", getClass.getClassLoader.getResource("bundle.min.mjs")).build
+  private lazy val nodejsBundleSource =
+    Source.newBuilder("js", getClass.getClassLoader.getResource("bundle.min.mjs")).build
   private lazy val nodejsModule = context.eval(nodejsBundleSource)
-  
-  def highlightCode(codeStr: String, codeLang: Option[String] = None): String = 
+
+  def highlightCode(codeStr: String, codeLang: Option[String] = None): String =
     withFileCache(s"highlightCode-${codeLang.getOrElse("unknown")}-${getMd5B64(codeStr)}") {
       codeLang match
         case Some(lang) =>
@@ -42,7 +39,7 @@ class NodejsInterop(cacheFolder: os.Path) {
       val renderGraphvizFun = nodejsModule.getMember("renderGraphviz")
       renderGraphvizFun.execute(dotStr, engine).asString()
     }
-    
+
   private def withFileCache(cacheKey: String)(code: => String) = {
     val cachedResultFileName = cacheFolder / "cached-results" / s"${cacheKey}.txt"
     if os.exists(cachedResultFileName) then {
