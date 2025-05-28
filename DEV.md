@@ -1,12 +1,10 @@
 
 
+## Making GraalVM native image
 
+```bash
+# prepare the reachability-metadata.json for optimized image
+./mill -i cli.run --no-cache
 
-
-
-
-
-## Why not graalvm native exe?
-- 500MB+
-- would be hard to add additional CLIs like mermaidjs-cli
-- jpackage makes installers for all platforms
+./mill -i cli.nativeImage2
+```

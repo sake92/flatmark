@@ -15,7 +15,11 @@ import org.commonmark.ext.image.attributes.ImageAttributesExtension
 import org.commonmark.ext.ins.InsExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
 
-class FlatmarkMarkdownRenderer(nodejsInterop: NodejsInterop) {
+class FlatmarkMarkdownRenderer(
+    codeHighlighter: FlatmarkCodeHighlighter,
+    graphvizRenderer: FlatmarkGraphvizRenderer,
+    mathRenderer: FlatmarkMathRenderer
+) {
 
   private val extensions = ju.Arrays.asList(
     TablesExtension.create(),
@@ -26,7 +30,7 @@ class FlatmarkMarkdownRenderer(nodejsInterop: NodejsInterop) {
     InsExtension.create(),
     ImageAttributesExtension.create(),
     TaskListItemsExtension.create(),
-    FlatmarkStaticCodeRendererExtension(nodejsInterop)
+    FlatmarkStaticCodeRendererExtension(codeHighlighter, graphvizRenderer, mathRenderer)
   )
   private val parser = Parser.builder.extensions(extensions).build
   private val renderer = HtmlRenderer.builder.extensions(extensions).build
@@ -36,29 +40,38 @@ class FlatmarkMarkdownRenderer(nodejsInterop: NodejsInterop) {
     renderer.render(document)
 }
 
-class FlatmarkStaticCodeRendererExtension(nodejsInterop: NodejsInterop) extends HtmlRendererExtension {
+class FlatmarkStaticCodeRendererExtension(
+    codeHighlighter: FlatmarkCodeHighlighter,
+    graphvizRenderer: FlatmarkGraphvizRenderer,
+    mathRenderer: FlatmarkMathRenderer
+) extends HtmlRendererExtension {
 
   override def extend(htmlRendererBuilder: HtmlRenderer.Builder): Unit =
     htmlRendererBuilder.nodeRendererFactory(new HtmlNodeRendererFactory() {
       def create(context: HtmlNodeRendererContext) =
-        new FlatmarkStaticCodeNodeRenderer(context, nodejsInterop)
+        new FlatmarkStaticCodeNodeRenderer(context, codeHighlighter, graphvizRenderer, mathRenderer)
     })
 
 }
 
-class FlatmarkStaticCodeNodeRenderer(context: HtmlNodeRendererContext, nodejsInterop: NodejsInterop)
-    extends NodeRenderer {
+class FlatmarkStaticCodeNodeRenderer(
+    context: HtmlNodeRendererContext,
+    codeHighlighter: FlatmarkCodeHighlighter,
+    graphvizRenderer: FlatmarkGraphvizRenderer,
+    mathRenderer: FlatmarkMathRenderer
+) extends NodeRenderer {
 
   override def getNodeTypes: util.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock]);
 
   override def render(node: Node): Unit = {
     val html = context.getWriter
     val codeBlock = node.asInstanceOf[FencedCodeBlock]
+    val codeBlockLiteral = codeBlock.getLiteral
     val codeLang = codeBlock.getInfo // e.g. scala
     val res =
-      if codeLang == "math" then nodejsInterop.highlightMath(codeBlock.getLiteral)
-      else if codeLang == "diagram:graphviz" then nodejsInterop.renderGraphviz(codeBlock.getLiteral)
-      else nodejsInterop.highlightCode(codeBlock.getLiteral, Some(codeLang))
+      if codeLang == "math" then mathRenderer.render(codeBlockLiteral)
+      else if codeLang == "diagram:graphviz" then graphvizRenderer.render(codeBlockLiteral)
+      else codeHighlighter.highlight(codeBlockLiteral, Some(codeLang))
     html.raw(res)
   }
 }

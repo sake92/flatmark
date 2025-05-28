@@ -1,21 +1,29 @@
 package build
 
-import coursier.MavenRepository
 import mill._
 import scalalib._
-import mill.util.Jvm
+import mill.define.ModuleRef
 
-object core extends ScalaModule with NativeImageModule {
-
+object cli extends ScalaModule with CustomNativeImageModule {
   def scalaVersion = "3.7.0"
+  def mainClass = Some("ba.sake.flatmark.cli.Main")
+  def moduleDeps = Seq(core)
+  def ivyDeps = Agg(
+    ivy"com.lihaoyi::mainargs:0.7.6"
+  )
 
+  def forkArgs = Seq[String](
+    "-Dorg.jboss.logging.provider=jdk"
+    // generate optimization file for graal-native
+    // "-agentlib:native-image-agent=config-output-dir=core/resources/META-INF/native-image"
+  )
+}
+
+object core extends ScalaModule {
+  def scalaVersion = "3.7.0"
+  def moduleDeps = Seq(ssr)
   def ivyDeps = Agg(
     ivy"com.lihaoyi::os-lib:0.11.4",
-    ivy"org.graalvm.polyglot:polyglot:24.2.1",
-    ivy"org.graalvm.polyglot:js:24.2.1",
-    ivy"org.graalvm.polyglot:wasm:24.2.1",
-    // ivy"org.graalvm.polyglot:js-community:24.2.1",
-    // ivy"org.graalvm.polyglot:wasm-community:24.2.1",
     ivy"org.commonmark:commonmark:0.24.0",
     ivy"org.commonmark:commonmark-ext-gfm-tables:0.24.0",
     ivy"org.commonmark:commonmark-ext-gfm-strikethrough:0.24.0",
@@ -25,66 +33,46 @@ object core extends ScalaModule with NativeImageModule {
     ivy"org.commonmark:commonmark-ext-ins:0.24.0",
     ivy"org.commonmark:commonmark-ext-image-attributes:0.24.0",
     ivy"org.commonmark:commonmark-ext-task-list-items:0.24.0",
-    //stari commonmark.. ivy"fr.brouillard.oss:commonmark-ext-notifications:1.1.0",
-    ivy"com.github.jknack:handlebars:4.4.0",
-    ivy"org.virtuslab::scala-yaml:0.3.0"
+    ivy"com.github.spullara.mustache.java:compiler:0.9.10",
+    ivy"org.virtuslab::scala-yaml:0.3.0",
+    ivy"org.seleniumhq.selenium:selenium-chrome-driver:4.33.0",
+    ivy"org.seleniumhq.selenium:selenium-support:4.33.0"
   )
-  
-/*
-  def repositoriesTask = Task.Anon {
-    super.repositoriesTask() ++ Seq(MavenRepository("https://jitpack.io"))
+  /* def repositoriesTask = Task.Anon {
+    super.repositoriesTask() ++ Seq(coursier.MavenRepository("https://jitpack.io"))
   }*/
-
 }
 
-object flatmark extends ScalaModule with CustomJpackageModule {
-
+object ssr extends ScalaModule {
   def scalaVersion = "3.7.0"
-
-  // def mainClass = Some("ba.sake.flatmark.cli")
-
-  def moduleDeps = Seq(core)
-
-  // samo za windows zasad
-  def jpackageType = "msi"
+  def ivyDeps = Agg(
+    ivy"ba.sake::sharaf-undertow:0.10.0"
+  )
 }
 
-import mill.util.Jvm
-trait CustomJpackageModule extends JpackageModule {
-  def jpackageAppImage2: T[PathRef] = Task {
-    // materialize all jars into a "lib" dir
-    val libs = Task.dest / "lib"
-    val cp = jpackageRunClasspath().map(_.path)
-    val jars = cp.filter(os.exists).zipWithIndex.map { case (p, idx) =>
-      val dest = libs / s"${idx + 1}-${p.last}"
-      os.copy(p, dest, createFolders = true)
-      dest
-    }
+object ZincWorkerGraalvm extends ZincWorkerModule {
+  def jvmId = "graalvm-community:24.0.1"
+  def jvmIndexVersion = "latest.release"
+}
 
-    val appName = jpackageName()
-    val appType = jpackageType()
-    val mainClass = jpackageMainClass()
-    val mainJarName = jars.head.last
+trait CustomNativeImageModule extends NativeImageModule {
+  def nativeImageOptions = Seq("--no-fallback", "--enable-url-protocols=http")
+  def zincWorker = ModuleRef(ZincWorkerGraalvm)
 
-    val args: Seq[String] = Seq(
-      Jvm.jdkTool("jpackage", this.jvmWorker().javaHome().map(_.path)),
-      "--type",
-      appType,
-      "--name",
-      appName,
-      "--input",
-      libs.toString(),
-      "--main-jar",
-      mainJarName,
-      "--main-class",
-      mainClass,
-      "--win-console" // TODO windows only
+  def nativeImage2: T[PathRef] = Task {
+    val dest = Task.dest
+    val executableName = "native-executable"
+    val args = nativeImageOptions() ++ Seq(
+      "-cp",
+      nativeImageClasspath().iterator.map(_.path).mkString(java.io.File.pathSeparator),
+      finalMainClass(),
+      (dest / executableName).toString()
     )
-
-    // run jpackage tool
-    val outDest = Task.dest / "image"
-    os.makeDir.all(outDest)
-    os.proc(args).call(cwd = outDest)
-    PathRef(outDest)
+    os.write(dest / "native-executable-args.txt", args.mkString("\n"))
+    os.proc(Seq(nativeImageTool().path.toString, "@native-executable-args.txt")).call(cwd = dest, stdout = os.Inherit)
+    val ext = if (mill.main.client.Util.isWindows) ".exe" else ""
+    val executable = dest / s"${executableName}${ext}"
+    assert(os.exists(executable))
+    PathRef(executable)
   }
 }

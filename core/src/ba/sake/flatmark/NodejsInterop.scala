@@ -1,5 +1,5 @@
 package ba.sake.flatmark
-
+/*
 import java.security.MessageDigest
 import java.util.Base64
 import org.graalvm.polyglot.*
@@ -59,7 +59,7 @@ class NodejsInterop(cacheFolder: os.Path) {
     val b64 = Base64.getEncoder.encode(theMD5digest)
     new String(b64, "UTF-8").replace('/', '-').replace('=', '_').replace('+', '$')
   }
-}
+}*/
 
 // AKO NEKAD ZATREBA PROMISE/ASYNC
 /*
