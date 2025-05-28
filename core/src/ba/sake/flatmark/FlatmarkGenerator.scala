@@ -37,25 +37,51 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           .toMap
       else Map()
 
-    os.walk(siteRootFolder).filter(_.ext == "md").foreach { file =>
-      // render markdown content
-      logger.fine(s"rendering markdown file: ${file}")
-      val mdContentTemplateRaw = os.read(file)
-      val (mdContentTemplate, frontMatter) = parseMd(mdContentTemplateRaw)
-      val mdContent = templateHandler.render(file.baseName, mdContentTemplate, frontMatter)
-      val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
-      // render final HTML file
-      val layoutTemplate = layoutTemplatesMap("default")
-      val htmlContent =
-        templateHandler
-          .render("default", layoutTemplate, Map("title" -> "Flatmark Example", "content" -> mdHtmlContent))
-      os.write.over(
-        outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
-        htmlContent,
-        createFolders = true
-      )
-      logger.fine(s"markdown file rendered: ${file}")
+    // skip any file/folder that starts with . or _
+    // TODO custom config
+    def shouldSkip(file: os.Path) =
+      file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
+
+    os.walk(siteRootFolder, skip = shouldSkip).foreach { file =>
+      if file.ext == "md" then {
+        renderMarkdownFile(siteRootFolder, file, outputFolder, layoutTemplatesMap, markdownRenderer, templateHandler)
+      } else {
+        os.copy(
+          file,
+          outputFolder / file.relativeTo(siteRootFolder),
+          replaceExisting = true,
+          createFolders = true,
+          mergeFolders = true,
+          followLinks = false
+        )
+      }
     }
+  }
+
+  private def renderMarkdownFile(
+      siteRootFolder: os.Path,
+      file: os.Path,
+      outputFolder: os.Path,
+      layoutTemplatesMap: Map[String, String],
+      markdownRenderer: FlatmarkMarkdownRenderer,
+      templateHandler: FlatmarkTemplateHandler
+  ): Unit = {
+    logger.fine(s"rendering markdown file: ${file}")
+    val mdContentTemplateRaw = os.read(file)
+    val (mdContentTemplate, frontMatter) = parseMd(mdContentTemplateRaw)
+    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, frontMatter)
+    val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
+    // render final HTML file
+    val layoutTemplate = layoutTemplatesMap("default")
+    val htmlContent =
+      templateHandler
+        .render("default", layoutTemplate, Map("title" -> "Flatmark Example", "content" -> mdHtmlContent))
+    os.write.over(
+      outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
+      htmlContent,
+      createFolders = true
+    )
+    logger.fine(s"markdown file rendered: ${file}")
   }
 
   private def parseMd(mdTemplateRaw: String): (String, Map[String, String]) = {
