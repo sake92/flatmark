@@ -10,14 +10,14 @@ import java.util.logging.Logger
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
-  def generate(siteRootFolder: os.Path): Unit = {
+  def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
 
     // TODO make sure these exist
     val outputFolder = siteRootFolder / "_site"
     val layoutsFolder = siteRootFolder / "_layouts"
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
-    val fileCache = FileCache(cacheFolder)
+    val fileCache = FileCache(cacheFolder, useCache)
 
     val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)

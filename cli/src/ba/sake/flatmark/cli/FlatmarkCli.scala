@@ -5,10 +5,10 @@ import java.util.logging.LogManager
 import ba.sake.flatmark.{ChromeDriverHolder, FlatmarkGenerator}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
-class FlatmarkCli(port: Int) {
+class FlatmarkCli(siteRootFolder: os.Path, port: Int, useCache: Boolean) {
   private val logger = Logger.getLogger(getClass.getName)
 
-  def run(siteRootFolder: os.Path): Unit = {
+  def run(): Unit = {
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
 
@@ -18,7 +18,7 @@ class FlatmarkCli(port: Int) {
     val chromeDriverHolder = ChromeDriverHolder()
     val flatmarkServer = startFlatmarkServer()
     val generator = FlatmarkGenerator(port, chromeDriverHolder)
-    try generator.generate(siteRootFolder)
+    try generator.generate(siteRootFolder, useCache)
     finally
       chromeDriverHolder.close()
       flatmarkServer.stop()

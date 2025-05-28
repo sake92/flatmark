@@ -13,9 +13,11 @@ object cli extends ScalaModule with CustomNativeImageModule {
   )
 
   def forkArgs = Seq[String](
-    "-Dorg.jboss.logging.provider=jdk"
+    "-Dorg.jboss.logging.provider=jdk",
+    // https://github.com/scala/scala3/issues/9013
+    "--sun-misc-unsafe-memory-access=allow",
     // generate optimization file for graal-native
-    // "-agentlib:native-image-agent=config-output-dir=core/resources/META-INF/native-image"
+    "-agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image"
   )
 }
 
@@ -46,7 +48,9 @@ object core extends ScalaModule {
 object ssr extends ScalaModule {
   def scalaVersion = "3.7.0"
   def ivyDeps = Agg(
-    ivy"ba.sake::sharaf-undertow:0.10.0"
+    ivy"ba.sake::sharaf-undertow:0.10.0",
+    // https://github.com/wildfly/wildfly-common/issues/74
+    ivy"org.wildfly.common:wildfly-common:1.7.0.Final"
   )
 }
 
@@ -56,7 +60,7 @@ object ZincWorkerGraalvm extends ZincWorkerModule {
 }
 
 trait CustomNativeImageModule extends NativeImageModule {
-  def nativeImageOptions = Seq("--no-fallback", "--enable-url-protocols=http")
+  def nativeImageOptions = Seq("--no-fallback", "--enable-url-protocols=http", "--initialize-at-build-time=org.wildfly.common.Substitutions")
   def zincWorker = ModuleRef(ZincWorkerGraalvm)
 
   def nativeImage2: T[PathRef] = Task {
