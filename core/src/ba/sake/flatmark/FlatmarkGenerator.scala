@@ -13,7 +13,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
 
-    val siteConfigYaml = os.read(siteRootFolder / "_config.yaml")
+    val siteConfigFile = siteRootFolder / "_config.yaml"
+    val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfigFileMap = yaml.load[ju.Map[String, String]](siteConfigYaml).asScala.toMap
     val siteConfig = SiteConfig.fromMap(siteConfigFileMap)
 
