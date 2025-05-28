@@ -12,7 +12,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val yaml = new Yaml()
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
-    
+
     val siteConfigYaml = os.read(siteRootFolder / "_config.yaml")
     val siteConfigFileMap = yaml.load[ju.Map[String, String]](siteConfigYaml).asScala.toMap
     val siteConfig = SiteConfig.fromMap(siteConfigFileMap)
@@ -47,7 +47,15 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val outputFolder = siteRootFolder / "_site"
     os.walk(siteRootFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
-        renderMarkdownFile(siteConfig, siteRootFolder, file, outputFolder, layoutTemplatesMap, markdownRenderer, templateHandler)
+        renderMarkdownFile(
+          siteConfig,
+          siteRootFolder,
+          file,
+          outputFolder,
+          layoutTemplatesMap,
+          markdownRenderer,
+          templateHandler
+        )
       } else if os.isFile(file) then {
         os.copy(
           file,
@@ -72,16 +80,19 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
-    val (mdContentTemplate, pageConfig) = parseMd(mdContentTemplateRaw)
-    val templateData = TemplateConfig(siteConfig, pageConfig)
-    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateData.toJavaMap)
+    val (mdContentTemplate, pageConfig) = parseMd(file.baseName, mdContentTemplateRaw)
+    val templateConfig = TemplateConfig(siteConfig, pageConfig)
+    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateConfig.toJavaMap)
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
-    val layoutTemplate = layoutTemplatesMap("default")
+    val layoutTemplate = layoutTemplatesMap.getOrElse(
+      pageConfig.layout,
+      throw RuntimeException(s"Layout '${pageConfig.layout}' not found for file: ${file}")
+    )
     val htmlContent = templateHandler.render(
-      "default",
+      pageConfig.layout,
       layoutTemplate,
-      templateData.copy(page = pageConfig.copy(content = mdHtmlContent)).toJavaMap
+      templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)).toJavaMap
     )
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
@@ -91,7 +102,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def parseMd(mdTemplateRaw: String): (String, PageConfig) = {
+  private def parseMd(fileNameBase: String, mdTemplateRaw: String): (String, PageConfig) = {
     var hasYamlFrontMatter = false
     var firstTripleDashIndex = -1
     var secondTripleDashIndex = -1
@@ -125,11 +136,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         .mkString("\n")
       (t, yaml.load[ju.Map[String, String]](rawYaml).asScala.toMap)
     } else {
-      (mdTemplateRaw, Map.empty[String, String])
+      (mdTemplateRaw, Map("title" -> fileNameBase))
     }
-
-    println(yamlMap)
-
     (mdContentTemplate, PageConfig.fromMap(yamlMap))
   }
 
@@ -156,8 +164,9 @@ object SiteConfig:
       description = map.getOrElse("description", "")
     )
 
-case class PageConfig(title: String, description: String, content: String) {
+case class PageConfig(layout: String, title: String, description: String, content: String) {
   def toJavaMap: ju.Map[String, Object] = Map(
+    "layout" -> layout,
     "title" -> title,
     "description" -> description,
     "content" -> content
@@ -167,6 +176,7 @@ case class PageConfig(title: String, description: String, content: String) {
 object PageConfig:
   def fromMap(map: Map[String, String]): PageConfig =
     PageConfig(
+      layout = map.getOrElse("layout", "default"),
       title = map.getOrElse("title", "Untitled"),
       description = map.getOrElse("description", ""),
       content = map.getOrElse("content", "")

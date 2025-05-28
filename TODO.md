@@ -1,52 +1,8 @@
 
 
+- headings anchors
 
 
-```bash
-
-# content
-index.md
-posts/mypost.md     <-- here the posts live
-404.md              <-- 404 not found page
-bs/                 <-- translations live in lang-code folders
-    index.md
-    posts/mypost.md
-
-# resources
-images/favicon.ico
-styles/main.css
-scripts/main.js
-
-# config
-_config.yaml        <-- global config
-_layouts/           <-- templates
-    default.html    <-- default layout: for index page, about page etc
-    post.html       <-- layout for posts
-_site/              <-- result of rendering, this will be deployed
-```
-
-## _config.yaml
-title:
-url: sake.ba
-description: SEO
-lang: en
-github_handle:
-twitter_handle:
-
-It can only be in the root folder.
-
-
-## Front matter
-
-```yaml
-title: Hello
-date: 2025-01-01 11:11 +02:00
-layout: post
-tags: [scala, java]
-publish: yes | no | hide # hide means published but not listed or searched, thus not google indexed
-
-custom_variable: whatever
-```
 
 
 ## templating
