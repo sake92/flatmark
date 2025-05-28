@@ -6,6 +6,8 @@ Current design of the project:
   - works even for mermaidjs, diagrams are plain SVGs
   - but we do need chrome installed!
 - file cache for diagrams, code highlighting, etc.
+- file system layout == URLs
+
 
 
 ## Modules

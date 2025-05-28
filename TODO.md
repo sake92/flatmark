@@ -1,6 +1,6 @@
 
 
-File system layout mirrors URLs.
+
 
 ```bash
 

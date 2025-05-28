@@ -4,18 +4,18 @@ import java.util as ju
 import java.util.logging.Logger
 import scala.util.boundary
 import scala.jdk.CollectionConverters.*
-import org.openqa.selenium.chrome.ChromeDriver
 import org.yaml.snakeyaml.Yaml
 
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
-  
+
   private val yaml = new Yaml()
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
-
-    val outputFolder = siteRootFolder / "_site"
-    val layoutsFolder = siteRootFolder / "_layouts"
+    
+    val siteConfigYaml = os.read(siteRootFolder / "_config.yaml")
+    val siteConfigFileMap = yaml.load[ju.Map[String, String]](siteConfigYaml).asScala.toMap
+    val siteConfig = SiteConfig.fromMap(siteConfigFileMap)
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder, useCache)
@@ -26,6 +26,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler()
 
+    val layoutsFolder = siteRootFolder / "_layouts"
     val layoutTemplatesMap =
       if os.exists(layoutsFolder) then
         os
@@ -43,9 +44,10 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
+    val outputFolder = siteRootFolder / "_site"
     os.walk(siteRootFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
-        renderMarkdownFile(siteRootFolder, file, outputFolder, layoutTemplatesMap, markdownRenderer, templateHandler)
+        renderMarkdownFile(siteConfig, siteRootFolder, file, outputFolder, layoutTemplatesMap, markdownRenderer, templateHandler)
       } else if os.isFile(file) then {
         os.copy(
           file,
@@ -60,6 +62,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   }
 
   private def renderMarkdownFile(
+      siteConfig: SiteConfig,
       siteRootFolder: os.Path,
       file: os.Path,
       outputFolder: os.Path,
@@ -69,9 +72,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
-    val (mdContentTemplate, pageData) = parseMd(mdContentTemplateRaw)
-    // TODO parse site data
-    val templateData = TemplateData(SiteData.Default, pageData)
+    val (mdContentTemplate, pageConfig) = parseMd(mdContentTemplateRaw)
+    val templateData = TemplateConfig(siteConfig, pageConfig)
     val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateData.toJavaMap)
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
@@ -79,7 +81,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val htmlContent = templateHandler.render(
       "default",
       layoutTemplate,
-      templateData.copy(page = pageData.copy(content = mdHtmlContent)).toJavaMap
+      templateData.copy(page = pageConfig.copy(content = mdHtmlContent)).toJavaMap
     )
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
@@ -89,7 +91,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def parseMd(mdTemplateRaw: String): (String, PageData) = {
+  private def parseMd(mdTemplateRaw: String): (String, PageConfig) = {
     var hasYamlFrontMatter = false
     var firstTripleDashIndex = -1
     var secondTripleDashIndex = -1
@@ -113,7 +115,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         i += 1
       }
     }
-    val (mdContentTemplate, yamlMap) =if hasYamlFrontMatter then {
+    val (mdContentTemplate, yamlMap) = if hasYamlFrontMatter then {
       val t = mdTemplateRaw.linesIterator
         .drop(secondTripleDashIndex + 1)
         .mkString("\n")
@@ -125,42 +127,47 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     } else {
       (mdTemplateRaw, Map.empty[String, String])
     }
-    
-    (mdContentTemplate, PageData.fromMap(yamlMap))
+
+    println(yamlMap)
+
+    (mdContentTemplate, PageConfig.fromMap(yamlMap))
   }
 
 }
 
-case class TemplateData(site: SiteData, page: PageData)  {
+case class TemplateConfig(site: SiteConfig, page: PageConfig) {
   def toJavaMap: ju.Map[String, Object] = Map(
     "site" -> site,
     "page" -> page
   ).asJava
 }
 
-case class SiteData(title: String, description: String) {
+case class SiteConfig(name: String, description: String) {
   def toJavaMap: ju.Map[String, Object] = Map(
-    "title" -> title,
+    "name" -> name,
     "description" -> description
   ).asJava
 }
 
-object SiteData:
-  val Default: SiteData = SiteData("Untitled", "No description available")
+object SiteConfig:
+  def fromMap(map: Map[String, String]): SiteConfig =
+    SiteConfig(
+      name = map.getOrElse("name", "My Site"),
+      description = map.getOrElse("description", "")
+    )
 
-case class PageData(title: String, description: String, content: String) {
+case class PageConfig(title: String, description: String, content: String) {
   def toJavaMap: ju.Map[String, Object] = Map(
     "title" -> title,
-    "page" -> description,
+    "description" -> description,
     "content" -> content
   ).asJava
 }
 
-object PageData:
-  def fromMap(map: Map[String, String]): PageData = {
-    PageData(
+object PageConfig:
+  def fromMap(map: Map[String, String]): PageConfig =
+    PageConfig(
       title = map.getOrElse("title", "Untitled"),
-      description = map.getOrElse("description", "No description available"),
+      description = map.getOrElse("description", ""),
       content = map.getOrElse("content", "")
     )
-  }
