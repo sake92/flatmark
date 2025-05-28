@@ -10,23 +10,26 @@ import org.openqa.selenium.support.ui.WebDriverWait
 
 import java.util.logging.{Level, Logger}
 
-class FlatmarkGraphvizRenderer(driver: ChromeDriver, fileCache: FileCache) {
+class FlatmarkGraphvizRenderer(port:Int,driverHolder: ChromeDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
-  def render(dotStr: String, engine: String = "dot"): String = try {
-    logger.fine("Render graphviz start")
-    val encodedDotStr = URLEncoder.encode(dotStr, "utf-8")
-    val encodedEngine = URLEncoder.encode(engine, "utf-8")
-    val url = s"http://localhost:8181/ssr/graphviz?source=${encodedDotStr}&engine=${encodedEngine}"
-    driver.get(url)
-    val waitCondition = new WebDriverWait(driver, Duration.ofSeconds(5))
-    waitCondition.until(_ => driver.executeScript("return renderFinished;") == true)
-    driver.findElement(By.id("result")).getDomProperty("innerHTML")
-  } catch {
-    case e: org.openqa.selenium.WebDriverException =>
-      val logs = driver.manage().logs().get(LogType.BROWSER).getAll()
-      logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
-      dotStr
-  }
+  def render(dotStr: String, engine: String = "dot"): String =
+    fileCache.cached(dotStr, engine) {
+      try {
+        logger.fine("Render graphviz start")
+        val encodedDotStr = URLEncoder.encode(dotStr, "utf-8")
+        val encodedEngine = URLEncoder.encode(engine, "utf-8")
+        val url = s"http://localhost:${port}/ssr/graphviz?source=${encodedDotStr}&engine=${encodedEngine}"
+        driverHolder.driver.get(url)
+        val waitCondition = new WebDriverWait(driverHolder.driver, Duration.ofSeconds(5))
+        waitCondition.until(_ => driverHolder.driver.executeScript("return renderFinished;") == true)
+        driverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
+      } catch {
+        case e: org.openqa.selenium.WebDriverException =>
+          val logs = driverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
+          dotStr
+      }
+    }
 
 }

@@ -14,7 +14,7 @@ object Main {
       port: Int = 8181
   ): Unit = {
     val siteRootFolder = os.Path(Paths.get(input).toAbsolutePath)
-    val cli = FlatmarkCli()
+    val cli = FlatmarkCli(port)
     cli.run(siteRootFolder)
   }
 

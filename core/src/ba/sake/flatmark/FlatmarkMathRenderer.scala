@@ -10,22 +10,24 @@ import org.openqa.selenium.support.ui.WebDriverWait
 
 import java.util.logging.{Level, Logger}
 
-class FlatmarkMathRenderer(driver: ChromeDriver, fileCache: FileCache) {
+class FlatmarkMathRenderer(port:Int, driverHolder: ChromeDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
-  def render(mathStr: String): String = try {
-    logger.fine("Render math start")
-    val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
-    val url = s"http://localhost:8181/ssr/katex?source=${encodedMathStr}"
-    driver.get(url)
-    val waitCondition = new WebDriverWait(driver, Duration.ofSeconds(5))
-    waitCondition.until(_ => driver.executeScript("return renderFinished;") == true)
-    driver.findElement(By.id("result")).getDomProperty("innerHTML")
-  } catch {
-    case e: org.openqa.selenium.WebDriverException =>
-      val logs = driver.manage().logs().get(LogType.BROWSER).getAll()
-      logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
-      mathStr
+  def render(mathStr: String): String = fileCache.cached(mathStr) {
+    try {
+      logger.fine("Render math start")
+      val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
+      val url = s"http://localhost:${port}/ssr/katex?source=${encodedMathStr}"
+      driverHolder.driver.get(url)
+      val waitCondition = new WebDriverWait(driverHolder.driver, Duration.ofSeconds(5))
+      waitCondition.until(_ => driverHolder.driver.executeScript("return renderFinished;") == true)
+      driverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
+    } catch {
+      case e: org.openqa.selenium.WebDriverException =>
+        val logs = driverHolder.driver.manage().logs().get(LogType.BROWSER).getAll()
+        logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
+        mathStr
+    }
   }
 
 }

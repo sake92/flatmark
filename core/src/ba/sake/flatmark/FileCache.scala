@@ -3,9 +3,10 @@ package ba.sake.flatmark
 import java.security.MessageDigest
 import java.util.Base64
 
-class FileCache(cacheFolder: os.Path) {
+class FileCache(cacheFolder: os.Path, skip: Boolean = false) {
 
-  def cached(cacheKey: String)(code: => String): String = {
+  def cached(cacheKeyParts: String*)(code: => String): String = {
+    val cacheKey = getMd5B64(cacheKeyParts.mkString("-"))
     val cachedResultFileName = cacheFolder / "cached-results" / s"${cacheKey}.txt"
     if os.exists(cachedResultFileName) then {
       os.read(cachedResultFileName)

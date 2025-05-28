@@ -7,31 +7,35 @@ import org.virtuslab.yaml.*
 
 import java.util.logging.Logger
 
-class FlatmarkGenerator(chromeDriver: ChromeDriver) {
+class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path): Unit = {
 
+    // TODO make sure these exist
     val outputFolder = siteRootFolder / "_site"
     val layoutsFolder = siteRootFolder / "_layouts"
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder)
 
-    val codeHighlighter = FlatmarkCodeHighlighter(chromeDriver, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(chromeDriver, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(chromeDriver, fileCache)
+    val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
+    val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
+    val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler()
 
-    val layoutTemplatesMap = os
-      .list(layoutsFolder)
-      .filter(_.ext == "html")
-      .map { file =>
-        val layoutContent = os.read(file)
-        file.baseName -> layoutContent
-      }
-      .toMap
+    val layoutTemplatesMap =
+      if os.exists(layoutsFolder) then
+        os
+          .list(layoutsFolder)
+          .filter(_.ext == "html")
+          .map { file =>
+            val layoutContent = os.read(file)
+            file.baseName -> layoutContent
+          }
+          .toMap
+      else Map()
 
     os.walk(siteRootFolder).filter(_.ext == "md").foreach { file =>
       // render markdown content
