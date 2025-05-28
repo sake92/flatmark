@@ -8,6 +8,15 @@ Current design of the project:
 - file cache for diagrams, code highlighting, etc.
 
 
+## Modules
+
+- `ssr-bundles` contains nodejs+bun logic for bundling the JS code needed for SSR, like syntax highlighting and diagram rendering
+- `ssr` contains the server-side rendering logic, renders HTML pages with syntax highlighting and diagrams
+  - the `core` is using `ssr` routes to render snippets of code and diagrams
+- `core` contains the core logic of the application, like parsing markdown, templates, rendering diagrams via Selenium etc.
+- `cli` contains the command line interface for the application
+
+
 
 ## GraalVM native image
 
