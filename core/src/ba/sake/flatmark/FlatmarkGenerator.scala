@@ -1,14 +1,16 @@
 package ba.sake.flatmark
 
-import org.openqa.selenium.chrome.ChromeDriver
-
-import scala.util.boundary
-import org.virtuslab.yaml.*
-
+import java.util as ju
 import java.util.logging.Logger
+import scala.util.boundary
+import scala.jdk.CollectionConverters.*
+import org.openqa.selenium.chrome.ChromeDriver
+import org.yaml.snakeyaml.Yaml
 
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
+  
+  private val yaml = new Yaml()
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
 
@@ -67,14 +69,18 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
-    val (mdContentTemplate, frontMatter) = parseMd(mdContentTemplateRaw)
-    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, frontMatter)
+    val (mdContentTemplate, pageData) = parseMd(mdContentTemplateRaw)
+    // TODO parse site data
+    val templateData = TemplateData(SiteData.Default, pageData)
+    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateData.toJavaMap)
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
     val layoutTemplate = layoutTemplatesMap("default")
-    val htmlContent =
-      templateHandler
-        .render("default", layoutTemplate, Map("title" -> "Flatmark Example", "content" -> mdHtmlContent))
+    val htmlContent = templateHandler.render(
+      "default",
+      layoutTemplate,
+      templateData.copy(page = pageData.copy(content = mdHtmlContent)).toJavaMap
+    )
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
       htmlContent,
@@ -83,7 +89,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def parseMd(mdTemplateRaw: String): (String, Map[String, String]) = {
+  private def parseMd(mdTemplateRaw: String): (String, PageData) = {
     var hasYamlFrontMatter = false
     var firstTripleDashIndex = -1
     var secondTripleDashIndex = -1
@@ -107,21 +113,54 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         i += 1
       }
     }
-    if hasYamlFrontMatter then {
+    val (mdContentTemplate, yamlMap) =if hasYamlFrontMatter then {
       val t = mdTemplateRaw.linesIterator
         .drop(secondTripleDashIndex + 1)
         .mkString("\n")
         .trim
-      val fm = mdTemplateRaw.linesIterator
+      val rawYaml = mdTemplateRaw.linesIterator
         .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
         .mkString("\n")
-        .as[Map[String, String]]
-        .toOption
-        .getOrElse(Map())
-      (t, fm)
+      (t, yaml.load[ju.Map[String, String]](rawYaml).asScala.toMap)
     } else {
-      (mdTemplateRaw, Map())
+      (mdTemplateRaw, Map.empty[String, String])
     }
+    
+    (mdContentTemplate, PageData.fromMap(yamlMap))
   }
 
 }
+
+case class TemplateData(site: SiteData, page: PageData)  {
+  def toJavaMap: ju.Map[String, Object] = Map(
+    "site" -> site,
+    "page" -> page
+  ).asJava
+}
+
+case class SiteData(title: String, description: String) {
+  def toJavaMap: ju.Map[String, Object] = Map(
+    "title" -> title,
+    "description" -> description
+  ).asJava
+}
+
+object SiteData:
+  val Default: SiteData = SiteData("Untitled", "No description available")
+
+case class PageData(title: String, description: String, content: String) {
+  def toJavaMap: ju.Map[String, Object] = Map(
+    "title" -> title,
+    "page" -> description,
+    "content" -> content
+  ).asJava
+}
+
+object PageData:
+  def fromMap(map: Map[String, String]): PageData = {
+    PageData(
+      title = map.getOrElse("title", "Untitled"),
+      description = map.getOrElse("description", "No description available"),
+      content = map.getOrElse("content", "")
+    )
+  }
