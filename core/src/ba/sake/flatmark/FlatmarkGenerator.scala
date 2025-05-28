@@ -12,7 +12,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
 
-    // TODO make sure these exist
     val outputFolder = siteRootFolder / "_site"
     val layoutsFolder = siteRootFolder / "_layouts"
 
@@ -37,15 +36,15 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           .toMap
       else Map()
 
-    // skip any file/folder that starts with . or _
     // TODO custom config
+    // skip any file/folder that starts with . or _
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
     os.walk(siteRootFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
         renderMarkdownFile(siteRootFolder, file, outputFolder, layoutTemplatesMap, markdownRenderer, templateHandler)
-      } else {
+      } else if os.isFile(file) then {
         os.copy(
           file,
           outputFolder / file.relativeTo(siteRootFolder),
@@ -66,7 +65,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler
   ): Unit = {
-    logger.fine(s"rendering markdown file: ${file}")
+    logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
     val (mdContentTemplate, frontMatter) = parseMd(mdContentTemplateRaw)
     val mdContent = templateHandler.render(file.baseName, mdContentTemplate, frontMatter)
@@ -81,7 +80,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       htmlContent,
       createFolders = true
     )
-    logger.fine(s"markdown file rendered: ${file}")
+    logger.fine(s"Markdown file rendered: ${file}")
   }
 
   private def parseMd(mdTemplateRaw: String): (String, Map[String, String]) = {
