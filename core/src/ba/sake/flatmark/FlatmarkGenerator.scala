@@ -4,19 +4,19 @@ import java.util as ju
 import java.util.logging.Logger
 import scala.util.boundary
 import scala.jdk.CollectionConverters.*
-import org.yaml.snakeyaml.Yaml
+import org.virtuslab.yaml.*
 
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
-
-  private val yaml = new Yaml()
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
-    val siteConfigFileMap = yaml.load[ju.Map[String, String]](siteConfigYaml).asScala.toMap
-    val siteConfig = SiteConfig.fromMap(siteConfigFileMap)
+    val siteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
+      throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
+    }
+    println(s"Site config: ${siteConfig}")
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder, useCache)
@@ -83,7 +83,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val mdContentTemplateRaw = os.read(file)
     val (mdContentTemplate, pageConfig) = parseMd(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
-    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateConfig.toJavaMap)
+    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateConfig)
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
     val layoutTemplate = layoutTemplatesMap.getOrElse(
@@ -93,7 +93,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val htmlContent = templateHandler.render(
       pageConfig.layout,
       layoutTemplate,
-      templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)).toJavaMap
+      templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent))
     )
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
@@ -127,7 +127,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         i += 1
       }
     }
-    val (mdContentTemplate, yamlMap) = if hasYamlFrontMatter then {
+    if hasYamlFrontMatter then {
       val t = mdTemplateRaw.linesIterator
         .drop(secondTripleDashIndex + 1)
         .mkString("\n")
@@ -135,50 +135,25 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       val rawYaml = mdTemplateRaw.linesIterator
         .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
         .mkString("\n")
-      (t, yaml.load[ju.Map[String, String]](rawYaml).asScala.toMap)
+      (
+        t,
+        rawYaml.as[PageConfig].toOption.getOrElse {
+          throw RuntimeException(s"Invalid YAML front matter in file: ${fileNameBase}. Expected PageConfig format.")
+        }
+      )
     } else {
-      (mdTemplateRaw, Map("title" -> fileNameBase))
+      (mdTemplateRaw, PageConfig())
     }
-    (mdContentTemplate, PageConfig.fromMap(yamlMap))
   }
-
 }
 
-case class TemplateConfig(site: SiteConfig, page: PageConfig) {
-  def toJavaMap: ju.Map[String, Object] = Map(
-    "site" -> site,
-    "page" -> page
-  ).asJava
-}
+case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
 
-case class SiteConfig(name: String, description: String) {
-  def toJavaMap: ju.Map[String, Object] = Map(
-    "name" -> name,
-    "description" -> description
-  ).asJava
-}
+case class SiteConfig(name: String = "My Site", description: String = "") derives YamlCodec
 
-object SiteConfig:
-  def fromMap(map: Map[String, String]): SiteConfig =
-    SiteConfig(
-      name = map.getOrElse("name", "My Site"),
-      description = map.getOrElse("description", "")
-    )
-
-case class PageConfig(layout: String, title: String, description: String, content: String) {
-  def toJavaMap: ju.Map[String, Object] = Map(
-    "layout" -> layout,
-    "title" -> title,
-    "description" -> description,
-    "content" -> content
-  ).asJava
-}
-
-object PageConfig:
-  def fromMap(map: Map[String, String]): PageConfig =
-    PageConfig(
-      layout = map.getOrElse("layout", "default"),
-      title = map.getOrElse("title", "Untitled"),
-      description = map.getOrElse("description", ""),
-      content = map.getOrElse("content", "")
-    )
+case class PageConfig(
+    layout: String = "default",
+    title: String = "Untitled",
+    description: String = "",
+    content: String = ""
+) derives YamlCodec
