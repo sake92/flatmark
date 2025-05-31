@@ -1,7 +1,7 @@
 package ba.sake.flatmark
 
 import scala.util.boundary
-import org.virtuslab.yaml.YamlCodec
+import org.virtuslab.yaml.*
 
 /* * Flatmark configuration classes.
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
@@ -11,8 +11,7 @@ case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
 
 case class SiteConfig(
     name: String = "My Site",
-    description: String = "",
-    posts: Seq[String] = Seq.empty
+    description: String = ""
 ) derives YamlCodec
 
 case class PageConfig(

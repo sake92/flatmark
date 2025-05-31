@@ -40,17 +40,18 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
-    os.walk(contentFolder, skip = shouldSkip).foreach { file =>
-      if file.ext == "md" || file.ext == "html" then {
-        renderMarkdownFile(
-          siteConfig,
-          contentFolder,
-          file,
-          outputFolder,
-          markdownRenderer,
-          templateHandler
-        )
-      } else if os.isFile(file) then {
+    val processFiles = os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
+      Option.when(os.isFile(file)) {
+        if file.ext == "md" || file.ext == "html" then ProcessFile.TemplatedFile(file) else ProcessFile.PlainFile(file)
+      }
+    }
+    
+    // TODO collect posts and build proper context(s)
+
+    processFiles.foreach {
+      case ProcessFile.TemplatedFile(file) =>
+        renderTemplatedFile(siteConfig, contentFolder, file, outputFolder, markdownRenderer, templateHandler)
+      case ProcessFile.PlainFile(file) =>
         os.copy(
           file,
           outputFolder / file.relativeTo(contentFolder),
@@ -59,11 +60,10 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           mergeFolders = true,
           followLinks = false
         )
-      }
     }
   }
 
-  private def renderMarkdownFile(
+  private def renderTemplatedFile(
       siteConfig: SiteConfig,
       contentFolder: os.Path,
       file: os.Path,
@@ -75,34 +75,47 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val mdContentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
-    val mdContent =
-      templateHandler.render(file.relativeTo(contentFolder).segments.mkString("/"), templateContext(templateConfig))
+    val fileRelPath = file.relativeTo(contentFolder)
+    val outputFileRelPath = s"${fileRelPath.segments.init}/${file.baseName}.html"
+    val mdContent = templateHandler.render(
+      fileRelPath.segments.mkString("/"),
+      templateContext(templateConfig, outputFileRelPath)
+    )
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
     val htmlContent = templateHandler.render(
       pageConfig.layout,
-      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)))
+      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)), outputFileRelPath)
     )
     os.write.over(
-      outputFolder / file.relativeTo(contentFolder).segments.init / s"${file.baseName}.html",
+      outputFolder / fileRelPath.segments.init / s"${file.baseName}.html",
       htmlContent,
       createFolders = true
     )
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def templateContext(templateConfig: TemplateConfig) =
-    Map(
-      "site" -> yamlNodeToObject(YamlCodec[SiteConfig].asNode(templateConfig.site)),
-      "page" -> yamlNodeToObject(YamlCodec[PageConfig].asNode(templateConfig.page))
-    ).asJava
-
-  private def yamlNodeToObject(node: Node): Object = node match {
-    case sn: Node.ScalarNode   => sn.value
-    case sn: Node.SequenceNode => sn.nodes.map(yamlNodeToObject).asJava
-    case mn: Node.MappingNode =>
-      mn.mappings.map { case (key, value) =>
-        yamlNodeToObject(key) -> yamlNodeToObject(value)
-      }.asJava
+  private def templateContext(
+      templateConfig: TemplateConfig,
+      outputFileRelPath: String
+  ): java.util.Map[String, Object] = {
+    TemplateContext(
+      SiteContext(
+        name = templateConfig.site.name,
+        description = templateConfig.site.description,
+        posts = Seq.empty
+      ),
+      PageContext(
+        title = templateConfig.page.title,
+        description = templateConfig.page.description,
+        content = templateConfig.page.content,
+        url = outputFileRelPath
+      )
+    ).toPebbleContext
   }
+
 }
+
+enum ProcessFile:
+  case TemplatedFile(file: os.Path)
+  case PlainFile(file: os.Path)
