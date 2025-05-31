@@ -1,65 +1,33 @@
 
 
 - headings anchors
+- static search
+- base url in config ???
+- _data_file.yaml hierarchical
+- warn on double index.md and index.html
+- tabbed content e.g. windows/linux/mac
+- RSS
 
 
-
-
-## templating
-    layout: page (i.e. index or about) | post
-
-Kontammm moždaaaa `_layouts/post.html` za layout "post".  #stonks
-Jer mislio sam obične `*.html` fajlove dozvolit isto, YOLO.
-
-includes
-{{ include _header.html }}
-
-
-https://jekyllrb.com/docs/variables/
-kae site.nesto čita iz _config.yaml
-a npr page.nesto iz stranice normala
+Check out Jekyll, Zola SSG, 11ty.
 
 
 ## i18n
 
-Just folders, but contextual.
-E.g. u templatingu reć posts da bude vezan za taj bs/ folder samo !!!
-
-Overrideat parent fajlove, tipa mypost.md u rootu overridaš sa bs/mypoost.md .
-Npr moreš i about.md.
-Isto i sa layoutima.
-
-## static search
-
-Kopirat sa hepeka..
-
-## Data files
-Koncept iz jekylla zgodan.
-Tipa imaš _bla.yml ili _bla.json sa nekim data,
-i onda moreš reć `site.bla . foreach ..`.
-
-Zgodno kad imaš neki externi data koji hoćeš da metneš u sajt.
-
-
-- synccc
-    - delete old files
-    - ignore _ and . files and .gitignored files
-
-
-- virtual hosts i domene
-
-
-## Dev loop
-- `flatmark serve` to build, watch and serve the site
-- it will show a label down below with a warning that this is a dev server
-- it will render even the posts that are not published! (and show a nice warning)
+- _data_translations.yaml hierarchical.
+- set locale for lang based on folder name, e.g. `content/bs/index.md` will be in Bosnian language
 
 
 ## Migrating from other platforms
 - import from wordpress, jekyll itd
 
-- RSS
 
+
+
+## Dev loop
+- `flatmark serve` to build, watch and serve the site
+- show a label down below with a warning that this is a dev server
+- render even the posts that are not published, and future-date posts! (and show a nice warning)
 
 
 
