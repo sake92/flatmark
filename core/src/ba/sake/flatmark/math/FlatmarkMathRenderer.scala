@@ -1,14 +1,16 @@
-package ba.sake.flatmark
+package ba.sake.flatmark.math
 
-import java.net.URLEncoder
-import java.time.Duration
-import scala.jdk.CollectionConverters.*
+import ba.sake.flatmark.FileCache
+import ba.sake.flatmark.selenium.ChromeDriverHolder
 import org.openqa.selenium.By
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.support.ui.WebDriverWait
 
+import java.net.URLEncoder
+import java.time.Duration
 import java.util.logging.{Level, Logger}
+import scala.jdk.CollectionConverters.*
 
 class FlatmarkMathRenderer(port:Int, driverHolder: ChromeDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)

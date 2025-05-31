@@ -1,8 +1,9 @@
-package ba.sake.flatmark
+package ba.sake.flatmark.selenium
 
-import java.util.logging.{Level, Logger}
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import org.openqa.selenium.logging.{LogType, LoggingPreferences}
+
+import java.util.logging.{Level, Logger}
 
 class ChromeDriverHolder {
   private val logger = Logger.getLogger(getClass.getName)

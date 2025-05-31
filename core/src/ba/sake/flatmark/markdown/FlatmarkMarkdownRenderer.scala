@@ -1,11 +1,8 @@
-package ba.sake.flatmark
+package ba.sake.flatmark.markdown
 
-import java.{util, util as ju}
-import org.commonmark.node.*
-import org.commonmark.parser.Parser
-import org.commonmark.renderer.NodeRenderer
-import org.commonmark.renderer.html.{HtmlNodeRendererContext, HtmlNodeRendererFactory, HtmlRenderer}
-import org.commonmark.renderer.html.HtmlRenderer.HtmlRendererExtension
+import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
+import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
+import ba.sake.flatmark.math.FlatmarkMathRenderer
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.footnotes.FootnotesExtension
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
@@ -14,6 +11,13 @@ import org.commonmark.ext.heading.anchor.HeadingAnchorExtension
 import org.commonmark.ext.image.attributes.ImageAttributesExtension
 import org.commonmark.ext.ins.InsExtension
 import org.commonmark.ext.task.list.items.TaskListItemsExtension
+import org.commonmark.node.*
+import org.commonmark.parser.Parser
+import org.commonmark.renderer.NodeRenderer
+import org.commonmark.renderer.html.HtmlRenderer.HtmlRendererExtension
+import org.commonmark.renderer.html.{HtmlNodeRendererContext, HtmlNodeRendererFactory, HtmlRenderer}
+
+import java.{util, util as ju}
 
 class FlatmarkMarkdownRenderer(
     codeHighlighter: FlatmarkCodeHighlighter,
@@ -68,6 +72,7 @@ class FlatmarkStaticCodeNodeRenderer(
     val codeBlock = node.asInstanceOf[FencedCodeBlock]
     val codeBlockLiteral = codeBlock.getLiteral
     val codeLang = codeBlock.getInfo // e.g. scala
+    // TODO mermaidjs
     val res =
       if codeLang == "math" then mathRenderer.render(codeBlockLiteral)
       else if codeLang == "diagram:graphviz" then graphvizRenderer.render(codeBlockLiteral)

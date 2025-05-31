@@ -1,30 +1,34 @@
 package ba.sake.flatmark
 
-import java.util as ju
 import java.util.logging.Logger
 import scala.util.boundary
 import scala.jdk.CollectionConverters.*
 import org.virtuslab.yaml.*
+import ba.sake.flatmark.selenium.ChromeDriverHolder
+import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
+import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
+import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
+import ba.sake.flatmark.math.FlatmarkMathRenderer
 
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
+    logger.info(s"Generating site in folder: ${siteRootFolder}")
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
     val contentFolder = siteRootFolder / "content"
     val outputFolder = siteRootFolder / "_site"
     val cacheFolder = siteRootFolder / ".flatmark-cache"
-    
+
     os.remove.all(outputFolder)
-    
+
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
-    
-    val fileCache = FileCache(cacheFolder, useCache)
 
+    val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
@@ -36,7 +40,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
-    
     os.walk(contentFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
         renderMarkdownFile(
@@ -61,18 +64,19 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   }
 
   private def renderMarkdownFile(
-      siteConfig: SiteConfig,
-      contentFolder: os.Path,
-      file: os.Path,
-      outputFolder: os.Path,
-      markdownRenderer: FlatmarkMarkdownRenderer,
-      templateHandler: FlatmarkTemplateHandler
+                                  siteConfig: SiteConfig,
+                                  contentFolder: os.Path,
+                                  file: os.Path,
+                                  outputFolder: os.Path,
+                                  markdownRenderer: FlatmarkMarkdownRenderer,
+                                  templateHandler: FlatmarkTemplateHandler
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
-    val mdContent = templateHandler.render(file.relativeTo(contentFolder).segments.mkString("/"), templateContext(templateConfig))
+    val mdContent =
+      templateHandler.render(file.relativeTo(contentFolder).segments.mkString("/"), templateContext(templateConfig))
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
     val htmlContent = templateHandler.render(
@@ -139,7 +143,11 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
 case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
 
-case class SiteConfig(name: String = "My Site", description: String = "") derives YamlCodec
+case class SiteConfig(
+    name: String = "My Site",
+    description: String = "",
+    posts: Seq[String] = Seq.empty
+) derives YamlCodec
 
 case class PageConfig(
     layout: String = "default",

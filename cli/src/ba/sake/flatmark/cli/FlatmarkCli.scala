@@ -1,7 +1,8 @@
 package ba.sake.flatmark.cli
 
 import java.util.logging.{Level, LogManager, Logger}
-import ba.sake.flatmark.{ChromeDriverHolder, FlatmarkGenerator}
+import ba.sake.flatmark.FlatmarkGenerator
+import ba.sake.flatmark.selenium.ChromeDriverHolder
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
