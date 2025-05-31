@@ -10,6 +10,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
+    // TODO delete whole output folder first !!?
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
@@ -31,12 +32,13 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
+    val contentFolder = siteRootFolder / "content"
     val outputFolder = siteRootFolder / "_site"
-    os.walk(siteRootFolder, skip = shouldSkip).foreach { file =>
+    os.walk(contentFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
         renderMarkdownFile(
           siteConfig,
-          siteRootFolder,
+          contentFolder,
           file,
           outputFolder,
           markdownRenderer,
@@ -57,7 +59,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private def renderMarkdownFile(
       siteConfig: SiteConfig,
-      siteRootFolder: os.Path,
+      contentFolder: os.Path,
       file: os.Path,
       outputFolder: os.Path,
       markdownRenderer: FlatmarkMarkdownRenderer,
@@ -65,25 +67,24 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
-    val (mdContentTemplate, pageConfig) = parseMd(file.baseName, mdContentTemplateRaw)
+    val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
-
-    val mdContent = templateHandler.renderContent(mdContentTemplate, templateContext(templateConfig))
+    val mdContent = templateHandler.render(file.relativeTo(contentFolder).segments.mkString("/"), templateContext(templateConfig))
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
-    val htmlContent = templateHandler.renderLayout(
+    val htmlContent = templateHandler.render(
       pageConfig.layout,
       templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)))
     )
     os.write.over(
-      outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
+      outputFolder / file.relativeTo(contentFolder).segments.init / s"${file.baseName}.html",
       htmlContent,
       createFolders = true
     )
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def parseMd(fileNameBase: String, mdTemplateRaw: String): (String, PageConfig) = {
+  private def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
     var hasYamlFrontMatter = false
     var firstTripleDashIndex = -1
     var secondTripleDashIndex = -1
@@ -108,22 +109,13 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       }
     }
     if hasYamlFrontMatter then {
-      val t = mdTemplateRaw.linesIterator
-        .drop(secondTripleDashIndex + 1)
-        .mkString("\n")
-        .trim
       val rawYaml = mdTemplateRaw.linesIterator
         .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
         .mkString("\n")
-      (
-        t,
-        rawYaml.as[PageConfig].toOption.getOrElse {
-          throw RuntimeException(s"Invalid YAML front matter in file: ${fileNameBase}. Expected PageConfig format.")
-        }
-      )
-    } else {
-      (mdTemplateRaw, PageConfig())
-    }
+      rawYaml.as[PageConfig].toOption.getOrElse {
+        throw RuntimeException(s"Invalid YAML front matter in file: ${fileNameBase}. Expected PageConfig format.")
+      }
+    } else PageConfig()
   }
 
   private def templateContext(templateConfig: TemplateConfig) =
