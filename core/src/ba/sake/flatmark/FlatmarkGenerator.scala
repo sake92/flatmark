@@ -41,7 +41,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
     os.walk(contentFolder, skip = shouldSkip).foreach { file =>
-      if file.ext == "md" then {
+      if file.ext == "md" || file.ext == "html" then {
         renderMarkdownFile(
           siteConfig,
           contentFolder,
@@ -64,12 +64,12 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   }
 
   private def renderMarkdownFile(
-                                  siteConfig: SiteConfig,
-                                  contentFolder: os.Path,
-                                  file: os.Path,
-                                  outputFolder: os.Path,
-                                  markdownRenderer: FlatmarkMarkdownRenderer,
-                                  templateHandler: FlatmarkTemplateHandler
+      siteConfig: SiteConfig,
+      contentFolder: os.Path,
+      file: os.Path,
+      outputFolder: os.Path,
+      markdownRenderer: FlatmarkMarkdownRenderer,
+      templateHandler: FlatmarkTemplateHandler
   ): Unit = {
     logger.fine(s"Markdown file rendering: ${file}")
     val mdContentTemplateRaw = os.read(file)
@@ -91,40 +91,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     logger.fine(s"Markdown file rendered: ${file}")
   }
 
-  private def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
-    var hasYamlFrontMatter = false
-    var firstTripleDashIndex = -1
-    var secondTripleDashIndex = -1
-    boundary {
-      val iter = mdTemplateRaw.linesIterator
-      var i = 0
-      while iter.hasNext do {
-        val line = iter.next().trim
-        if line.nonEmpty then {
-          if line == "---" then {
-            if (firstTripleDashIndex == -1) firstTripleDashIndex = i
-            else if (secondTripleDashIndex == -1) {
-              secondTripleDashIndex = i
-              hasYamlFrontMatter = true
-              boundary.break()
-            }
-          } else if (firstTripleDashIndex == -1) {
-            boundary.break() // first non-empty line is not triple dash -> no YAML front matter
-          }
-        }
-        i += 1
-      }
-    }
-    if hasYamlFrontMatter then {
-      val rawYaml = mdTemplateRaw.linesIterator
-        .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
-        .mkString("\n")
-      rawYaml.as[PageConfig].toOption.getOrElse {
-        throw RuntimeException(s"Invalid YAML front matter in file: ${fileNameBase}. Expected PageConfig format.")
-      }
-    } else PageConfig()
-  }
-
   private def templateContext(templateConfig: TemplateConfig) =
     Map(
       "site" -> yamlNodeToObject(YamlCodec[SiteConfig].asNode(templateConfig.site)),
@@ -140,18 +106,3 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       }.asJava
   }
 }
-
-case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
-
-case class SiteConfig(
-    name: String = "My Site",
-    description: String = "",
-    posts: Seq[String] = Seq.empty
-) derives YamlCodec
-
-case class PageConfig(
-    layout: String = "default",
-    title: String = "Untitled",
-    description: String = "",
-    content: String = ""
-) derives YamlCodec
