@@ -1,16 +1,16 @@
 package ba.sake.flatmark.cli
 
-import java.util.logging.Logger
-import java.util.logging.LogManager
+import java.util.logging.{Level, LogManager, Logger}
 import ba.sake.flatmark.{ChromeDriverHolder, FlatmarkGenerator}
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
-class FlatmarkCli(siteRootFolder: os.Path, port: Int, useCache: Boolean) {
+class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def run(): Unit = {
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
+    LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
 
     logger.info("Flatmark started")
 

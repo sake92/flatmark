@@ -1,28 +1,36 @@
 package ba.sake.flatmark
 
-import java.io.{StringReader, StringWriter}
-import scala.jdk.CollectionConverters.*
-import com.github.mustachejava.DefaultMustacheFactory
-import org.virtuslab.yaml.*
+import java.util as ju
+import java.util.logging.Logger
+import java.io.StringWriter
+import io.pebbletemplates.pebble.PebbleEngine
+import io.pebbletemplates.pebble.loader.{FileLoader, StringLoader}
 
-class FlatmarkTemplateHandler {
+class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
+  private val logger = Logger.getLogger(getClass.getName)
 
-  private val mf = new DefaultMustacheFactory()
+  private val layoutLoader = new FileLoader()
+  layoutLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/")
+  layoutLoader.setSuffix(".html")
+  private val layoutEngine = new PebbleEngine.Builder().loader(layoutLoader).autoEscaping(false).build()
 
-  def render[T](templateName: String, templateValue: String, templateData: T)(using codec: YamlCodec[T]): String = {
-    val template = mf.compile(new StringReader(templateValue), templateName)
-    val sw = new StringWriter()
-    val templateDataObject = yamlNodeToObject(codec.asNode(templateData))
-    template.execute(sw, templateDataObject).flush()
-    sw.toString
+  private val contentLoader = new StringLoader
+  private val contentEngine = new PebbleEngine.Builder().loader(contentLoader).autoEscaping(false).build()
+
+  def renderLayout(templateName: String, context: ju.Map[String, Object]): String = {
+    logger.fine(s"Rendering layout with context: ${context}")
+    val compiledTemplate = layoutEngine.getTemplate(s"_layouts/${templateName}")
+    val writer = new StringWriter()
+    compiledTemplate.evaluate(writer, context)
+    writer.toString
   }
 
-  private def yamlNodeToObject(node: Node): Object = node match {
-    case sn: Node.ScalarNode   => sn.value
-    case sn: Node.SequenceNode => sn.nodes.map(yamlNodeToObject).asJava
-    case mn: Node.MappingNode =>
-      mn.mappings.map { case (key, value) =>
-        yamlNodeToObject(key) -> yamlNodeToObject(value)
-      }.asJava
+  def renderContent(templateValue: String, context: ju.Map[String, Object]): String = {
+    logger.fine(s"Rendering content with context: ${context}")
+    // template name is actually the value of the template in StringLoader
+    val compiledTemplate = contentEngine.getTemplate(templateValue)
+    val writer = new StringWriter()
+    compiledTemplate.evaluate(writer, context)
+    writer.toString
   }
 }

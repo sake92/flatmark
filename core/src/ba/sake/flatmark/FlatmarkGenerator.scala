@@ -16,7 +16,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val siteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
-    println(s"Site config: ${siteConfig}")
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder, useCache)
@@ -25,7 +24,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
-    val templateHandler = FlatmarkTemplateHandler()
+    val templateHandler = FlatmarkTemplateHandler(siteRootFolder)
 
     val layoutsFolder = siteRootFolder / "_layouts"
     val layoutTemplatesMap =
@@ -83,17 +82,17 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val mdContentTemplateRaw = os.read(file)
     val (mdContentTemplate, pageConfig) = parseMd(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
-    val mdContent = templateHandler.render(file.baseName, mdContentTemplate, templateConfig)
+    
+    val mdContent = templateHandler.renderContent(mdContentTemplate, templateContext(templateConfig))
     val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
     // render final HTML file
-    val layoutTemplate = layoutTemplatesMap.getOrElse(
+    /*val layoutTemplate = layoutTemplatesMap.getOrElse(
       pageConfig.layout,
       throw RuntimeException(s"Layout '${pageConfig.layout}' not found for file: ${file}")
-    )
-    val htmlContent = templateHandler.render(
+    )*/
+    val htmlContent = templateHandler.renderLayout(
       pageConfig.layout,
-      layoutTemplate,
-      templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent))
+      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)))
     )
     os.write.over(
       outputFolder / file.relativeTo(siteRootFolder).segments.init / s"${file.baseName}.html",
@@ -144,6 +143,21 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     } else {
       (mdTemplateRaw, PageConfig())
     }
+  }
+  
+  private def templateContext(templateConfig: TemplateConfig) = 
+    Map(
+        "site" -> yamlNodeToObject(YamlCodec[SiteConfig].asNode( templateConfig.site )),
+        "page" -> yamlNodeToObject(YamlCodec[PageConfig].asNode( templateConfig.page ))
+    ).asJava
+  
+  private def yamlNodeToObject(node: Node): Object = node match {
+    case sn: Node.ScalarNode   => sn.value
+    case sn: Node.SequenceNode => sn.nodes.map(yamlNodeToObject).asJava
+    case mn: Node.MappingNode =>
+      mn.mappings.map { case (key, value) =>
+        yamlNodeToObject(key) -> yamlNodeToObject(value)
+      }.asJava
   }
 }
 
