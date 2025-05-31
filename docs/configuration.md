@@ -23,7 +23,7 @@ Put the configuration at the top of your page or post file, in YAML format, like
 title: Hello
 date: 2025-01-01 11:11
 layout: post
-tags: scala, java
+tags: [scala, java]
 publish: yes | no | hide # hide means published but not listed/searched/google-indexed
 ---
 

@@ -16,8 +16,8 @@ import java.nio.charset.StandardCharsets
 
 class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
   private val logger = Logger.getLogger(getClass.getName)
-  
-  private val loader = locally {
+
+  private val engine = locally {
     val layoutsLoader = new FileLoader()
     layoutsLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_layouts/")
     layoutsLoader.setSuffix(".html")
@@ -26,10 +26,9 @@ class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
     includesLoader.setSuffix(".html")
     val contentLoader = new CustomLoader()
     contentLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/content/")
-    new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))
+    val loader = new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))
+    new PebbleEngine.Builder().loader(loader).autoEscaping(false).build()
   }
-  
-  private val engine = new PebbleEngine.Builder().loader(loader).autoEscaping(false).build()
 
   def render(templateName: String, context: ju.Map[String, Object]): String = {
     logger.fine(s"Rendering '${templateName}' with context: ${context}")

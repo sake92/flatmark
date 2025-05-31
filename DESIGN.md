@@ -1,11 +1,11 @@
 
 
 Current design of the project:
-- graalvm for native image
-- serving syntax highlighting, diagram rendering trough http and getting it via Selenium
-  - works even for mermaidjs, diagrams are plain SVGs
-  - but we do need chrome installed!
-- file cache for diagrams, code highlighting, etc.
+- one executable, no plugins
+- http server + Selenium for syntax highlighting, diagram rendering etc (everything that needs a browser)
+  - works even for mermaidjs, diagrams are plain SVGs!
+  - we do need chrome installed tho
+  - file cached
 - file system layout == URLs
 
 
@@ -20,14 +20,13 @@ Current design of the project:
 
 
 
-## GraalVM native image
+## GraalVM Native Image
 
-Best for CLIs, snappiest startup time etc.
+- one executable for the whole application
+- snappy startup time
+- minimal memory usage
+- minimum app size
+
 Need to be careful with reflection, dynamic class loading, etc.
 
-
-## jpackage
-
-Makes installers for all platforms.
-Would be veery nice, easier to distribute to winget, apt, brew, etc.
 

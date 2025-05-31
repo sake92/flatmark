@@ -10,15 +10,19 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
-    // TODO delete whole output folder first !!?
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
+    val contentFolder = siteRootFolder / "content"
+    val outputFolder = siteRootFolder / "_site"
+    val cacheFolder = siteRootFolder / ".flatmark-cache"
+    
+    os.remove.all(outputFolder)
+    
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
-
-    val cacheFolder = siteRootFolder / ".flatmark-cache"
+    
     val fileCache = FileCache(cacheFolder, useCache)
 
     val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
@@ -32,8 +36,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
 
-    val contentFolder = siteRootFolder / "content"
-    val outputFolder = siteRootFolder / "_site"
+    
     os.walk(contentFolder, skip = shouldSkip).foreach { file =>
       if file.ext == "md" then {
         renderMarkdownFile(
@@ -47,7 +50,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       } else if os.isFile(file) then {
         os.copy(
           file,
-          outputFolder / file.relativeTo(siteRootFolder),
+          outputFolder / file.relativeTo(contentFolder),
           replaceExisting = true,
           createFolders = true,
           mergeFolders = true,
