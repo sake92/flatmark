@@ -1,7 +1,7 @@
 package ba.sake.flatmark
 
 import java.util.logging.Logger
-import scala.util.boundary
+import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
 import org.virtuslab.yaml.*
 import ba.sake.flatmark.selenium.ChromeDriverHolder
@@ -42,24 +42,69 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
     val processFiles = os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
       Option.when(os.isFile(file)) {
-        if file.ext == "md" || file.ext == "html" then ProcessFile.TemplatedFile(file) else ProcessFile.PlainFile(file)
+        if file.ext == "md" || file.ext == "html"
+        then ProcessFile.TemplatedFile(file)
+        else ProcessFile.PlainFile(file)
       }
     }
-    
-    // TODO collect posts and build proper context(s)
 
-    processFiles.foreach {
-      case ProcessFile.TemplatedFile(file) =>
-        renderTemplatedFile(siteConfig, contentFolder, file, outputFolder, markdownRenderer, templateHandler)
-      case ProcessFile.PlainFile(file) =>
-        os.copy(
-          file,
-          outputFolder / file.relativeTo(contentFolder),
-          replaceExisting = true,
-          createFolders = true,
-          mergeFolders = true,
-          followLinks = false
-        )
+    // TODO collect posts and build proper context(s)
+    val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
+    val templatedNonIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
+    val templatedPostFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
+    processFiles.collect { case tf: ProcessFile.TemplatedFile =>
+      val fileRelPath = tf.file.relativeTo(contentFolder)
+      fileRelPath.segments.head match {
+        case "index.md" | "index.html" => templatedIndexFiles += tf
+        case "posts"                   => templatedPostFiles += tf
+        case _                         => templatedNonIndexFiles += tf
+      }
+    }
+    templatedNonIndexFiles.foreach { tf =>
+      renderTemplatedFile(
+        siteConfig,
+        contentFolder = contentFolder,
+        file = tf.file,
+        outputFolder = outputFolder,
+        markdownRenderer,
+        templateHandler,
+        posts = Seq.empty
+      )
+    }
+    // need to generate posts first to get their snippets for index page
+    val postResults = templatedPostFiles.map { tf =>
+      renderTemplatedFile(
+        siteConfig,
+        contentFolder = contentFolder,
+        file = tf.file,
+        outputFolder = outputFolder,
+        markdownRenderer,
+        templateHandler,
+        posts = Seq.empty
+      )
+    }.toSeq
+    templatedIndexFiles.foreach { tf =>
+      renderTemplatedFile(
+        siteConfig,
+        contentFolder = contentFolder,
+        file = tf.file,
+        outputFolder = outputFolder,
+        markdownRenderer,
+        templateHandler,
+        posts = postResults.map(_.pageContext)
+      )
+    }
+    // copy plain files (e.g. images, css, static assets)
+    val plainFiles = processFiles.collect { case pf: ProcessFile.PlainFile => pf }
+    plainFiles.foreach { pf =>
+      os.copy(
+        pf.file,
+        outputFolder / pf.file.relativeTo(contentFolder),
+        replaceExisting = true,
+        createFolders = true,
+        mergeFolders = true,
+        followLinks = false
+      )
     }
   }
 
@@ -69,41 +114,47 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       file: os.Path,
       outputFolder: os.Path,
       markdownRenderer: FlatmarkMarkdownRenderer,
-      templateHandler: FlatmarkTemplateHandler
-  ): Unit = {
-    logger.fine(s"Markdown file rendering: ${file}")
+      templateHandler: FlatmarkTemplateHandler,
+      posts: Seq[PageContext]
+  ): RenderResult = {
+    logger.fine(s"Rendering templated file: ${file}")
     val mdContentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
-    val outputFileRelPath = s"${fileRelPath.segments.init}/${file.baseName}.html"
-    val mdContent = templateHandler.render(
-      fileRelPath.segments.mkString("/"),
-      templateContext(templateConfig, outputFileRelPath)
+    val outputFileRelPath = s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
+    val contentContext = templateContext(templateConfig, outputFileRelPath, posts)
+    val content = templateHandler.render(
+      fileRelPath.toString,
+      contentContext.toPebbleContext
     )
-    val mdHtmlContent = markdownRenderer.renderMarkdown(mdContent)
+    val mdHtmlContent = markdownRenderer.renderMarkdown(content)
     // render final HTML file
+    val layoutContext =
+      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)), outputFileRelPath, posts)
     val htmlContent = templateHandler.render(
       pageConfig.layout,
-      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)), outputFileRelPath)
+      layoutContext.toPebbleContext
     )
     os.write.over(
       outputFolder / fileRelPath.segments.init / s"${file.baseName}.html",
       htmlContent,
       createFolders = true
     )
-    logger.fine(s"Markdown file rendered: ${file}")
+    logger.fine(s"Rendered templated file: ${file}")
+    RenderResult(layoutContext.page)
   }
 
   private def templateContext(
       templateConfig: TemplateConfig,
-      outputFileRelPath: String
-  ): java.util.Map[String, Object] = {
+      outputFileRelPath: String,
+      posts: Seq[PageContext]
+  ): TemplateContext =
     TemplateContext(
       SiteContext(
         name = templateConfig.site.name,
         description = templateConfig.site.description,
-        posts = Seq.empty
+        posts = posts
       ),
       PageContext(
         title = templateConfig.page.title,
@@ -111,11 +162,14 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         content = templateConfig.page.content,
         url = outputFileRelPath
       )
-    ).toPebbleContext
-  }
+    )
 
 }
 
 enum ProcessFile:
   case TemplatedFile(file: os.Path)
   case PlainFile(file: os.Path)
+
+case class RenderResult(
+    pageContext: PageContext
+)
