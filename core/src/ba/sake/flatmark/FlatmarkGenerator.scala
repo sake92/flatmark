@@ -21,7 +21,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val outputFolder = siteRootFolder / "_site"
     val cacheFolder = siteRootFolder / ".flatmark-cache"
 
-    os.remove.all(outputFolder)
+    os.remove.all(outputFolder, ignoreErrors = true)
 
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
@@ -54,10 +54,19 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val templatedPostFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
     processFiles.collect { case tf: ProcessFile.TemplatedFile =>
       val fileRelPath = tf.file.relativeTo(contentFolder)
-      if fileRelPath.segments.length > 1 && fileRelPath.segments.head == "posts" then templatedPostFiles += tf
-      else if tf.file.baseName == "index" then templatedIndexFiles += tf
+      if tf.file.baseName == "index" then templatedIndexFiles += tf
+      else if fileRelPath.segments.length > 1 && fileRelPath.segments.head == "posts" then templatedPostFiles += tf
       else templatedNonIndexFiles += tf
     }
+
+   /* println(
+      (
+        templatedPostFiles,
+        templatedIndexFiles,
+        templatedNonIndexFiles
+      )
+    )*/
+
     templatedNonIndexFiles.foreach { tf =>
       renderTemplatedFile(
         siteConfig,
@@ -120,7 +129,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
-    val outputFileRelPath = s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
+    val outputFileRelPath = s"/${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
     val contentContext = templateContext(templateConfig, outputFileRelPath, posts)
     val content = templateHandler.render(
       fileRelPath.toString,
