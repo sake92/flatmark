@@ -20,10 +20,10 @@ class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
   private val engine = locally {
     val layoutsLoader = new FileLoader()
     layoutsLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_layouts/")
-    layoutsLoader.setSuffix(".html")
+    layoutsLoader.setSuffix(".peb")
     val includesLoader = new FileLoader()
     includesLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_includes/")
-    includesLoader.setSuffix(".html")
+    includesLoader.setSuffix(".peb")
     val contentLoader = new CustomLoader()
     contentLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/content/")
     val loader = new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))

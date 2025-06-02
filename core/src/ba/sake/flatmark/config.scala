@@ -11,7 +11,10 @@ case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
 
 case class SiteConfig(
     name: String = "My Site",
-    description: String = ""
+    description: String = "",
+    baseUrl: String = "",
+    lang: String = "en", // Default language
+    theme: String = "default"
 ) derives YamlCodec
 
 case class PageConfig(

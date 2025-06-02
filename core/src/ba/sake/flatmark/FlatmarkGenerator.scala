@@ -54,11 +54,9 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val templatedPostFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
     processFiles.collect { case tf: ProcessFile.TemplatedFile =>
       val fileRelPath = tf.file.relativeTo(contentFolder)
-      fileRelPath.segments.head match {
-        case "index.md" | "index.html" => templatedIndexFiles += tf
-        case "posts"                   => templatedPostFiles += tf
-        case _                         => templatedNonIndexFiles += tf
-      }
+      if fileRelPath.segments.length > 1 && fileRelPath.segments.head == "posts" then templatedPostFiles += tf
+      else if tf.file.baseName == "index" then templatedIndexFiles += tf
+      else templatedNonIndexFiles += tf
     }
     templatedNonIndexFiles.foreach { tf =>
       renderTemplatedFile(
