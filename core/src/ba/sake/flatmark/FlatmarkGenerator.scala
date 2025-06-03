@@ -2,7 +2,6 @@ package ba.sake.flatmark
 
 import java.util.logging.Logger
 import scala.collection.mutable
-import scala.jdk.CollectionConverters.*
 import org.virtuslab.yaml.*
 import ba.sake.flatmark.selenium.ChromeDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
@@ -16,7 +15,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
     logger.info(s"Generating site in folder: ${siteRootFolder}")
 
-    val siteConfigFile = siteRootFolder / "_config.yaml"
+    val siteConfigFile = siteRootFolder / "_site.yaml"
     val contentFolder = siteRootFolder / "content"
     val outputFolder = siteRootFolder / "_site"
     val cacheFolder = siteRootFolder / ".flatmark-cache"
