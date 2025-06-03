@@ -21,7 +21,13 @@ case class PageConfig(
     layout: String = "default",
     title: String = "Untitled",
     description: String = "",
-    content: String = ""
+    content: String = "",
+    paginate: Option[PaginateConfig] = None
+) derives YamlCodec
+
+case class PaginateConfig(
+    data: String,
+    size: Int = 10
 ) derives YamlCodec
 
 private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {

@@ -4,7 +4,6 @@
 - static search
 - base url in config ???
 - _data_file.yaml hierarchical
-- warn on double index.md and index.html
 - tabbed content e.g. windows/linux/mac
 - RSS
 

@@ -48,7 +48,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       }
     }
 
-    // TODO collect posts and build proper context(s)
     val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
     val templatedNonIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
     val templatedPostFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
@@ -59,14 +58,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       else templatedNonIndexFiles += tf
     }
 
-   /* println(
-      (
-        templatedPostFiles,
-        templatedIndexFiles,
-        templatedNonIndexFiles
-      )
-    )*/
-
     templatedNonIndexFiles.foreach { tf =>
       renderTemplatedFile(
         siteConfig,
@@ -75,7 +66,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
-        posts = Seq.empty
+        unPaginatedPosts = Seq.empty
       )
     }
     // need to generate posts first to get their snippets for index page
@@ -87,7 +78,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
-        posts = Seq.empty
+        unPaginatedPosts = Seq.empty
       )
     }.toSeq
     templatedIndexFiles.foreach { tf =>
@@ -98,7 +89,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
-        posts = postResults.map(_.pageContext)
+        unPaginatedPosts = postResults.flatten.map(_.pageContext)
       )
     }
     // copy plain files (e.g. images, css, static assets)
@@ -122,29 +113,84 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       outputFolder: os.Path,
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler,
-      posts: Seq[PageContext]
-  ): RenderResult = {
+      unPaginatedPosts: Seq[PageContext]
+  ): Seq[RenderResult] = {
     logger.fine(s"Rendering templated file: ${file}")
     val mdContentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
-    val outputFileRelPath = s"/${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
-    val contentContext = templateContext(templateConfig, outputFileRelPath, posts)
-    val content = templateHandler.render(
-      fileRelPath.toString,
-      contentContext.toPebbleContext
-    )
+
+    pageConfig.paginate match {
+      case Some(paginateConfig) =>
+        paginateConfig.data match {
+          case "site.posts" =>
+            val posts = unPaginatedPosts
+            val paginatedPosts = posts.grouped(paginateConfig.size).toSeq
+            for (paginatedPostsGroup, i) <- paginatedPosts.zipWithIndex yield {
+              def outputFileRelPath(pageNum: Int) = {
+                val pageNumSuffix = if pageNum == 1 then "" else s"-${pageNum}"
+                s"/${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.html"
+              }
+              val contentContext = templateContext(
+                templateConfig,
+                outputFileRelPath,
+                paginatedPostsGroup,
+                currentPage = i + 1,
+                pageSize = paginateConfig.size,
+                totalItems = posts.length
+              )
+              renderTemplatedFileSingle(
+                contentFolder,
+                file,
+                contentContext,
+                outputFolder,
+                markdownRenderer,
+                templateHandler
+              )
+            }
+          case _ =>
+            throw RuntimeException(s"Unsupported pagination data: ${paginateConfig.data} in file: ${file}")
+        }
+      case None =>
+        val outputFileRelPath = s"/${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
+        val contentContext = templateContext(
+          templateConfig,
+          _ => outputFileRelPath,
+          unPaginatedPosts,
+          currentPage = 1,
+          pageSize = 10,
+          totalItems = unPaginatedPosts.length
+        )
+        Seq(
+          renderTemplatedFileSingle(
+            contentFolder,
+            file,
+            contentContext,
+            outputFolder,
+            markdownRenderer,
+            templateHandler
+          )
+        )
+    }
+  }
+
+  private def renderTemplatedFileSingle(
+      contentFolder: os.Path,
+      file: os.Path,
+      contentContext: TemplateContext,
+      outputFolder: os.Path,
+      markdownRenderer: FlatmarkMarkdownRenderer,
+      templateHandler: FlatmarkTemplateHandler
+  ): RenderResult = {
+    val fileRelPath = file.relativeTo(contentFolder)
+    val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext)
     val mdHtmlContent = markdownRenderer.renderMarkdown(content)
     // render final HTML file
-    val layoutContext =
-      templateContext(templateConfig.copy(page = pageConfig.copy(content = mdHtmlContent)), outputFileRelPath, posts)
-    val htmlContent = templateHandler.render(
-      pageConfig.layout,
-      layoutContext.toPebbleContext
-    )
+    val layoutContext = contentContext.copy(page = contentContext.page.copy(content = mdHtmlContent))
+    val htmlContent = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext)
     os.write.over(
-      outputFolder / fileRelPath.segments.init / s"${file.baseName}.html",
+      outputFolder / os.SubPath(contentContext.page.rootRelPath.dropWhile(_ == '/')),
       htmlContent,
       createFolders = true
     )
@@ -154,8 +200,11 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private def templateContext(
       templateConfig: TemplateConfig,
-      outputFileRelPath: String,
-      posts: Seq[PageContext]
+      outputFileRelPath: Int => String,
+      posts: Seq[PageContext],
+      currentPage: Int,
+      pageSize: Int,
+      totalItems: Int
   ): TemplateContext =
     TemplateContext(
       SiteContext(
@@ -164,10 +213,20 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         posts = posts
       ),
       PageContext(
+        layout = templateConfig.page.layout,
         title = templateConfig.page.title,
         description = templateConfig.page.description,
         content = templateConfig.page.content,
-        url = outputFileRelPath
+        rootRelPath = outputFileRelPath(currentPage)
+      ),
+      Option.when(posts.nonEmpty)(
+        PaginatorContext(
+          currentPage = currentPage,
+          items = posts,
+          totalItems = totalItems,
+          pageSize = pageSize,
+          outputFileRelPath = outputFileRelPath
+        )
       )
     )
 
