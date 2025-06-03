@@ -174,7 +174,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         )
     }
   }
-
+  
   private def renderTemplatedFileSingle(
       contentFolder: os.Path,
       file: os.Path,
@@ -185,13 +185,13 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   ): RenderResult = {
     val fileRelPath = file.relativeTo(contentFolder)
     val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext)
-    val mdHtmlContent = markdownRenderer.renderMarkdown(content)
+    val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
     // render final HTML file
-    val layoutContext = contentContext.copy(page = contentContext.page.copy(content = mdHtmlContent))
-    val htmlContent = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext)
+    val layoutContext = contentContext.copy(page = contentContext.page.copy(content = contentHtml))
+    val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext)
     os.write.over(
       outputFolder / os.SubPath(contentContext.page.rootRelPath.dropWhile(_ == '/')),
-      htmlContent,
+      finalHtml,
       createFolders = true
     )
     logger.fine(s"Rendered templated file: ${file}")
