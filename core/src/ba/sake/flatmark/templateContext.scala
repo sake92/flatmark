@@ -59,14 +59,17 @@ case class PaginatorContext(
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
       "items" -> items.map(_.toPebbleContext).asJava,
+      "perPage" -> Integer.valueOf(pageSize),
       "hasItems" -> Boolean.box(totalItems > 0),
       "totalItems" -> Integer.valueOf(totalItems),
       "totalPages" -> Integer.valueOf(totalPages),
-      "currentPage" -> Integer.valueOf(currentPage),
+      "current" -> Integer.valueOf(currentPage),
+      "prev" -> Integer.valueOf(currentPage - 1),
+      "next" -> Integer.valueOf(currentPage + 1),
       "hasPrev" -> Boolean.box(hasPrev),
       "hasNext" -> Boolean.box(hasNext),
-      "prev" -> outputFileRelPath(currentPage - 1),
-      "next" -> outputFileRelPath(currentPage + 1)
+      "prevUrl" -> outputFileRelPath(currentPage - 1),
+      "nextUrl" -> outputFileRelPath(currentPage + 1)
     ).asJava
   }
 }
