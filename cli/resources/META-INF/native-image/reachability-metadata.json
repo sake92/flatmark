@@ -22,6 +22,9 @@
       "type": "[Ljava.lang.String;"
     },
     {
+      "type": "[Ljava.nio.file.CopyOption;"
+    },
+    {
       "type": "[Ljava.nio.file.attribute.FileAttribute;"
     },
     {
@@ -40,7 +43,47 @@
       "type": "[Z"
     },
     {
-      "type": "ba.sake.flatmark.ChromeDriverHolder",
+      "type": "ba.sake.flatmark.CategoryConfig$",
+      "fields": [
+        {
+          "name": "derived$YamlCodec$lzy3"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.PageConfig$",
+      "fields": [
+        {
+          "name": "derived$YamlCodec$lzy5"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.SiteConfig$",
+      "fields": [
+        {
+          "name": "derived$YamlCodec$lzy2"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.TagConfig$",
+      "fields": [
+        {
+          "name": "derived$YamlCodec$lzy4"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.TemplateConfig$",
+      "fields": [
+        {
+          "name": "derived$YamlCodec$lzy1"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.selenium.ChromeDriverHolder",
       "fields": [
         {
           "name": "driver$lzy1"
@@ -81,9 +124,6 @@
           "name": "queryParamsRaw$lzy1"
         }
       ]
-    },
-    {
-      "type": "ch.qos.logback.classic.Logger"
     },
     {
       "type": "com.google.gson.JsonElement"
@@ -543,13 +583,18 @@
       "type": "java.util.ImmutableCollections$MapN"
     },
     {
-      "type": "java.util.Map",
+      "type": "java.util.Map"
+    },
+    {
+      "type": "java.util.Map$Entry",
       "methods": [
         {
-          "name": "get",
-          "parameterTypes": [
-            "java.lang.Object"
-          ]
+          "name": "getKey",
+          "parameterTypes": []
+        },
+        {
+          "name": "getValue",
+          "parameterTypes": []
         }
       ]
     },
@@ -615,15 +660,6 @@
     },
     {
       "type": "jdk.management.jfr.SettingDescriptorInfo"
-    },
-    {
-      "type": "org.apache.log4j.LogManager"
-    },
-    {
-      "type": "org.apache.logging.log4j.Logger"
-    },
-    {
-      "type": "org.jboss.logmanager.LogManager"
     },
     {
       "type": "org.jboss.threads.EnhancedQueueExecutor",
@@ -718,6 +754,15 @@
       "type": "org.openqa.selenium.chrome.AddHasCdp"
     },
     {
+      "type": "org.openqa.selenium.chromium.AddHasLaunchApp"
+    },
+    {
+      "type": "org.openqa.selenium.chromium.AddHasNetworkConditions"
+    },
+    {
+      "type": "org.openqa.selenium.chromium.AddHasPermissions"
+    },
+    {
       "type": "org.openqa.selenium.logging.LoggingPreferences",
       "methods": [
         {
@@ -771,6 +816,9 @@
     },
     {
       "type": "org.openqa.selenium.remote.http.jdk.JdkHttpClient$Factory"
+    },
+    {
+      "type": "org.slf4j.jul.JULServiceProvider"
     },
     {
       "type": "org.xnio.Connection",
@@ -2332,9 +2380,6 @@
       "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
     },
     {
-      "glob": "META-INF/services/org.jboss.logging.LoggerProvider"
-    },
-    {
       "glob": "META-INF/services/org.openqa.selenium.devtools.CdpInfo"
     },
     {
@@ -2342,6 +2387,9 @@
     },
     {
       "glob": "META-INF/services/org.openqa.selenium.remote.http.HttpClient$Factory"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
     },
     {
       "glob": "META-INF/services/org.xnio.XnioProvider"
@@ -2372,6 +2420,10 @@
     },
     {
       "glob": "public/katex.min.js"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/net/www/content-types.properties"
     },
     {
       "module": "java.logging",

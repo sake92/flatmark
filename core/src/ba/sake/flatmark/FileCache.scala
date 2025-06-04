@@ -3,7 +3,7 @@ package ba.sake.flatmark
 import java.security.MessageDigest
 import java.util.Base64
 
-class FileCache(cacheFolder: os.Path, useCache: Boolean = true) {
+class FileCache(cacheFolder: os.Path, useCache: Boolean) {
 
   def cached(cacheKeyParts: String*)(code: => String): String = {
     val cacheKey = getMd5B64(cacheKeyParts.mkString("-"))
