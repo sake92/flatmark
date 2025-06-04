@@ -1,13 +1,11 @@
 package ba.sake.flatmark
 
+import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.util.TimeZone
 import scala.util.{Try, boundary}
 import org.virtuslab.yaml.*
 import org.virtuslab.yaml.Node.ScalarNode
-
-import java.time.format.DateTimeFormatter
-
 
 /* * Flatmark configuration classes.
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
@@ -20,7 +18,7 @@ given YamlDecoder[LocalDateTime] = YamlDecoder { case s @ ScalarNode(value, _) =
 
 given YamlEncoder[LocalDateTime] = dt => ScalarNode(dt.toString)
 
-given YamlDecoder[TimeZone] = YamlDecoder { case s@ScalarNode(value, _) =>
+given YamlDecoder[TimeZone] = YamlDecoder { case s @ ScalarNode(value, _) =>
   Try(TimeZone.getTimeZone(value)).toEither.left
     .map(ConstructError.from(_, "TimeZone", s))
 }
@@ -33,14 +31,14 @@ case class TemplateConfig(
 ) derives YamlCodec
 
 case class SiteConfig(
-                       name: String = "My Site",
-                       description: String = "",
-                       baseUrl: String = "",
-                       lang: String = "en", // Default language
-                       timezone: TimeZone = TimeZone.getDefault,
-                       theme: String = "default",
-                       categories: Map[String, CategoryConfig] = Map.empty,
-                       tags: Map[String, TagConfig] = Map.empty
+    name: String = "My Site",
+    description: String = "",
+    baseUrl: String = "",
+    lang: String = "en", // Default language
+    timezone: TimeZone = TimeZone.getDefault,
+    theme: String = "default",
+    categories: Map[String, CategoryConfig] = Map.empty,
+    tags: Map[String, TagConfig] = Map.empty
 ) derives YamlCodec
 
 case class CategoryConfig(
@@ -89,10 +87,14 @@ private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): 
     val rawYaml = mdTemplateRaw.linesIterator
       .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
       .mkString("\n")
-    rawYaml.as[PageConfig].left.map { error =>
-      throw new RuntimeException(
-        s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}"
-      )
-    }.getOrElse(PageConfig())
+    rawYaml
+      .as[PageConfig]
+      .left
+      .map { error =>
+        throw new RuntimeException(
+          s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}"
+        )
+      }
+      .getOrElse(PageConfig())
   } else PageConfig()
 }
