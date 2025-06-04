@@ -60,7 +60,6 @@ case class PaginatorContext(
     Map(
       "items" -> items.map(_.toPebbleContext).asJava,
       "perPage" -> Integer.valueOf(pageSize),
-      "hasItems" -> Boolean.box(totalItems > 0),
       "totalItems" -> Integer.valueOf(totalItems),
       "totalPages" -> Integer.valueOf(totalPages),
       "current" -> Integer.valueOf(currentPage),

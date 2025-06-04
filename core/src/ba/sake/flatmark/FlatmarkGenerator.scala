@@ -13,9 +13,13 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
-    logger.info(s"Generating site in folder: ${siteRootFolder}")
+    if !os.exists(siteRootFolder) then
+      throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
+    if !os.isDir(siteRootFolder) then
+        throw RuntimeException(s"Site root folder is not a folder: ${siteRootFolder}")
+    logger.info(s"Generating site in: ${siteRootFolder}")
 
-    val siteConfigFile = siteRootFolder / "_site.yaml"
+    val siteConfigFile = siteRootFolder / "_config.yaml"
     val contentFolder = siteRootFolder / "content"
     val outputFolder = siteRootFolder / "_site"
     val cacheFolder = siteRootFolder / ".flatmark-cache"
