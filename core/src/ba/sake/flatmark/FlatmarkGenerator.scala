@@ -13,39 +13,29 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
+    logger.info(s"Generating site in: ${siteRootFolder}")
     if !os.exists(siteRootFolder) then throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw RuntimeException(s"Site root is not a folder: ${siteRootFolder}")
-    logger.info(s"Generating site in: ${siteRootFolder}")
 
-    val siteConfigFile = siteRootFolder / "_config.yaml"
-    val contentFolder = siteRootFolder / "content"
     val outputFolder = siteRootFolder / "_site"
-    val cacheFolder = siteRootFolder / ".flatmark-cache"
-
     os.remove.all(outputFolder, ignoreErrors = true)
 
+    val siteConfigFile = siteRootFolder / "_config.yaml"
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
 
-    val fileCache = FileCache(cacheFolder, useCache)
-    val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
-    val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
-    val templateHandler = FlatmarkTemplateHandler(siteRootFolder)
-
+    // collect relevant content
     // TODO custom config
-    // skip any file/folder that starts with . or _
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
-
+    val contentFolder = siteRootFolder / "content"
     val processFiles = os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
       Option.when(os.isFile(file)) {
         if file.ext == "md" || file.ext == "html"
         then ProcessFile.TemplatedFile(file)
-        else ProcessFile.PlainFile(file)
+        else ProcessFile.StaticFile(file)
       }
     }
 
@@ -56,7 +46,15 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       else templatedContentFiles += tf
     }
 
-    // need to generate posts first to get their snippets for index page
+    val cacheFolder = siteRootFolder / ".flatmark-cache"
+    val fileCache = FileCache(cacheFolder, useCache)
+    val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
+    val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
+    val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
+    val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
+    val templateHandler = FlatmarkTemplateHandler(siteRootFolder)
+
+    // generate content first to get their snippets for index pages
     val contentResults = templatedContentFiles.flatMap { tf =>
       renderTemplatedFile(
         siteConfig,
@@ -68,7 +66,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         paginateItems = None
       )
     }.toSeq
-
+    // generate index files with pagination and all
     val contentByCategoryMap = siteConfig.categories.keys.map(_ -> Seq.empty[PageContext]).to(mutable.Map)
     contentResults.foreach { cr =>
       val segments = cr.pageContext.rootRelPath.segments
@@ -79,12 +77,11 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
             contentByCategoryMap.update(firstSegment, contentPages.appended(cr.pageContext))
           case None =>
             logger.warning(
-              s"Category ${firstSegment} not found in site config for post: ${cr.pageContext.rootRelPath}"
+              s"Category ${firstSegment} not found in site config for content file: ${cr.pageContext.rootRelPath}"
             )
         }
       }
     }
-
     templatedIndexFiles.foreach { tf =>
       val categoryItems = contentByCategoryMap.getOrElse(
         tf.file.relativeTo(contentFolder).segments.head,
@@ -100,9 +97,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         paginateItems = Some(categoryItems)
       )
     }
-    // copy plain files (e.g. images, css, static assets)
-    val plainFiles = processFiles.collect { case pf: ProcessFile.PlainFile => pf }
-    plainFiles.foreach { pf =>
+    // copy static files (e.g. images, css..)
+    processFiles.collect { case pf: ProcessFile.StaticFile =>
       os.copy(
         pf.file,
         outputFolder / pf.file.relativeTo(contentFolder),
@@ -133,7 +129,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       case Some(allItems) =>
         val pageSize = 10
         val paginatedItems = allItems.grouped(pageSize).toSeq
-        for (paginatedPostsGroup, i) <- paginatedItems.zipWithIndex yield {
+        for (paginatedItemsGroup, i) <- paginatedItems.zipWithIndex yield {
           def rootRelPath(pageNum: Int): os.RelPath = {
             val pageNumSuffix = if pageNum == 1 then "" else s"-${pageNum}"
             os.RelPath(
@@ -144,7 +140,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           val contentContext = templateContext(
             templateConfig,
             rootRelPath,
-            paginatedPostsGroup,
+            paginatedItemsGroup,
             currentPage = i + 1,
             pageSize = pageSize,
             totalItems = allItems.length
@@ -210,7 +206,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private def templateContext(
       templateConfig: TemplateConfig,
       rootRelPath: Int => os.RelPath,
-      posts: Seq[PageContext],
+      items: Seq[PageContext],
       currentPage: Int,
       pageSize: Int,
       totalItems: Int
@@ -219,7 +215,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       SiteContext(
         name = templateConfig.site.name,
         description = templateConfig.site.description,
-        posts = posts,
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },
@@ -232,10 +227,10 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         content = templateConfig.page.content,
         rootRelPath = rootRelPath(currentPage)
       ),
-      Option.when(posts.nonEmpty)(
+      Option.when(items.nonEmpty)(
         PaginatorContext(
           currentPage = currentPage,
-          items = posts,
+          items = items,
           totalItems = totalItems,
           pageSize = pageSize,
           rootRelPath = rootRelPath
@@ -247,7 +242,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
 enum ProcessFile:
   case TemplatedFile(file: os.Path)
-  case PlainFile(file: os.Path)
+  case StaticFile(file: os.Path)
 
 case class RenderResult(
     pageContext: PageContext

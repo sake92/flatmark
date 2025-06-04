@@ -1,26 +1,20 @@
 
-
+# content
 - headings anchors
 - static search
-- base url in config ???
-- _data_file.yaml hierarchical
+- post-process internal links to use the base url or to be realative
 - tabbed content e.g. windows/linux/mac
 - RSS
 
 
-Check out Jekyll, Zola SSG, 11ty.
-
-
 ## i18n
 
-- _data_translations.yaml hierarchical.
+- _translations.yaml
 - set locale for lang based on folder name, e.g. `content/bs/index.md` will be in Bosnian language
 
 
 ## Migrating from other platforms
 - import from wordpress, jekyll itd
-
-
 
 
 ## Dev loop

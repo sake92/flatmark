@@ -19,7 +19,6 @@ case class TemplateContext(
 case class SiteContext(
     name: String,
     description: String,
-    posts: Seq[PageContext],
     categories: Map[String, CategoryContext],
     tags: Map[String, TagContext]
 ) {
@@ -27,7 +26,6 @@ case class SiteContext(
     Map(
       "name" -> name,
       "description" -> description,
-      "posts" -> posts.asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava
     ).asJava
