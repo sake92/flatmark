@@ -26,6 +26,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
 
+    logger.fine(s"Site configuration: ${siteConfig}")
+
     // collect relevant content
     // TODO custom config
     def shouldSkip(file: os.Path) =
@@ -225,6 +227,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         title = templateConfig.page.title,
         description = templateConfig.page.description,
         content = templateConfig.page.content,
+        publishDate = templateConfig.page.publishDate.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage)
       ),
       Option.when(items.nonEmpty)(

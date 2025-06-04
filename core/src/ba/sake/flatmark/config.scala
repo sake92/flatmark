@@ -1,11 +1,31 @@
 package ba.sake.flatmark
 
-import scala.util.boundary
+import java.time.LocalDateTime
+import java.util.TimeZone
+import scala.util.{Try, boundary}
 import org.virtuslab.yaml.*
+import org.virtuslab.yaml.Node.ScalarNode
+
+import java.time.format.DateTimeFormatter
+
 
 /* * Flatmark configuration classes.
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
+
+given YamlDecoder[LocalDateTime] = YamlDecoder { case s @ ScalarNode(value, _) =>
+  Try(LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).toEither.left
+    .map(ConstructError.from(_, "Timestamp", s))
+}
+
+given YamlEncoder[LocalDateTime] = dt => ScalarNode(dt.toString)
+
+given YamlDecoder[TimeZone] = YamlDecoder { case s@ScalarNode(value, _) =>
+  Try(TimeZone.getTimeZone(value)).toEither.left
+    .map(ConstructError.from(_, "TimeZone", s))
+}
+
+given YamlEncoder[TimeZone] = dt => ScalarNode(dt.toString)
 
 case class TemplateConfig(
     site: SiteConfig,
@@ -13,13 +33,14 @@ case class TemplateConfig(
 ) derives YamlCodec
 
 case class SiteConfig(
-    name: String = "My Site",
-    description: String = "",
-    baseUrl: String = "",
-    lang: String = "en", // Default language
-    theme: String = "default",
-    categories: Map[String, CategoryConfig] = Map.empty,
-    tags: Map[String, TagConfig] = Map.empty
+                       name: String = "My Site",
+                       description: String = "",
+                       baseUrl: String = "",
+                       lang: String = "en", // Default language
+                       timezone: TimeZone = TimeZone.getDefault,
+                       theme: String = "default",
+                       categories: Map[String, CategoryConfig] = Map.empty,
+                       tags: Map[String, TagConfig] = Map.empty
 ) derives YamlCodec
 
 case class CategoryConfig(
@@ -36,7 +57,8 @@ case class PageConfig(
     layout: String = "page",
     title: String = "Untitled",
     description: String = "",
-    content: String = ""
+    content: String = "",
+    publishDate: Option[LocalDateTime] = None
 ) derives YamlCodec
 
 private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
@@ -67,8 +89,10 @@ private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): 
     val rawYaml = mdTemplateRaw.linesIterator
       .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
       .mkString("\n")
-    rawYaml.as[PageConfig].toOption.getOrElse {
-      throw RuntimeException(s"Invalid YAML front matter in file: ${fileNameBase}. Expected PageConfig format.")
-    }
+    rawYaml.as[PageConfig].left.map { error =>
+      throw new RuntimeException(
+        s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}"
+      )
+    }.getOrElse(PageConfig())
   } else PageConfig()
 }

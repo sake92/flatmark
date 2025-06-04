@@ -59,6 +59,7 @@ case class PageContext(
     title: String,
     description: String,
     content: String,
+    publishDate: Option[java.time.ZonedDateTime],
     rootRelPath: os.RelPath
 ) {
   def toPebbleContext: java.util.Map[String, Object] = {
@@ -67,6 +68,7 @@ case class PageContext(
       "title" -> title,
       "description" -> description,
       "content" -> content,
+      "publishDate" -> publishDate.orNull,
       "url" -> s"/${rootRelPath.segments.mkString("/")}"
     ).asJava
   }
