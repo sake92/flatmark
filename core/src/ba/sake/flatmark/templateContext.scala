@@ -2,7 +2,11 @@ package ba.sake.flatmark
 
 import scala.jdk.CollectionConverters.*
 
-case class TemplateContext(site: SiteContext, page: PageContext, paginator: Option[PaginatorContext] = None) {
+case class TemplateContext(
+    site: SiteContext,
+    page: PageContext,
+    paginator: Option[PaginatorContext] = None
+) {
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
       "site" -> site.toPebbleContext,
@@ -15,15 +19,41 @@ case class TemplateContext(site: SiteContext, page: PageContext, paginator: Opti
 case class SiteContext(
     name: String,
     description: String,
-    posts: Seq[PageContext]
+    posts: Seq[PageContext],
+    categories: Map[String, CategoryContext],
+    tags: Map[String, TagContext]
 ) {
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
       "name" -> name,
       "description" -> description,
-      "posts" -> posts.asJava
+      "posts" -> posts.asJava,
+      "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
+      "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava
     ).asJava
   }
+}
+
+case class CategoryContext(
+    label: String,
+    description: String = ""
+) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(
+      "label" -> label,
+      "description" -> description
+    ).asJava
+}
+
+case class TagContext(
+    label: String,
+    description: String = ""
+) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(
+      "label" -> label,
+      "description" -> description
+    ).asJava
 }
 
 case class PageContext(
@@ -31,7 +61,7 @@ case class PageContext(
     title: String,
     description: String,
     content: String,
-    rootRelPath: String
+    rootRelPath: os.RelPath
 ) {
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
@@ -39,16 +69,20 @@ case class PageContext(
       "title" -> title,
       "description" -> description,
       "content" -> content,
-      "url" -> rootRelPath
+      "url" -> s"/${rootRelPath.segments.mkString("/")}"
     ).asJava
   }
+
+  override def toString: String =
+    s"PageContext(layout=$layout, title=$title, description=$description, content=${content.take(20)}..., rootRelPath=$rootRelPath)"
 }
+
 case class PaginatorContext(
     currentPage: Int,
     items: Seq[PageContext],
     totalItems: Int,
     pageSize: Int,
-    outputFileRelPath: Int => String
+    rootRelPath: Int => os.RelPath
 ) {
   private val totalPages =
     if pageSize == 0 then 1 // Avoid division by zero
@@ -67,8 +101,8 @@ case class PaginatorContext(
       "next" -> Integer.valueOf(currentPage + 1),
       "hasPrev" -> Boolean.box(hasPrev),
       "hasNext" -> Boolean.box(hasNext),
-      "prevUrl" -> outputFileRelPath(currentPage - 1),
-      "nextUrl" -> outputFileRelPath(currentPage + 1)
+      "prevUrl" -> s"/${rootRelPath(currentPage - 1).segments.mkString("/")}",
+      "nextUrl" -> s"/${rootRelPath(currentPage + 1).segments.mkString("/")}"
     ).asJava
   }
 }

@@ -7,27 +7,36 @@ import org.virtuslab.yaml.*
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
 
-case class TemplateConfig(site: SiteConfig, page: PageConfig) derives YamlCodec
+case class TemplateConfig(
+    site: SiteConfig,
+    page: PageConfig
+) derives YamlCodec
 
 case class SiteConfig(
     name: String = "My Site",
     description: String = "",
     baseUrl: String = "",
     lang: String = "en", // Default language
-    theme: String = "default"
+    theme: String = "default",
+    categories: Map[String, CategoryConfig] = Map.empty,
+    tags: Map[String, TagConfig] = Map.empty
+) derives YamlCodec
+
+case class CategoryConfig(
+    label: String,
+    description: String = ""
+) derives YamlCodec
+
+case class TagConfig(
+    label: String,
+    description: String = ""
 ) derives YamlCodec
 
 case class PageConfig(
-    layout: String = "default",
+    layout: String = "page",
     title: String = "Untitled",
     description: String = "",
-    content: String = "",
-    paginate: Option[PaginateConfig] = None
-) derives YamlCodec
-
-case class PaginateConfig(
-    data: String,
-    size: Int = 10
+    content: String = ""
 ) derives YamlCodec
 
 private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
