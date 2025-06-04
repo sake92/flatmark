@@ -4,8 +4,24 @@
 
 Edit `_config.yaml` in the root folder:
 ```yaml
-title: My Cool Blog
+name: My Cool Blog
 description: My Cool Blog Description
+
+categories:
+  # content/blog/ folder
+  blog:
+    label: Blog
+    description: The blog section of the site
+  # content/docs/ folder
+  docs:
+    label: Documentation
+    description: The documentation section of the site
+
+tags:
+  programming:
+    label: Programming
+    description: Posts related to programming
+
 # default language
 lang: en
 timezone: Europe/Sarajevo
@@ -21,10 +37,9 @@ Put the configuration at the top of your page or post file, in YAML format, like
 ```yaml
 ---
 title: Hello
-date: 2025-01-01 11:11
-layout: post
 tags: [scala, java]
-publish: yes | no | hide # hide means published but not listed/searched/google-indexed
+publish_date: 2025-01-01 11:11
+publish: yes | no | hide # hide means published but not listed/searched/google-indexed, default is yes
 ---
 
 # Hello {{page.title}}
@@ -32,5 +47,6 @@ publish: yes | no | hide # hide means published but not listed/searched/google-i
 This is my first post!
 ```
 
-The page configuration needs to start with `---` and end with `---` to denote the YAML front matter.  
-It needs to be the first thing in the file, before any other content.
+The page configuration section is optional.
+The file needs to start with `---` and the config ends with another `---`.  
+This type of config is called "YAML front matter".
