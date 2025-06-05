@@ -1,14 +1,14 @@
 ---
-title: Flatmark Features
-description: Flatmark Features
+title: Flatmark Mogućnosti
+description: Flatmark Mogućnosti
 tags: ["programming"]
 ---
 
 # {{page.title}}
 
-This is a **bold** markdown example with *italic* and `code`.
+Ovo je **boldirani** markdown primjer s *italic tekstom* i `kodom`.
 
-This is ~~strikethrough~~ text.
+Ovo je ~~prekrižen~~ tekst.
 
 This is ++inserted++ text.
 

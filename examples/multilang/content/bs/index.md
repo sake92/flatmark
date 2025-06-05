@@ -1,11 +1,11 @@
 ---
-title: Home
-description: Home page
+title: Početna
+description: Početna stranica
 ---
 
-# Hello Flatmark!
+# Poyy Flatmark!
 
-This is the home page.
+Ovo je početna stranica.
 
 
 

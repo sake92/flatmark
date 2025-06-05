@@ -37,7 +37,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
     val processFiles = mutable.ArrayBuffer.empty[ProcessFile]
-    val usedLanguageCodes = mutable.ArrayBuffer.empty[String]
+    val translationsLangCodes = mutable.ArrayBuffer.empty[String]
     os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
       Option.when(os.isFile(file)) {
         val processFile =
@@ -46,9 +46,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           else ProcessFile.StaticFile(file)
         val rootRelPath = file.relativeTo(contentFolder)
         val firstSegment = rootRelPath.segments.head
-        if Iso2LanguageCodes(firstSegment) then {
-          usedLanguageCodes += firstSegment
-        }
+        if Iso2LanguageCodes(firstSegment) then translationsLangCodes += firstSegment
         processFiles += processFile
       }
     }
@@ -68,12 +66,12 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       else templatedContentFiles += tf
     }
 
-    // pokupit sve pathove za content files
+    // TODO pokupit sve pathove za content files
     // i proslijedit pebbleu za custom translation_url
 
     // generate content first to get their snippets for index pages
     val allUsedLanguages =
-      usedLanguageCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
+      translationsLangCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
     val contentResults = templatedContentFiles.flatMap { tf =>
       renderTemplatedFile(
         siteConfig,
@@ -87,26 +85,36 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       )
     }.toSeq
     // generate index files with pagination and all
-    val contentByCategoryMap = siteConfig.categories.keys.map(_ -> Seq.empty[PageContext]).to(mutable.Map)
+    val contentByLangAndCategory: mutable.Map[(String, String), Seq[PageContext]] = (for
+      lang <- allUsedLanguages.map(_.toLanguageTag)
+      cat <- siteConfig.categories.keys
+    yield (lang, cat) -> Seq.empty[PageContext]).to(mutable.Map)
     contentResults.foreach { cr =>
       val segments = cr.pageContext.rootRelPath.segments
       val firstSegment = segments.head
-      boundary {
-        if allUsedLanguages.exists(_.toLanguageTag == firstSegment) then boundary.break()
-        contentByCategoryMap.get(firstSegment) match {
-          case Some(contentPages) =>
-            contentByCategoryMap.update(firstSegment, contentPages.appended(cr.pageContext))
-          case None =>
-            logger.warning(
-              s"Category ${firstSegment} not found in site config for content file: ${cr.pageContext.rootRelPath}"
-            )
-        }
+      val key =
+        if translationsLangCodes.contains(firstSegment)
+        then (firstSegment, segments(1)) // (lang, category)
+        else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
+      contentByLangAndCategory.get(key) match {
+        case Some(contentPages) =>
+          contentByLangAndCategory.update(key, contentPages.appended(cr.pageContext))
+        case None =>
+          logger.warning(
+            s"Category ${firstSegment} not found in site config for content file: ${cr.pageContext.rootRelPath}"
+          )
       }
     }
     templatedIndexFiles.foreach { tf =>
-      val categoryItems = contentByCategoryMap.getOrElse(
-        tf.file.relativeTo(contentFolder).segments.head,
-        contentByCategoryMap.values.flatten.toSeq // by default use all content pages
+      val segments = tf.file.relativeTo(contentFolder).segments
+      val firstSegment = segments.head
+      val key =
+        if translationsLangCodes.contains(firstSegment)
+        then (firstSegment, segments(1)) // (lang, category)
+        else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
+      val categoryItems = contentByLangAndCategory.getOrElse(
+        key,
+        contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
       )
       renderTemplatedFile(
         siteConfig,

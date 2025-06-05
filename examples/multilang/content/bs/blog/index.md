@@ -2,4 +2,4 @@
 layout: index
 ---
 
-# My Blog
+# Moj Blog
