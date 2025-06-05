@@ -1,0 +1,29 @@
+
+name: CI
+
+on:
+  push:
+    branches: main
+  pull_request:
+  workflow_call:  # allow this workflow to be called from other workflows
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - run: |
+        ./mill -i cli.nativeImage2
+        cp out/cli/nativeImage2.dest/native-executable flatmark
+      - name: Archive native-executable
+        uses: actions/upload-artifact@v4
+        with:
+          path: flatmark
+          retention-days: 30
