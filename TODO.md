@@ -5,6 +5,7 @@
 - post-process internal links to use the base url or to be realative
 - tabbed content e.g. windows/linux/mac
 - RSS
+- custom skip files?
 
 
 ## i18n

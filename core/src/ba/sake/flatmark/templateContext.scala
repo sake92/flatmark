@@ -19,6 +19,7 @@ case class TemplateContext(
 case class SiteContext(
     name: String,
     description: String,
+    languages: Seq[LanguageContext],
     categories: Map[String, CategoryContext],
     tags: Map[String, TagContext]
 ) {
@@ -26,10 +27,24 @@ case class SiteContext(
     Map(
       "name" -> name,
       "description" -> description,
+      "languages" -> languages.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava
     ).asJava
   }
+}
+
+case class LanguageContext(
+    code: String,
+    label: String,
+    url: String
+) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(
+      "code" -> code,
+      "label" -> label,
+      "url" -> url
+    ).asJava
 }
 
 case class CategoryContext(

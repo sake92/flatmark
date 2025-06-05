@@ -9,8 +9,12 @@ import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 
+import java.util.Locale
+
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
+
+  private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
     logger.info(s"Generating site in: ${siteRootFolder}")
@@ -25,27 +29,27 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
-
     logger.fine(s"Site configuration: ${siteConfig}")
 
     // collect relevant content
-    // TODO custom config
+    val contentFolder = siteRootFolder / "content"
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
-    val contentFolder = siteRootFolder / "content"
-    val processFiles = os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
+    val processFiles = mutable.ArrayBuffer.empty[ProcessFile]
+    val usedLanguageCodes = mutable.ArrayBuffer.empty[String]
+    os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
       Option.when(os.isFile(file)) {
-        if file.ext == "md" || file.ext == "html"
-        then ProcessFile.TemplatedFile(file)
-        else ProcessFile.StaticFile(file)
+        val processFile =
+          if file.ext == "md" || file.ext == "html"
+          then ProcessFile.TemplatedFile(file)
+          else ProcessFile.StaticFile(file)
+        val rootRelPath = file.relativeTo(contentFolder)
+        val firstSegment = rootRelPath.segments.head
+        if Iso2LanguageCodes(firstSegment) then {
+          usedLanguageCodes += firstSegment
+        }
+        processFiles += processFile
       }
-    }
-
-    val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
-    val templatedContentFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
-    processFiles.collect { case tf: ProcessFile.TemplatedFile =>
-      if tf.file.baseName == "index" then templatedIndexFiles += tf
-      else templatedContentFiles += tf
     }
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
@@ -56,10 +60,23 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler(siteRootFolder)
 
+    val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
+    val templatedContentFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
+    processFiles.collect { case tf: ProcessFile.TemplatedFile =>
+      if tf.file.baseName == "index" then templatedIndexFiles += tf
+      else templatedContentFiles += tf
+    }
+
+    // pokupit sve pathove za content files
+    // i proslijedit pebbleu za custom translation_url
+
     // generate content first to get their snippets for index pages
+    val allUsedLanguages =
+      usedLanguageCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
     val contentResults = templatedContentFiles.flatMap { tf =>
       renderTemplatedFile(
         siteConfig,
+        allUsedLanguages,
         contentFolder = contentFolder,
         file = tf.file,
         outputFolder = outputFolder,
@@ -91,6 +108,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       )
       renderTemplatedFile(
         siteConfig,
+        allUsedLanguages,
         contentFolder = contentFolder,
         file = tf.file,
         outputFolder = outputFolder,
@@ -114,6 +132,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private def renderTemplatedFile(
       siteConfig: SiteConfig,
+      allUsedLanguages: Seq[Locale],
       contentFolder: os.Path,
       file: os.Path,
       outputFolder: os.Path,
@@ -126,6 +145,12 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
+    val locale =
+      if fileRelPath.segments.length > 1 && Iso2LanguageCodes(fileRelPath.segments.head) then
+        Locale.forLanguageTag(fileRelPath.segments.head)
+      else siteConfig.lang
+    Locale.setDefault(Locale.Category.DISPLAY, locale) // set locale for rendering language names in current language
+    val languages = allUsedLanguages.filterNot(_ == locale) // exclude the current locale
 
     paginateItems match {
       case Some(allItems) =>
@@ -140,6 +165,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
             )
           }
           val contentContext = templateContext(
+            languages,
             templateConfig,
             rootRelPath,
             paginatedItemsGroup,
@@ -153,7 +179,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
             contentContext,
             outputFolder,
             markdownRenderer,
-            templateHandler
+            templateHandler,
+            locale
           )
         }
       case None =>
@@ -162,6 +189,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
         )
         val contentContext = templateContext(
+          languages,
           templateConfig,
           _ => rootRelPath,
           Seq.empty,
@@ -176,7 +204,8 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
             contentContext,
             outputFolder,
             markdownRenderer,
-            templateHandler
+            templateHandler,
+            locale
           )
         )
     }
@@ -188,14 +217,15 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       contentContext: TemplateContext,
       outputFolder: os.Path,
       markdownRenderer: FlatmarkMarkdownRenderer,
-      templateHandler: FlatmarkTemplateHandler
+      templateHandler: FlatmarkTemplateHandler,
+      locale: Locale
   ): RenderResult = {
     val fileRelPath = file.relativeTo(contentFolder)
-    val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext)
+    val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext, locale)
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
     // render final HTML file
     val layoutContext = contentContext.copy(page = contentContext.page.copy(content = contentHtml))
-    val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext)
+    val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
     os.write.over(
       outputFolder / contentContext.page.rootRelPath,
       finalHtml,
@@ -206,6 +236,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   }
 
   private def templateContext(
+      languages: Seq[Locale],
       templateConfig: TemplateConfig,
       rootRelPath: Int => os.RelPath,
       items: Seq[PageContext],
@@ -217,6 +248,10 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
       SiteContext(
         name = templateConfig.site.name,
         description = templateConfig.site.description,
+        languages = languages.map { l =>
+          val url = if templateConfig.site.lang == l then "/" else s"/${l.toLanguageTag}"
+          LanguageContext(l.toLanguageTag, l.getDisplayLanguage, url)
+        },
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },

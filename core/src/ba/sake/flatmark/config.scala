@@ -2,28 +2,14 @@ package ba.sake.flatmark
 
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
-import java.util.TimeZone
+import java.util.{Locale, TimeZone}
 import scala.util.{Try, boundary}
 import org.virtuslab.yaml.*
-import org.virtuslab.yaml.Node.ScalarNode
+import YamlInstances.given
 
 /* * Flatmark configuration classes.
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
-
-given YamlDecoder[LocalDateTime] = YamlDecoder { case s @ ScalarNode(value, _) =>
-  Try(LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).toEither.left
-    .map(ConstructError.from(_, "Timestamp", s))
-}
-
-given YamlEncoder[LocalDateTime] = dt => ScalarNode(dt.toString)
-
-given YamlDecoder[TimeZone] = YamlDecoder { case s @ ScalarNode(value, _) =>
-  Try(TimeZone.getTimeZone(value)).toEither.left
-    .map(ConstructError.from(_, "TimeZone", s))
-}
-
-given YamlEncoder[TimeZone] = dt => ScalarNode(dt.toString)
 
 case class TemplateConfig(
     site: SiteConfig,
@@ -34,7 +20,7 @@ case class SiteConfig(
     name: String = "My Site",
     description: String = "",
     baseUrl: String = "",
-    lang: String = "en", // Default language
+    lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "default",
     categories: Map[String, CategoryConfig] = Map.empty,

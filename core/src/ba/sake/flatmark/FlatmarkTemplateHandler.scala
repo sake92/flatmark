@@ -1,18 +1,17 @@
 package ba.sake.flatmark
 
-import io.pebbletemplates.pebble.attributes.AttributeResolver
-import io.pebbletemplates.pebble.error.LoaderException
-
+import java.nio.file.Files
+import java.nio.charset.StandardCharsets
 import java.util as ju
 import java.util.logging.Logger
-import java.nio.file.Files
+import java.util.Locale
 import java.io.{File, Reader, StringReader, StringWriter}
 import scala.util.boundary
 import io.pebbletemplates.pebble.PebbleEngine
 import io.pebbletemplates.pebble.loader.{DelegatingLoader, FileLoader}
 import io.pebbletemplates.pebble.utils.PathUtils
-
-import java.nio.charset.StandardCharsets
+import io.pebbletemplates.pebble.attributes.AttributeResolver
+import io.pebbletemplates.pebble.error.LoaderException
 
 class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
   private val logger = Logger.getLogger(getClass.getName)
@@ -30,11 +29,11 @@ class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
     new PebbleEngine.Builder().loader(loader).autoEscaping(false).build()
   }
 
-  def render(templateName: String, context: ju.Map[String, Object]): String = {
+  def render(templateName: String, context: ju.Map[String, Object], locale: Locale): String = {
     logger.fine(s"Rendering '${templateName}' with context: ${context}")
     val compiledTemplate = engine.getTemplate(templateName)
     val writer = new StringWriter()
-    compiledTemplate.evaluate(writer, context)
+    compiledTemplate.evaluate(writer, context, locale)
     writer.toString
   }
 
