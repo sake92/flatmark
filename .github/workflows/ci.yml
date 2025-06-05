@@ -20,8 +20,8 @@ jobs:
           distribution: 'temurin'
           java-version: 21
       - run: |
-        ./mill -i cli.nativeImage2
-        cp out/cli/nativeImage2.dest/native-executable flatmark
+          ./mill -i cli.nativeImage2
+          cp out/cli/nativeImage2.dest/native-executable flatmark
       - name: Archive native-executable
         uses: actions/upload-artifact@v4
         with:
