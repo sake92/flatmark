@@ -1,0 +1,25 @@
+
+<header>
+    <nav>
+        <ul>
+            <li><a href="{{ page.lang.url }}">Home</a></li>            
+            {% for cat in site.categories %}
+                {% if page.lang.url == "/" %}
+                <li><a href="/{{ cat.key }}">{{ cat.value.label }}</a></li>
+                {% else %}
+                <li><a href="{{ page.lang.url }}/{{ cat.key }}">{{ cat.value.label }}</a></li>
+                {% endif %}
+            
+            {% endfor %}
+        </ul>
+    </nav>
+    <nav>
+        <ul>
+            Languages:
+            {% for lang in site.langs %}
+            <li><a href="{{ lang.url }}">{{ lang.label | capitalize }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
+</header>
+    

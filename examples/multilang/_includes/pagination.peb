@@ -1,0 +1,23 @@
+
+{% if paginator.totalItems %}
+    {% for item in paginator.items %}
+    <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+    {% endfor %}
+
+    {% if paginator.hasPrev %}
+    <a href="{{ paginator.prevUrl }}">Prev</a>
+    {% else %}
+    <span>Prev</span>
+    {% endif %}
+
+    <b>{{ paginator.current }}</b>
+    
+    {% if paginator.hasNext %}
+    <a href="{{ paginator.nextUrl }}">Next</a>
+    {% else %}
+    <span>Next</span>
+    {% endif %}
+
+{% else %}
+<p>There are no posts. #sad </p>
+{% endif %}

@@ -1,0 +1,10 @@
+
+{% extends "base" %}
+
+{% block title %}
+    {{page.title}} | {{site.name}}
+{% endblock %}
+
+{% block content %}
+{{page.content}}
+{% endblock %}

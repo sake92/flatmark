@@ -1,0 +1,4 @@
+
+<footer>
+    {{site.name}} | {{site.description}}
+</footer>
