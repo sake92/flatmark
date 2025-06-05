@@ -1,15 +1,16 @@
 package ba.sake.flatmark
 
+import java.util.Locale
 import java.util.logging.Logger
 import scala.collection.mutable
+import scala.util.boundary
 import org.virtuslab.yaml.*
 import ba.sake.flatmark.selenium.ChromeDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
-
-import java.util.Locale
+import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
 class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
@@ -89,8 +90,9 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val contentByCategoryMap = siteConfig.categories.keys.map(_ -> Seq.empty[PageContext]).to(mutable.Map)
     contentResults.foreach { cr =>
       val segments = cr.pageContext.rootRelPath.segments
-      if segments.length > 1 then {
-        val firstSegment = segments.head
+      val firstSegment = segments.head
+      boundary {
+        if allUsedLanguages.exists(_.toLanguageTag == firstSegment) then boundary.break()
         contentByCategoryMap.get(firstSegment) match {
           case Some(contentPages) =>
             contentByCategoryMap.update(firstSegment, contentPages.appended(cr.pageContext))
@@ -132,7 +134,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private def renderTemplatedFile(
       siteConfig: SiteConfig,
-      allUsedLanguages: Seq[Locale],
+      languages: Seq[Locale],
       contentFolder: os.Path,
       file: os.Path,
       outputFolder: os.Path,
@@ -150,7 +152,6 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         Locale.forLanguageTag(fileRelPath.segments.head)
       else siteConfig.lang
     Locale.setDefault(Locale.Category.DISPLAY, locale) // set locale for rendering language names in current language
-    val languages = allUsedLanguages.filterNot(_ == locale) // exclude the current locale
 
     paginateItems match {
       case Some(allItems) =>
@@ -166,6 +167,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
           }
           val contentContext = templateContext(
             languages,
+            locale,
             templateConfig,
             rootRelPath,
             paginatedItemsGroup,
@@ -190,6 +192,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         )
         val contentContext = templateContext(
           languages,
+          locale,
           templateConfig,
           _ => rootRelPath,
           Seq.empty,
@@ -237,21 +240,36 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private def templateContext(
       languages: Seq[Locale],
+      lang: Locale,
       templateConfig: TemplateConfig,
       rootRelPath: Int => os.RelPath,
       items: Seq[PageContext],
       currentPage: Int,
       pageSize: Int,
       totalItems: Int
-  ): TemplateContext =
+  ): TemplateContext = {
+    val (langContexts, langContext) = locally {
+      val originalLocale = Locale.getDefault(Locale.Category.DISPLAY)
+      val res1 = languages.map { l =>
+        // set locale for rendering language names in respective language
+        Locale.setDefault(Locale.Category.DISPLAY, l)
+        val url = if templateConfig.site.lang == l then "/" else s"/${l.toLanguageTag}"
+        LanguageContext(l.toLanguageTag, l.getDisplayLanguage, url)
+      }
+      val res2 = LanguageContext(
+        lang.toLanguageTag,
+        lang.getDisplayLanguage,
+        if templateConfig.site.lang == lang then "/" else s"/${lang.toLanguageTag}"
+      )
+      Locale.setDefault(Locale.Category.DISPLAY, originalLocale) // restore original locale
+      (res1, res2)
+    }
+
     TemplateContext(
       SiteContext(
         name = templateConfig.site.name,
         description = templateConfig.site.description,
-        languages = languages.map { l =>
-          val url = if templateConfig.site.lang == l then "/" else s"/${l.toLanguageTag}"
-          LanguageContext(l.toLanguageTag, l.getDisplayLanguage, url)
-        },
+        langs = langContexts,
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },
@@ -262,6 +280,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         title = templateConfig.page.title,
         description = templateConfig.page.description,
         content = templateConfig.page.content,
+        lang = langContext,
         publishDate = templateConfig.page.publishDate.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage)
       ),
@@ -275,6 +294,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
         )
       )
     )
+  }
 
 }
 

@@ -19,7 +19,7 @@ case class TemplateContext(
 case class SiteContext(
     name: String,
     description: String,
-    languages: Seq[LanguageContext],
+    langs: Seq[LanguageContext],
     categories: Map[String, CategoryContext],
     tags: Map[String, TagContext]
 ) {
@@ -27,7 +27,7 @@ case class SiteContext(
     Map(
       "name" -> name,
       "description" -> description,
-      "languages" -> languages.map(_.toPebbleContext).asJava,
+      "langs" -> langs.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava
     ).asJava
@@ -74,6 +74,7 @@ case class PageContext(
     title: String,
     description: String,
     content: String,
+    lang: LanguageContext,
     publishDate: Option[java.time.ZonedDateTime],
     rootRelPath: os.RelPath
 ) {
@@ -83,6 +84,7 @@ case class PageContext(
       "title" -> title,
       "description" -> description,
       "content" -> content,
+      "lang" -> lang.toPebbleContext,
       "publishDate" -> publishDate.orNull,
       "url" -> s"/${rootRelPath.segments.mkString("/")}"
     ).asJava

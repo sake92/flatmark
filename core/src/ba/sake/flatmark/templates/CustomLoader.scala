@@ -1,43 +1,13 @@
-package ba.sake.flatmark
+package ba.sake.flatmark.templates
 
-import java.nio.file.Files
-import java.nio.charset.StandardCharsets
-import java.util as ju
-import java.util.logging.Logger
-import java.util.Locale
-import java.io.{File, Reader, StringReader, StringWriter}
-import scala.util.boundary
-import io.pebbletemplates.pebble.PebbleEngine
-import io.pebbletemplates.pebble.loader.{DelegatingLoader, FileLoader}
-import io.pebbletemplates.pebble.utils.PathUtils
-import io.pebbletemplates.pebble.attributes.AttributeResolver
 import io.pebbletemplates.pebble.error.LoaderException
+import io.pebbletemplates.pebble.loader.FileLoader
+import io.pebbletemplates.pebble.utils.PathUtils
 
-class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
-  private val logger = Logger.getLogger(getClass.getName)
-
-  private val engine = locally {
-    val layoutsLoader = new FileLoader()
-    layoutsLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_layouts/")
-    layoutsLoader.setSuffix(".peb")
-    val includesLoader = new FileLoader()
-    includesLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_includes/")
-    includesLoader.setSuffix(".peb")
-    val contentLoader = new CustomLoader()
-    contentLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/content/")
-    val loader = new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))
-    new PebbleEngine.Builder().loader(loader).autoEscaping(false).build()
-  }
-
-  def render(templateName: String, context: ju.Map[String, Object], locale: Locale): String = {
-    logger.fine(s"Rendering '${templateName}' with context: ${context}")
-    val compiledTemplate = engine.getTemplate(templateName)
-    val writer = new StringWriter()
-    compiledTemplate.evaluate(writer, context, locale)
-    writer.toString
-  }
-
-}
+import java.io.{File, Reader, StringReader}
+import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import scala.util.boundary
 
 // skips YAML front matter (triple dash lines) in the content files
 class CustomLoader extends FileLoader {
