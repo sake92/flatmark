@@ -18,7 +18,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
-    logger.info(s"Generating site in: ${siteRootFolder}")
+    logger.info(s"Generating site in '${siteRootFolder}'")
     if !os.exists(siteRootFolder) then throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw RuntimeException(s"Site root is not a folder: ${siteRootFolder}")
 

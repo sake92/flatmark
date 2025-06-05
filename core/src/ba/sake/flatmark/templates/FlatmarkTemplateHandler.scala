@@ -13,13 +13,15 @@ class FlatmarkTemplateHandler(siteRootFolder: os.Path) {
 
   private val engine = locally {
     val layoutsLoader = new FileLoader()
-    layoutsLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_layouts/")
+    val relPath = siteRootFolder.relativeTo(os.pwd).toString
+    val relPathPrefix = if (relPath.isEmpty) "" else s"${relPath}/"
+    layoutsLoader.setPrefix(s"${relPathPrefix}_layouts/")
     layoutsLoader.setSuffix(".peb")
     val includesLoader = new FileLoader()
-    includesLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/_includes/")
+    includesLoader.setPrefix(s"${relPathPrefix}_includes/")
     includesLoader.setSuffix(".peb")
     val contentLoader = new CustomLoader()
-    contentLoader.setPrefix(siteRootFolder.relativeTo(os.pwd).toString + "/content/")
+    contentLoader.setPrefix(s"${relPathPrefix}content/")
     val loader = new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))
     new PebbleEngine.Builder().loader(loader).autoEscaping(false).build()
   }
