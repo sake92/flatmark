@@ -16,7 +16,7 @@ class FlatmarkCodeHighlighter(port: Int, webDriverHolder: WebDriverHolder, fileC
   private val logger = Logger.getLogger(getClass.getName)
 
   def highlight(codeStr: String, codeLang: Option[String] = None): String =
-    fileCache.cached(codeStr, codeLang.getOrElse("plaintext")) {
+    fileCache.cached("highlightjs", codeStr, codeLang.getOrElse("plaintext")) {
       try {
         logger.fine("Highlighting code start")
         val encodedCodeStr = URLEncoder.encode(codeStr, "utf-8")

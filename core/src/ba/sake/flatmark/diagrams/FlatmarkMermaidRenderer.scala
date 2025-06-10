@@ -1,4 +1,4 @@
-package ba.sake.flatmark.math
+package ba.sake.flatmark.diagrams
 
 import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
@@ -11,24 +11,24 @@ import java.time.Duration
 import java.util.logging.{Level, Logger}
 import scala.jdk.CollectionConverters.*
 
-class FlatmarkMathRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkMermaidRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
-  def render(mathStr: String): String =
-    fileCache.cached("katex", mathStr) {
+  def render(source: String): String =
+    fileCache.cached("mermaid", source) {
       try {
-        logger.fine("Render math start")
-        val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
-        val url = s"http://localhost:${port}/ssr/katex?source=${encodedMathStr}"
+        logger.fine("Render mermaid start")
+        val encodedSource = URLEncoder.encode(source, "utf-8")
+        val url = s"http://localhost:${port}/ssr/mermaid?source=${encodedSource}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)
         webDriverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
       } catch {
         case e: org.openqa.selenium.WebDriverException =>
-          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll()
-          logger.log(Level.SEVERE, s"Errors during math rendering: ${logs.asScala.mkString("\n")}", e)
-          mathStr
+          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.log(Level.SEVERE, s"Errors during mermaid rendering: ${logs.asScala.mkString("\n")}", e)
+          source
       }
     }
 

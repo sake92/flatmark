@@ -14,7 +14,7 @@ class FlatmarkGraphvizRenderer(port: Int, webDriverHolder: WebDriverHolder, file
   private val logger = Logger.getLogger(getClass.getName)
 
   def render(dotStr: String, engine: String = "dot"): String =
-    fileCache.cached(dotStr, engine) {
+    fileCache.cached("graphviz", dotStr, engine) {
       try {
         logger.fine("Render graphviz start")
         val encodedDotStr = URLEncoder.encode(dotStr, "utf-8")
@@ -27,7 +27,7 @@ class FlatmarkGraphvizRenderer(port: Int, webDriverHolder: WebDriverHolder, file
       } catch {
         case e: org.openqa.selenium.WebDriverException =>
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
-          logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
+          logger.log(Level.SEVERE, s"Errors during graphviz rendering: ${logs.asScala.mkString("\n")}", e)
           dotStr
       }
     }

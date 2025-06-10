@@ -8,6 +8,7 @@ import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
+import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
@@ -59,8 +60,9 @@ class FlatmarkGenerator(port: Int, webDriverHolder: WebDriverHolder) {
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(port, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(port, webDriverHolder, fileCache)
+    val mermaidRenderer = FlatmarkMermaidRenderer(port, webDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(port, webDriverHolder, fileCache)
-    val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
+    val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
 
     val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]

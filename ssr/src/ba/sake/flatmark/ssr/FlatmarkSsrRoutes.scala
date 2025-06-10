@@ -60,7 +60,7 @@ val routes = Routes {
         )
       )
     )
-  case GET -> Path("ssr", "mermaidjs") =>
+  case GET -> Path("ssr", "mermaid") =>
     case class QP(source: String) derives QueryStringRW
     val qp = Request.current.queryParams[QP]
     Response.withBody(

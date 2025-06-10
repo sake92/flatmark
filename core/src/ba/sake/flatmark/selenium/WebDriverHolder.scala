@@ -19,7 +19,6 @@ class WebDriverHolder {
     chromeOptions.setCapability("goog:loggingPrefs", driverLogPrefs)
     chromeOptions.addArguments("--headless=new")
     chromeOptions.addArguments("--allow-file-access-from-files")
-    chromeOptions.set
     val webDriver = new ChromeDriver(chromeOptions)
     initialized = true
     logger.fine("WebDriver started")
