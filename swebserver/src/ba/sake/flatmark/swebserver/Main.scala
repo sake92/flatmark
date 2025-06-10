@@ -3,6 +3,7 @@ package ba.sake.flatmark.swebserver
 import java.nio.file.Paths
 import mainargs.{ParserForMethods, arg, main}
 import io.undertow.Undertow
+import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
 
 object Main {
 
@@ -14,8 +15,13 @@ object Main {
       port: Int = 5555
   ): Unit = {
     val baseFolder = Paths.get(directory).toAbsolutePath
-    Undertow.builder.addHttpListener(port, "localhost").setHandler(new SWebServerHandler(baseFolder)).build.start()
-    System.out.println(s"Server started on http://localhost:${port}")
+    val resourceManager = new PathResourceManager(baseFolder)
+    Undertow.builder
+      .addHttpListener(port, "localhost")
+      .setHandler(new SWebServerHandler(baseFolder, new ResourceHandler(resourceManager)))
+      .build
+      .start()
+    println(s"HTTP server started on http://localhost:${port} ; Watching files in: ${baseFolder.toString}")
   }
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrExit(args)
