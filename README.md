@@ -6,9 +6,7 @@ Start with a markdown file and end with a static website.
 
 ## Design goals
 
-Minimal setup:
-- one command to install
-- one dependency: chrome
+Minimal setup, one command install.
 
 
 

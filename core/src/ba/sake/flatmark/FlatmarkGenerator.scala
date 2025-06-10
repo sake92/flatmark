@@ -3,20 +3,18 @@ package ba.sake.flatmark
 import java.util.Locale
 import java.util.logging.Logger
 import scala.collection.mutable
-import scala.util.boundary
 import org.virtuslab.yaml.*
-import ba.sake.flatmark.selenium.ChromeDriverHolder
+import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
-class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
+class FlatmarkGenerator(port: Int, webDriverHolder: WebDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
-
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
     logger.info(s"Generating site in '${siteRootFolder}'")
@@ -59,9 +57,9 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder, useCache)
-    val codeHighlighter = FlatmarkCodeHighlighter(port, chromeDriverHolder, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
+    val codeHighlighter = FlatmarkCodeHighlighter(port, webDriverHolder, fileCache)
+    val graphvizRenderer = FlatmarkGraphvizRenderer(port, webDriverHolder, fileCache)
+    val mathRenderer = FlatmarkMathRenderer(port, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
 

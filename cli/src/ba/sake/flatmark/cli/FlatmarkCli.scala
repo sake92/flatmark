@@ -2,7 +2,7 @@ package ba.sake.flatmark.cli
 
 import java.util.logging.{Level, LogManager, Logger}
 import ba.sake.flatmark.FlatmarkGenerator
-import ba.sake.flatmark.selenium.ChromeDriverHolder
+import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.sharaf.undertow.UndertowSharafServer
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
@@ -16,12 +16,12 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     logger.info("Flatmark started")
 
     val startAtMillis = System.currentTimeMillis()
-    val chromeDriverHolder = ChromeDriverHolder()
+    val webDriverHolder = WebDriverHolder()
     val flatmarkServer = startFlatmarkServer()
-    val generator = FlatmarkGenerator(port, chromeDriverHolder)
+    val generator = FlatmarkGenerator(port, webDriverHolder)
     try generator.generate(siteRootFolder, useCache)
     finally
-      chromeDriverHolder.close()
+      webDriverHolder.close()
       flatmarkServer.stop()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000

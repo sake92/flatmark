@@ -1,37 +1,39 @@
 package ba.sake.flatmark.selenium
 
+import java.util.logging.{Level, Logger}
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import org.openqa.selenium.logging.{LogType, LoggingPreferences}
+import org.openqa.selenium.remote.RemoteWebDriver
 
-import java.util.logging.{Level, Logger}
-
-class ChromeDriverHolder {
+class WebDriverHolder {
   private val logger = Logger.getLogger(getClass.getName)
-  
-  private var initialized = false
-  
-  lazy val driver: ChromeDriver = {
-    logger.fine("ChromeDriver starting...")
+
+  @volatile private var initialized = false
+
+  // selenium automatically downloads the driver binaries and webdriver!
+  lazy val driver: RemoteWebDriver = {
+    logger.fine("WebDriver starting...")
     val chromeOptions = new ChromeOptions()
     val driverLogPrefs = new LoggingPreferences()
     driverLogPrefs.enable(LogType.BROWSER, Level.ALL)
     chromeOptions.setCapability("goog:loggingPrefs", driverLogPrefs)
     chromeOptions.addArguments("--headless=new")
     chromeOptions.addArguments("--allow-file-access-from-files")
-    val chromeDriver = new ChromeDriver(chromeOptions)
-    logger.fine("ChromeDriver started")
+    chromeOptions.set
+    val webDriver = new ChromeDriver(chromeOptions)
     initialized = true
-    chromeDriver
+    logger.fine("WebDriver started")
+    webDriver
   }
 
   def close(): Unit = {
-    if (initialized) {
-      logger.fine("Closing ChromeDriver...")
+    if initialized then {
+      logger.fine("Closing WebDriver...")
       driver.quit()
       initialized = false
-      logger.fine("ChromeDriver closed")
+      logger.fine("WebDriver closed")
     } else {
-      logger.fine("ChromeDriver was not initialized, nothing to close.")
+      logger.fine("WebDriver was not initialized, nothing to close.")
     }
   }
 }

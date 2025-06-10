@@ -1,9 +1,8 @@
 package ba.sake.flatmark.math
 
 import ba.sake.flatmark.FileCache
-import ba.sake.flatmark.selenium.ChromeDriverHolder
+import ba.sake.flatmark.selenium.WebDriverHolder
 import org.openqa.selenium.By
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.support.ui.WebDriverWait
 
@@ -12,7 +11,7 @@ import java.time.Duration
 import java.util.logging.{Level, Logger}
 import scala.jdk.CollectionConverters.*
 
-class FlatmarkMathRenderer(port:Int, driverHolder: ChromeDriverHolder, fileCache: FileCache) {
+class FlatmarkMathRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def render(mathStr: String): String = fileCache.cached(mathStr) {
@@ -20,13 +19,13 @@ class FlatmarkMathRenderer(port:Int, driverHolder: ChromeDriverHolder, fileCache
       logger.fine("Render math start")
       val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
       val url = s"http://localhost:${port}/ssr/katex?source=${encodedMathStr}"
-      driverHolder.driver.get(url)
-      val waitCondition = new WebDriverWait(driverHolder.driver, Duration.ofSeconds(5))
-      waitCondition.until(_ => driverHolder.driver.executeScript("return renderFinished;") == true)
-      driverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
+      webDriverHolder.driver.get(url)
+      val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
+      waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)
+      webDriverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
     } catch {
       case e: org.openqa.selenium.WebDriverException =>
-        val logs = driverHolder.driver.manage().logs().get(LogType.BROWSER).getAll()
+        val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll()
         logger.log(Level.SEVERE, s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
         mathStr
     }
