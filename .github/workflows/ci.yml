@@ -7,6 +7,9 @@ on:
   pull_request:
   workflow_call:  # allow this workflow to be called from other workflows
 
+env:
+  FORK_ARGS: "-agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image"
+
 jobs:
   test:
     name: test

@@ -12,12 +12,10 @@ object cli extends ScalaModule with CustomNativeImageModule {
     ivy"com.lihaoyi::mainargs:0.7.6"
   )
 
-  def forkArgs = Seq[String](
+  def forkArgs = Seq(Task.env.getOrElse("FORK_ARGS", "")) ++ Seq[String](
     "-Dorg.jboss.logging.provider=jdk",
     // https://github.com/scala/scala3/issues/9013
-    "--sun-misc-unsafe-memory-access=allow",
-    // generate optimization file for graal-native
-    //"-agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image"
+    "--sun-misc-unsafe-memory-access=allow"
   )
 }
 

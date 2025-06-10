@@ -2,16 +2,10 @@
 # content
 - headings anchors
 - static search
-- post-process internal links to use the base url or to be realative
+- post-process internal links to use the base url or to be relative
 - tabbed content e.g. windows/linux/mac
 - RSS
 - custom skip files?
-
-
-## i18n
-
-- _translations.yaml
-- set locale for lang based on folder name, e.g. `content/bs/index.md` will be in Bosnian language
 
 
 ## Migrating from other platforms
