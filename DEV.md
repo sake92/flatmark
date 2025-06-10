@@ -1,15 +1,5 @@
 
 
-
-
-
-
-
-
-
-
-
-
 ## Making GraalVM native image
 
 ```bash

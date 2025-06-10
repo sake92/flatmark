@@ -2,6 +2,7 @@
 # content
 - headings anchors
 - static search
+- translation_url filter
 - post-process internal links to use the base url or to be relative
 - tabbed content e.g. windows/linux/mac
 - RSS

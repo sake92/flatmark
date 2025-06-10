@@ -4,8 +4,8 @@ Current design of the project:
 - one executable, no plugins
 - http server + Selenium for syntax highlighting, diagram rendering etc (everything that needs a browser)
   - works even for mermaidjs, diagrams are plain SVGs!
-  - we do need chrome installed tho
   - file cached
+  - selenium handles chrome installation for us
 - file system layout == URLs
 
 

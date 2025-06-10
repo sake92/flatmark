@@ -1,13 +1,13 @@
 package build
 
 import mill._
-import scalalib._
+import mill.scalalib._
 import mill.define.ModuleRef
 
 object cli extends ScalaModule with CustomNativeImageModule {
   def scalaVersion = "3.7.0"
   def mainClass = Some("ba.sake.flatmark.cli.Main")
-  def moduleDeps = Seq(core)
+  def moduleDeps = Seq(core, swebserver)
   def ivyDeps = Agg(
     ivy"com.lihaoyi::mainargs:0.7.6"
   )
@@ -42,6 +42,16 @@ object core extends ScalaModule {
   /* def repositoriesTask = Task.Anon {
     super.repositoriesTask() ++ Seq(coursier.MavenRepository("https://jitpack.io"))
   }*/
+}
+
+object swebserver extends ScalaModule {
+  def scalaVersion = "3.7.0"
+  def ivyDeps = Agg(
+    ivy"ba.sake::sharaf-undertow:0.10.0",
+    // https://github.com/wildfly/wildfly-common/issues/74
+    ivy"org.wildfly.common:wildfly-common:1.7.0.Final",
+    ivy"com.lihaoyi::mainargs:0.7.6"
+  )
 }
 
 object ssr extends ScalaModule {
