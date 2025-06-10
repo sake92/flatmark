@@ -17,10 +17,16 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
+
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
     logger.info(s"Generating site in '${siteRootFolder}'")
     if !os.exists(siteRootFolder) then throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw RuntimeException(s"Site root is not a folder: ${siteRootFolder}")
+
+    val customClassloader = new java.net.URLClassLoader(
+      Array((siteRootFolder / "_i18n").toIO.toURI.toURL),
+      Thread.currentThread.getContextClassLoader
+    )
 
     val outputFolder = siteRootFolder / "_site"
     os.remove.all(outputFolder, ignoreErrors = true)
@@ -57,7 +63,7 @@ class FlatmarkGenerator(port: Int, chromeDriverHolder: ChromeDriverHolder) {
     val graphvizRenderer = FlatmarkGraphvizRenderer(port, chromeDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(port, chromeDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mathRenderer)
-    val templateHandler = FlatmarkTemplateHandler(siteRootFolder)
+    val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
 
     val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
     val templatedContentFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
