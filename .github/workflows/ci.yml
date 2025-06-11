@@ -23,7 +23,7 @@ jobs:
           distribution: 'temurin'
           java-version: 21
       - run: |
-          ./mill -i cli.run -i examples/multilang --no-cache
+          ./mill -i cli.run build -i examples/multilang --no-cache
           ./mill -i cli.nativeImage2
           cp out/cli/nativeImage2.dest/native-executable flatmark
       - name: Archive native-executable
