@@ -11,7 +11,7 @@ import java.time.Duration
 import java.util.logging.{Level, Logger}
 import scala.jdk.CollectionConverters.*
 
-class FlatmarkMathRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkMathRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def render(mathStr: String): String =
@@ -19,7 +19,7 @@ class FlatmarkMathRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCach
       try {
         logger.fine("Render math start")
         val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
-        val url = s"http://localhost:${port}/ssr/katex?source=${encodedMathStr}"
+        val url = s"http://localhost:${ssrServerPort}/ssr/katex?source=${encodedMathStr}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

@@ -5,9 +5,9 @@ import java.util.Base64
 
 class FileCache(cacheFolder: os.Path, useCache: Boolean) {
 
-  def cached(cacheKeyParts: String*)(code: => String): String = {
+  def cached(prefix: String, cacheKeyParts: String*)(code: => String): String = {
     val cacheKey = getMd5B64(cacheKeyParts.mkString("-"))
-    val cachedResultFileName = cacheFolder / "cached-results" / s"${cacheKey}.txt"
+    val cachedResultFileName = cacheFolder / "cached-results" / s"${prefix}-${cacheKey}.txt"
     if useCache && os.exists(cachedResultFileName) then {
       os.read(cachedResultFileName)
     } else {

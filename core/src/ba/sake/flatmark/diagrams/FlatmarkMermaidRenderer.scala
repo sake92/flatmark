@@ -11,7 +11,7 @@ import java.time.Duration
 import java.util.logging.{Level, Logger}
 import scala.jdk.CollectionConverters.*
 
-class FlatmarkMermaidRenderer(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkMermaidRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
   private val logger = Logger.getLogger(getClass.getName)
 
   def render(source: String): String =
@@ -19,7 +19,7 @@ class FlatmarkMermaidRenderer(port: Int, webDriverHolder: WebDriverHolder, fileC
       try {
         logger.fine("Render mermaid start")
         val encodedSource = URLEncoder.encode(source, "utf-8")
-        val url = s"http://localhost:${port}/ssr/mermaid?source=${encodedSource}"
+        val url = s"http://localhost:${ssrServerPort}/ssr/mermaid?source=${encodedSource}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

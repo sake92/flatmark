@@ -5,7 +5,7 @@ import ba.sake.sharaf.*
 import ba.sake.querson.*
 
 val routes = Routes {
-  case GET -> Path("ssr","highlightjs") =>
+  case GET -> Path("ssr", "highlightjs") =>
     case class QP(code: String, lang: String) derives QueryStringRW
     val qp = Request.current.queryParams[QP]
     Response.withBody(

@@ -1,19 +1,15 @@
 package ba.sake.flatmark.cli
 
-import java.util.Collection
 import java.util.logging.{Level, LogManager, Logger}
 import ba.sake.flatmark.FlatmarkGenerator
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.swebserver.SWebServerHandler
+import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.undertow.handlers.RoutesHandler
+import ba.sake.sharaf.utils.NetworkUtils
 import io.undertow.Undertow
 import io.undertow.server.handlers.BlockingHandler
-import io.undertow.server.handlers.resource.{
-  PathResourceManager,
-  ResourceChangeEvent,
-  ResourceChangeListener,
-  ResourceHandler
-}
+import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = Logger.getLogger(getClass.getName)
@@ -26,11 +22,14 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
     val flatmarkServer = startFlatmarkServer(port)
-    val generator = FlatmarkGenerator(port, webDriverHolder)
+    val ssrServerPort = NetworkUtils.getFreePort()
+    val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
+    val generator = FlatmarkGenerator(ssrServerPort, webDriverHolder)
     try generator.generate(siteRootFolder, useCache)
     finally
       webDriverHolder.close()
       flatmarkServer.stop()
+      flatmarkSsrServer.stop()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
     logger.info(s"Flatmark finished in ${totalSeconds} s")
@@ -43,7 +42,9 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     logger.info("Flatmark started")
     val webDriverHolder = WebDriverHolder()
     startFlatmarkServer(port)
-    val generator = FlatmarkGenerator(port, webDriverHolder)
+    val ssrServerPort = NetworkUtils.getFreePort()
+    startFlatmarkSsrServer(ssrServerPort)
+    val generator = FlatmarkGenerator(ssrServerPort, webDriverHolder)
     generator.generate(siteRootFolder, useCache)
     os.watch.watch(
       Seq(siteRootFolder),
@@ -61,15 +62,9 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
 
   private def startFlatmarkServer(port: Int): Undertow =
     logger.fine("Flatmark server starting...")
-    val flatmarkRoutes = ba.sake.flatmark.ssr.routes
     val generatedSiteFolder = (siteRootFolder / "_site").wrapped
     val resourceManager = new PathResourceManager(generatedSiteFolder)
-    val undertowHandler = BlockingHandler(
-      RoutesHandler(
-        flatmarkRoutes,
-        SWebServerHandler(generatedSiteFolder, new ResourceHandler(resourceManager))
-      )
-    )
+    val undertowHandler = SWebServerHandler(generatedSiteFolder, new ResourceHandler(resourceManager))
     val server = Undertow
       .builder()
       .addHttpListener(port, "localhost")
@@ -77,5 +72,16 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
       .build()
     server.start()
     logger.info(s"Flatmark server started at http://localhost:${port}")
+    server
+
+  private def startFlatmarkSsrServer(port: Int): UndertowSharafServer =
+    logger.fine("Flatmark SSR server starting...")
+    val server = UndertowSharafServer(
+      "localhost",
+      port,
+      ba.sake.flatmark.ssr.routes
+    )
+    server.start()
+    logger.fine(s"Flatmark SSR server started at http://localhost:${port}")
     server
 }

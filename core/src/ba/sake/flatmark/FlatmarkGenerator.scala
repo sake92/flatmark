@@ -12,7 +12,7 @@ import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
-class FlatmarkGenerator(port: Int, webDriverHolder: WebDriverHolder) {
+class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
   private val logger = Logger.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
@@ -58,10 +58,10 @@ class FlatmarkGenerator(port: Int, webDriverHolder: WebDriverHolder) {
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val fileCache = FileCache(cacheFolder, useCache)
-    val codeHighlighter = FlatmarkCodeHighlighter(port, webDriverHolder, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(port, webDriverHolder, fileCache)
-    val mermaidRenderer = FlatmarkMermaidRenderer(port, webDriverHolder, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(port, webDriverHolder, fileCache)
+    val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
+    val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerPort, webDriverHolder, fileCache)
+    val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerPort, webDriverHolder, fileCache)
+    val mathRenderer = FlatmarkMathRenderer(ssrServerPort, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
 

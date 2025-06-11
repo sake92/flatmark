@@ -11,7 +11,7 @@ import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
 
 // driver is lazy because of performance reasons, it is created only when needed
-class FlatmarkCodeHighlighter(port: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkCodeHighlighter(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
 
   private val logger = Logger.getLogger(getClass.getName)
 
@@ -21,7 +21,7 @@ class FlatmarkCodeHighlighter(port: Int, webDriverHolder: WebDriverHolder, fileC
         logger.fine("Highlighting code start")
         val encodedCodeStr = URLEncoder.encode(codeStr, "utf-8")
         val encodedCodeLang = codeLang.map(lang => URLEncoder.encode(lang, "utf-8")).getOrElse("plaintext")
-        val url = s"http://localhost:${port}/ssr/highlightjs?code=${encodedCodeStr}&lang=${encodedCodeLang}"
+        val url = s"http://localhost:${ssrServerPort}/ssr/highlightjs?code=${encodedCodeStr}&lang=${encodedCodeLang}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)
