@@ -14,7 +14,7 @@
 
 
 ## Dev loop
-- `flatmark serve` to build, watch and serve the site
+- `flatmark serve` live reload
 - show a label down below with a warning that this is a dev server
 - render even the posts that are not published, and future-date posts! (and show a nice warning)
 

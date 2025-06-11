@@ -62,9 +62,10 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
 
   private def startFlatmarkServer(port: Int): Undertow =
     logger.fine("Flatmark server starting...")
-    val generatedSiteFolder = (siteRootFolder / "_site").wrapped
-    val resourceManager = new PathResourceManager(generatedSiteFolder)
-    val undertowHandler = SWebServerHandler(generatedSiteFolder, new ResourceHandler(resourceManager))
+    val generatedSiteFolder = siteRootFolder / "_site"
+    if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
+    val resourceManager = new PathResourceManager(generatedSiteFolder.wrapped)
+    val undertowHandler = SWebServerHandler(generatedSiteFolder.wrapped, new ResourceHandler(resourceManager))
     val server = Undertow
       .builder()
       .addHttpListener(port, "localhost")
