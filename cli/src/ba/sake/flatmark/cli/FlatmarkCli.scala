@@ -1,24 +1,23 @@
 package ba.sake.flatmark.cli
 
-import java.util.logging.{Level, LogManager, Logger}
+import java.util.logging.{Level, LogManager}
+import org.slf4j.LoggerFactory
+import io.undertow.Undertow
+import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
 import ba.sake.flatmark.FlatmarkGenerator
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.swebserver.SWebServerHandler
 import ba.sake.sharaf.undertow.UndertowSharafServer
-import ba.sake.sharaf.undertow.handlers.RoutesHandler
 import ba.sake.sharaf.utils.NetworkUtils
-import io.undertow.Undertow
-import io.undertow.server.handlers.BlockingHandler
-import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
-  private val logger = Logger.getLogger(getClass.getName)
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def build(): Unit = {
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
-    logger.info("Flatmark started")
+    logger.info("Flatmark build started")
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
     val flatmarkServer = startFlatmarkServer(port)
@@ -32,14 +31,14 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
       flatmarkSsrServer.stop()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
-    logger.info(s"Flatmark finished in ${totalSeconds} s")
+    logger.info(s"Flatmark build finished in ${totalSeconds} s")
   }
 
   def serve(): Unit = {
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
-    logger.info("Flatmark started")
+    logger.info("Flatmark serve started")
     val webDriverHolder = WebDriverHolder()
     startFlatmarkServer(port)
     val ssrServerPort = NetworkUtils.getFreePort()
@@ -53,7 +52,7 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
           p.startsWith(siteRootFolder / ".flatmark-cache") || p.startsWith(siteRootFolder / "_site")
         )
         if relevantFiles.nonEmpty then {
-          logger.info(s"Detected changes, regenerating..")
+          logger.info(s"Detected changes, regenerating...")
           generator.generate(siteRootFolder, useCache)
         }
       }
@@ -61,11 +60,11 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
   }
 
   private def startFlatmarkServer(port: Int): Undertow =
-    logger.fine("Flatmark server starting...")
+    logger.debug("Flatmark server starting...")
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
-    val resourceManager = new PathResourceManager(generatedSiteFolder.wrapped)
-    val undertowHandler = SWebServerHandler(generatedSiteFolder.wrapped, new ResourceHandler(resourceManager))
+    val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
+    val undertowHandler = SWebServerHandler(generatedSiteFolder.wrapped, ResourceHandler(resourceManager))
     val server = Undertow
       .builder()
       .addHttpListener(port, "localhost")
@@ -76,13 +75,13 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     server
 
   private def startFlatmarkSsrServer(port: Int): UndertowSharafServer =
-    logger.fine("Flatmark SSR server starting...")
+    logger.debug("Flatmark SSR server starting...")
     val server = UndertowSharafServer(
       "localhost",
       port,
       ba.sake.flatmark.ssr.routes
     )
     server.start()
-    logger.fine(s"Flatmark SSR server started at http://localhost:${port}")
+    logger.debug(s"Flatmark SSR server started at http://localhost:${port}")
     server
 }

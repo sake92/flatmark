@@ -1,7 +1,7 @@
 package ba.sake.flatmark
 
 import java.util.Locale
-import java.util.logging.Logger
+import org.slf4j.LoggerFactory
 import scala.collection.mutable
 import org.virtuslab.yaml.*
 import ba.sake.flatmark.selenium.WebDriverHolder
@@ -13,7 +13,7 @@ import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
 class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
-  private val logger = Logger.getLogger(getClass.getName)
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
@@ -35,7 +35,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
       throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
-    logger.fine(s"Site configuration: ${siteConfig}")
+    logger.debug(s"Site configuration: ${siteConfig}")
 
     // collect relevant content
     val contentFolder = siteRootFolder / "content"
@@ -106,9 +106,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         case Some(contentPages) =>
           contentByLangAndCategory.update(key, contentPages.appended(cr.pageContext))
         case None =>
-          logger.warning(
-            s"Category ${firstSegment} not found in site config for content file: ${cr.pageContext.rootRelPath}"
-          )
+          logger.warn(s"Category ${firstSegment} not found in site config for '${cr.pageContext.rootRelPath}'")
       }
     }
     templatedIndexFiles.foreach { tf =>
@@ -144,6 +142,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         followLinks = false
       )
     }
+    logger.info(s"Site generated successfully")
   }
 
   private def renderTemplatedFile(
@@ -156,7 +155,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       templateHandler: FlatmarkTemplateHandler,
       paginateItems: Option[Seq[PageContext]]
   ): Seq[RenderResult] = {
-    logger.fine(s"Rendering templated file: ${file}")
+    logger.debug(s"Rendering templated file: ${file}")
     val mdContentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
@@ -248,7 +247,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       finalHtml,
       createFolders = true
     )
-    logger.fine(s"Rendered templated file: ${file}")
+    logger.debug(s"Rendered templated file: ${file}")
     RenderResult(layoutContext.page)
   }
 
@@ -293,7 +292,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         layout = templateConfig.page.layout,
         title = templateConfig.page.title,
         description = templateConfig.page.description,
-        content = templateConfig.page.content,
+        content = "",
         lang = langContext,
         publishDate = templateConfig.page.publishDate.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage)

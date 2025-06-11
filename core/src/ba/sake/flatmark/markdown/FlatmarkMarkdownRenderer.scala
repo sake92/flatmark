@@ -1,5 +1,6 @@
 package ba.sake.flatmark.markdown
 
+import java.util as ju
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
@@ -17,8 +18,6 @@ import org.commonmark.parser.Parser
 import org.commonmark.renderer.NodeRenderer
 import org.commonmark.renderer.html.HtmlRenderer.HtmlRendererExtension
 import org.commonmark.renderer.html.{HtmlNodeRendererContext, HtmlNodeRendererFactory, HtmlRenderer}
-
-import java.{util, util as ju}
 
 class FlatmarkMarkdownRenderer(
     codeHighlighter: FlatmarkCodeHighlighter,
@@ -69,7 +68,7 @@ class FlatmarkStaticCodeNodeRenderer(
     mathRenderer: FlatmarkMathRenderer
 ) extends NodeRenderer {
 
-  override def getNodeTypes: util.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock]);
+  override def getNodeTypes: ju.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock]);
 
   override def render(node: Node): Unit = {
     val html = context.getWriter

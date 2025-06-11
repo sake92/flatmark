@@ -41,7 +41,6 @@ case class PageConfig(
     layout: String = "page",
     title: String = "Untitled",
     description: String = "",
-    content: String = "",
     publishDate: Option[LocalDateTime] = None
 ) derives YamlCodec
 

@@ -1,16 +1,16 @@
 package ba.sake.flatmark.templates
 
-
 import java.io.StringWriter
 import java.util as ju
 import java.util.Locale
-import java.util.logging.Logger
+import org.slf4j.LoggerFactory
 import io.pebbletemplates.pebble.PebbleEngine
 import io.pebbletemplates.pebble.loader.{DelegatingLoader, FileLoader}
 import ba.sake.flatmark.templates.i18n.I18nExtension
 
 class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: os.Path) {
-  private val logger = Logger.getLogger(getClass.getName)
+
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val engine = locally {
     val layoutsLoader = new FileLoader()
@@ -33,7 +33,7 @@ class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: 
   }
 
   def render(templateName: String, context: ju.Map[String, Object], locale: Locale): String = {
-    logger.fine(s"Rendering '${templateName}' with context: ${context}")
+    logger.debug(s"Rendering '${templateName}'")
     val compiledTemplate = engine.getTemplate(templateName)
     val writer = new StringWriter()
     compiledTemplate.evaluate(writer, context, locale)

@@ -1,23 +1,22 @@
 package ba.sake.flatmark.math
 
-import ba.sake.flatmark.FileCache
-import ba.sake.flatmark.selenium.WebDriverHolder
+import java.net.URLEncoder
+import java.time.Duration
+import scala.jdk.CollectionConverters.*
+import org.slf4j.LoggerFactory
 import org.openqa.selenium.By
 import org.openqa.selenium.logging.LogType
 import org.openqa.selenium.support.ui.WebDriverWait
-
-import java.net.URLEncoder
-import java.time.Duration
-import java.util.logging.{Level, Logger}
-import scala.jdk.CollectionConverters.*
+import ba.sake.flatmark.FileCache
+import ba.sake.flatmark.selenium.WebDriverHolder
 
 class FlatmarkMathRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
-  private val logger = Logger.getLogger(getClass.getName)
+  private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def render(mathStr: String): String =
     fileCache.cached("katex", mathStr) {
       try {
-        logger.fine("Render math start")
+        logger.debug("Render math start")
         val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
         val url = s"http://localhost:${ssrServerPort}/ssr/katex?source=${encodedMathStr}"
         webDriverHolder.driver.get(url)
@@ -27,7 +26,7 @@ class FlatmarkMathRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder,
       } catch {
         case e: org.openqa.selenium.WebDriverException =>
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll()
-          logger.log(Level.SEVERE, s"Errors during math rendering: ${logs.asScala.mkString("\n")}", e)
+          logger.error(s"Errors during math rendering: ${logs.asScala.mkString("\n")}", e)
           mathStr
       }
     }
