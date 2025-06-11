@@ -6,13 +6,16 @@ import java.io.IOException
 import java.nio.file.Files
 import io.undertow.server.HttpHandler
 import io.undertow.server.HttpServerExchange
-import io.undertow.server.handlers.resource.PathResourceManager
+import io.undertow.server.handlers.resource.{PathResourceManager, ResourceChangeListener}
 import io.undertow.util.Headers
+
 import scala.util.boundary
 
-class SWebServerHandler(baseFolder: Path, next: HttpHandler) extends HttpHandler {
-  
+class SWebServerHandler(baseFolder: Path, next: HttpHandler)
+    extends HttpHandler {
+
   private val resourceManager = new PathResourceManager(baseFolder, 100 * 1024 * 1024)
+  // TODO trigger WS listener.foreach(resourceManager.registerResourceChangeListener)
 
   override def handleRequest(exchange: HttpServerExchange): Unit = boundary {
     val requestPath = exchange.getRelativePath

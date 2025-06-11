@@ -9,7 +9,8 @@ object cli extends ScalaModule with CustomNativeImageModule {
   def mainClass = Some("ba.sake.flatmark.cli.Main")
   def moduleDeps = Seq(core, swebserver)
   def ivyDeps = Agg(
-    ivy"com.lihaoyi::mainargs:0.7.6"
+    ivy"com.lihaoyi::mainargs:0.7.6",
+    ivy"com.lihaoyi::os-lib-watch:0.11.4"
   )
 
   def forkArgs = Seq(Task.env.getOrElse("FORK_ARGS", "")) ++ Seq[String](

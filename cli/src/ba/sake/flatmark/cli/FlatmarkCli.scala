@@ -1,14 +1,19 @@
 package ba.sake.flatmark.cli
 
+import java.util.Collection
 import java.util.logging.{Level, LogManager, Logger}
 import ba.sake.flatmark.FlatmarkGenerator
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.swebserver.SWebServerHandler
-import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.undertow.handlers.RoutesHandler
 import io.undertow.Undertow
 import io.undertow.server.handlers.BlockingHandler
-import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
+import io.undertow.server.handlers.resource.{
+  PathResourceManager,
+  ResourceChangeEvent,
+  ResourceChangeListener,
+  ResourceHandler
+}
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = Logger.getLogger(getClass.getName)
@@ -17,9 +22,7 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
-
     logger.info("Flatmark started")
-
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
     val flatmarkServer = startFlatmarkServer(port)
@@ -37,13 +40,23 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
-
     logger.info("Flatmark started")
-
     val webDriverHolder = WebDriverHolder()
     startFlatmarkServer(port)
     val generator = FlatmarkGenerator(port, webDriverHolder)
     generator.generate(siteRootFolder, useCache)
+    os.watch.watch(
+      Seq(siteRootFolder),
+      changed => {
+        val relevantFiles = changed.filterNot(p =>
+          p.startsWith(siteRootFolder / ".flatmark-cache") || p.startsWith(siteRootFolder / "_site")
+        )
+        if relevantFiles.nonEmpty then {
+          logger.info(s"Detected changes, regenerating..")
+          generator.generate(siteRootFolder, useCache)
+        }
+      }
+    )
   }
 
   private def startFlatmarkServer(port: Int): Undertow =
@@ -52,7 +65,10 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     val generatedSiteFolder = (siteRootFolder / "_site").wrapped
     val resourceManager = new PathResourceManager(generatedSiteFolder)
     val undertowHandler = BlockingHandler(
-      RoutesHandler(flatmarkRoutes, SWebServerHandler(generatedSiteFolder, new ResourceHandler(resourceManager)))
+      RoutesHandler(
+        flatmarkRoutes,
+        SWebServerHandler(generatedSiteFolder, new ResourceHandler(resourceManager))
+      )
     )
     val server = Undertow
       .builder()
