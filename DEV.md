@@ -1,15 +1,22 @@
 
 
-## Making GraalVM native image
+
+
+
+
+
+
+## Generating GraalVM native image metadata
+
+This is needed when there are changes in the dependencies.
 
 ```bash
-# 1. if dependencies has changed since last reachability-metadata.json generation:
-export FORK_ARGS="-agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image"
+./mill -i cli.assembly
 
-# 2. generate reachability-metadata.json for optimized image:
-./mill -i cli.run -i examples/multilang --no-cache
+graalvm/java -agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image --sun-misc-unsafe-memory-access=allow -jar out/cli/assembly.dest/out.jar serve -i examples/multilang --no-cache
+# now play with the app, change files, trigger some actions, etc.
+# then kill the process and it will generate the metadata
 
-# 3. generate native image:
 ./mill -i cli.nativeImage2
 ```
 

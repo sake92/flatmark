@@ -9,7 +9,7 @@ object cli extends ScalaModule with CustomNativeImageModule {
   def mainClass = Some("ba.sake.flatmark.cli.Main")
   def moduleDeps = Seq(core, swebserver)
 
-  def forkArgs = Seq(Task.env.getOrElse("FORK_ARGS", "")) ++ Seq[String](
+  def forkArgs = Seq[String](
     "-Dorg.jboss.logging.provider=jdk",
     // https://github.com/scala/scala3/issues/9013
     "--sun-misc-unsafe-memory-access=allow"
