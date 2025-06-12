@@ -45,18 +45,14 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val contentFolder = siteRootFolder / "content"
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
-    val processFiles = mutable.ArrayBuffer.empty[ProcessFile]
+    val processFiles = mutable.ArrayBuffer.empty[os.Path]
     val translationsLangCodes = mutable.ArrayBuffer.empty[String]
     os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
-      Option.when(os.isFile(file)) {
-        val processFile =
-          if file.ext == "md" || file.ext == "html"
-          then ProcessFile.TemplatedFile(file)
-          else ProcessFile.StaticFile(file)
+      Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
         val rootRelPath = file.relativeTo(contentFolder)
         val firstSegment = rootRelPath.segments.head
         if Iso2LanguageCodes(firstSegment) then translationsLangCodes += firstSegment
-        processFiles += processFile
+        processFiles += file
       }
     }
 
@@ -69,11 +65,11 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
 
-    val templatedIndexFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
-    val templatedContentFiles = mutable.ArrayBuffer.empty[ProcessFile.TemplatedFile]
-    processFiles.collect { case tf: ProcessFile.TemplatedFile =>
-      if tf.file.baseName == "index" then templatedIndexFiles += tf
-      else templatedContentFiles += tf
+    val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
+    val templatedContentFiles = mutable.ArrayBuffer.empty[os.Path]
+    processFiles.foreach { file =>
+      if file.baseName == "index" then templatedIndexFiles += file
+      else templatedContentFiles += file
     }
 
     // TODO pokupit sve pathove za content files
@@ -82,12 +78,12 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     // generate content first to get their snippets for index pages
     val allUsedLanguages =
       translationsLangCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
-    val contentResults = templatedContentFiles.flatMap { tf =>
+    val contentResults = templatedContentFiles.flatMap { file =>
       renderTemplatedFile(
         siteConfig,
         allUsedLanguages,
         contentFolder = contentFolder,
-        file = tf.file,
+        file = file,
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
@@ -113,8 +109,8 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
           // noop for a top level page without category: about.md etc
       }
     }
-    templatedIndexFiles.foreach { tf =>
-      val segments = tf.file.relativeTo(contentFolder).segments
+    templatedIndexFiles.foreach { file =>
+      val segments = file.relativeTo(contentFolder).segments
       val firstSegment = segments.head
       val key =
         if translationsLangCodes.contains(firstSegment)
@@ -128,7 +124,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         siteConfig,
         allUsedLanguages,
         contentFolder = contentFolder,
-        file = tf.file,
+        file = file,
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
@@ -136,11 +132,11 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       )
     }
     // copy static files (e.g. images, css..)
-    // TODO separate folder, noice
-    processFiles.collect { case pf: ProcessFile.StaticFile =>
+    val staticFolder = siteRootFolder / "static"
+    os.walk(staticFolder).foreach { file =>
       os.copy(
-        pf.file,
-        outputFolder / pf.file.relativeTo(contentFolder),
+        file,
+        outputFolder / file.relativeTo(staticFolder),
         replaceExisting = true,
         createFolders = true,
         mergeFolders = true,
@@ -315,10 +311,6 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
   }
 
 }
-
-enum ProcessFile:
-  case TemplatedFile(file: os.Path)
-  case StaticFile(file: os.Path)
 
 case class RenderResult(
     pageContext: PageContext

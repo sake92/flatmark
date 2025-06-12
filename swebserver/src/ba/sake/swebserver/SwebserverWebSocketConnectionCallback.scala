@@ -12,7 +12,7 @@ class SwebserverWebSocketConnectionCallback(changes: AtomicBoolean) extends WebS
 
   private val clients = new java.util.concurrent.ConcurrentHashMap[WebSocketChannel, Boolean]()
 
-  new Thread(() => {
+  private val t = new Thread(() => {
     while true do {
       if changes.get() then {
         clients.keys.asScala.foreach { channel =>
@@ -22,7 +22,9 @@ class SwebserverWebSocketConnectionCallback(changes: AtomicBoolean) extends WebS
       }
       Thread.sleep(100) // Check every 100ms at max
     }
-  }).start()
+  })
+  t.setDaemon(true)
+  t.start()
 
   override def onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel): Unit = {
     clients.put(channel, true)
