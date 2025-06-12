@@ -8,10 +8,6 @@ object cli extends ScalaModule with CustomNativeImageModule {
   def scalaVersion = "3.7.0"
   def mainClass = Some("ba.sake.flatmark.cli.Main")
   def moduleDeps = Seq(core, swebserver)
-  def ivyDeps = Agg(
-    ivy"com.lihaoyi::mainargs:0.7.6",
-    ivy"com.lihaoyi::os-lib-watch:0.11.4"
-  )
 
   def forkArgs = Seq(Task.env.getOrElse("FORK_ARGS", "")) ++ Seq[String](
     "-Dorg.jboss.logging.provider=jdk",
@@ -51,7 +47,9 @@ object swebserver extends ScalaModule {
     ivy"ba.sake::sharaf-undertow:0.10.0",
     // https://github.com/wildfly/wildfly-common/issues/74
     ivy"org.wildfly.common:wildfly-common:1.7.0.Final",
-    ivy"com.lihaoyi::mainargs:0.7.6"
+    ivy"com.lihaoyi::mainargs:0.7.6",
+    ivy"com.lihaoyi::os-lib-watch:0.11.4",
+    ivy"org.slf4j:slf4j-api:2.0.17"
   )
 }
 

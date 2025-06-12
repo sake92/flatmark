@@ -28,7 +28,11 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     )
 
     val outputFolder = siteRootFolder / "_site"
-    os.remove.all(outputFolder, ignoreErrors = true)
+    
+    // TODO remove files that are not part of this build
+    /*os.list(outputFolder).foreach { file =>
+      os.remove.all(file, ignoreErrors = true)
+    }*/
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
@@ -106,7 +110,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         case Some(contentPages) =>
           contentByLangAndCategory.update(key, contentPages.appended(cr.pageContext))
         case None =>
-          logger.warn(s"Category ${firstSegment} not found in site config for '${cr.pageContext.rootRelPath}'")
+          // noop for a top level page without category: about.md etc
       }
     }
     templatedIndexFiles.foreach { tf =>
@@ -132,6 +136,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       )
     }
     // copy static files (e.g. images, css..)
+    // TODO separate folder, noice
     processFiles.collect { case pf: ProcessFile.StaticFile =>
       os.copy(
         pf.file,

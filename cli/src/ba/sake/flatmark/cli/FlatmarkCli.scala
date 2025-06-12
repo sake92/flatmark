@@ -4,11 +4,13 @@ import java.util.logging.{Level, LogManager}
 import org.slf4j.LoggerFactory
 import io.undertow.Undertow
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
+import io.undertow.Handlers
 import ba.sake.flatmark.FlatmarkGenerator
 import ba.sake.flatmark.selenium.WebDriverHolder
-import ba.sake.flatmark.swebserver.SWebServerHandler
 import ba.sake.sharaf.undertow.UndertowSharafServer
 import ba.sake.sharaf.utils.NetworkUtils
+import ba.sake.swebserver.SwebserverFileHandler
+import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 
 class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -64,13 +66,24 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
-    val undertowHandler = SWebServerHandler(generatedSiteFolder.wrapped, ResourceHandler(resourceManager))
+    val fileHandler = SwebserverFileHandler(generatedSiteFolder, "localhost", port, ResourceHandler(resourceManager))
+    val changes = new java.util.concurrent.atomic.AtomicBoolean(false)
+    val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(changes))
     val server = Undertow
       .builder()
       .addHttpListener(port, "localhost")
-      .setHandler(undertowHandler)
+      .setHandler(
+        Handlers
+          .path()
+          .addPrefixPath("/ws", websocketHandler)
+          .addPrefixPath("/", fileHandler)
+      )
       .build()
     server.start()
+    os.watch.watch(
+      Seq(generatedSiteFolder),
+      _ => changes.set(true)
+    )
     logger.info(s"Flatmark server started at http://localhost:${port}")
     server
 

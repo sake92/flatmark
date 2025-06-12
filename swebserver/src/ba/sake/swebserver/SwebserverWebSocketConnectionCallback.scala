@@ -1,0 +1,39 @@
+package ba.sake.swebserver
+
+import java.util.concurrent.atomic.AtomicBoolean
+import scala.jdk.CollectionConverters.*
+import org.slf4j.LoggerFactory
+import io.undertow.websockets.WebSocketConnectionCallback
+import io.undertow.websockets.core.{AbstractReceiveListener, StreamSourceFrameChannel, WebSocketChannel, WebSockets}
+import io.undertow.websockets.spi.WebSocketHttpExchange
+
+class SwebserverWebSocketConnectionCallback(changes: AtomicBoolean) extends WebSocketConnectionCallback {
+  private val logger = LoggerFactory.getLogger(getClass.getName)
+
+  private val clients = new java.util.concurrent.ConcurrentHashMap[WebSocketChannel, Boolean]()
+
+  new Thread(() => {
+    while true do {
+      if changes.get() then {
+        clients.keys.asScala.foreach { channel =>
+          if channel.isOpen then WebSockets.sendText("reload", channel, null)
+        }
+        changes.set(false)
+      }
+      Thread.sleep(100) // Check every 100ms at max
+    }
+  }).start()
+
+  override def onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel): Unit = {
+    clients.put(channel, true)
+    logger.debug(s"WebSocket client connected: ${channel.getPeerAddress}")
+
+    channel.getReceiveSetter.set(new AbstractReceiveListener {
+      override def onClose(webSocketChannel: WebSocketChannel, channel: StreamSourceFrameChannel): Unit = {
+        clients.remove(webSocketChannel)
+        logger.debug(s"WebSocket client disconnected: ${webSocketChannel.getPeerAddress}")
+      }
+    })
+    channel.resumeReceives()
+  }
+}
