@@ -11,9 +11,21 @@ env:
   FORK_ARGS: "-agentlib:native-image-agent=config-output-dir=cli/resources/META-INF/native-image"
 
 jobs:
-  test:
-    name: test
-    runs-on: ubuntu-latest
+  build:
+    name: build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            original-exe-name: native-executable
+            exe-name: flatmark
+          - os: macos-latest
+            original-exe-name: native-executable
+            exe-name: flatmark
+          - os: windows-latest
+            original-exe-name: native-executable.exe
+            exe-name: flatmark.exe
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,9 +37,13 @@ jobs:
       - run: |
           ./mill -i cli.run build -i examples/multilang --no-cache
           ./mill -i cli.nativeImage2
-          cp out/cli/nativeImage2.dest/native-executable flatmark
+          cp out/cli/nativeImage2.dest/${{ matrix.original-exe-name }} ${{ matrix.exe-name }}
       - name: Archive native-executable
         uses: actions/upload-artifact@v4
         with:
-          path: flatmark
+          path: ${{ matrix.exe-name }}
           retention-days: 30
+
+
+
+
