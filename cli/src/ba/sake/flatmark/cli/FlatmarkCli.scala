@@ -22,14 +22,12 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     logger.info("Flatmark build started")
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
-    val flatmarkServer = startFlatmarkServer(port)
     val ssrServerPort = NetworkUtils.getFreePort()
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
     val generator = FlatmarkGenerator(ssrServerPort, webDriverHolder)
     try generator.generate(siteRootFolder, useCache)
     finally
       webDriverHolder.close()
-      flatmarkServer.stop()
       flatmarkSsrServer.stop()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
