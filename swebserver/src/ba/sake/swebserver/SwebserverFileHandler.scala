@@ -9,14 +9,15 @@ import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceChangeListener}
 import io.undertow.util.Headers
 
-
 class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, next: HttpHandler) extends HttpHandler {
 
   private val resourceManager = new PathResourceManager(baseFolder.wrapped)
 
+  // IIFE so that HTMX boosting works correctly
   private val InjectedScript =
     s"""
       |<script>
+      |(function() {
       |    const ws = new WebSocket("ws://${address}:${port}/ws");
       |
       |    ws.onopen = (event) => {
@@ -43,6 +44,7 @@ class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, nex
       |    ws.onerror = (error) => {
       |        console.error("[Swebserver] WebSocket error:", error);
       |    };
+      |})(); // IIFE
       |</script>
       |""".stripMargin
 

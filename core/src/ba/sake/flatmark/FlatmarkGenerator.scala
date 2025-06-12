@@ -143,7 +143,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         followLinks = false
       )
     }
-    logger.info(s"Site generated successfully")
+    logger.info("Site generated successfully")
   }
 
   private def renderTemplatedFile(
