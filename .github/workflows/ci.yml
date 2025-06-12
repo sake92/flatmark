@@ -19,13 +19,16 @@ jobs:
         include:
           - os: ubuntu-latest
             original-exe-name: native-executable
-            exe-name: flatmark-ubuntu-x64
+            exe-name: flatmark
+            artifact-name: flatmark-ubuntu-x64
           - os: macos-latest
             original-exe-name: native-executable
-            exe-name: flatmark-macos-arm64
+            exe-name: flatmark
+            artifact-name: flatmark-macos-arm64
           - os: windows-latest
             original-exe-name: native-executable.exe
-            exe-name: flatmark-windows-x64.exe
+            exe-name: flatmark.exe
+            artifact-name: flatmark-windows-x64
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +44,7 @@ jobs:
       - name: Archive native-executable
         uses: actions/upload-artifact@v4
         with:
+          name: ${{ matrix.artifact-name }}
           path: ${{ matrix.exe-name }}
           retention-days: 30
 

@@ -7,10 +7,13 @@
 - tabbed content e.g. windows/linux/mac
 - RSS
 - custom skip files?
+- page image for preview
 
 
-## Migrating from other platforms
-- import from wordpress, jekyll itd
+
+## themes
+- git clone (+ folder) by default, else use GH API
+
 
 
 ## Dev loop
@@ -20,3 +23,6 @@
 
 
 
+
+## Migrating from other platforms
+- import from wordpress, jekyll itd
