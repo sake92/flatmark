@@ -62,10 +62,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesFolder = cacheFolder / "themes"
-    val themeHash = HashUtils.generate(siteConfig.theme)
-    val themeRepoFolder = themesFolder / themeHash
-    val relThemeFolder = downloadThemeRepo(siteConfig.theme, themeHash, themeRepoFolder, useCache)
-    val themeFolder = themeRepoFolder / relThemeFolder
+    val themeFolder = downloadThemeRepo(siteConfig.theme, themesFolder, useCache)
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerPort, webDriverHolder, fileCache)
@@ -341,28 +338,30 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
   }
 
   /** returns the folder that contains theme */
-  private def downloadThemeRepo(url: String, themeHash: String, themeRepoFolder: os.Path, useCache: Boolean): os.RelPath = {
+  private def downloadThemeRepo(url: String, themesFolder : os.Path, useCache: Boolean): os.Path = {
     val parsedUri = java.net.URI.create(url)
-    val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
     val qp = QueryParameterUtils
       .parseQueryString(parsedUri.getQuery, "utf-8")
       .asScala
       .map((k, v) => k -> v.asScala.toSeq)
       .toMap
       .parseQueryStringMap[ThemeUrlQP]
+    val themeHash = s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(url)}".replace("/", "-")
+    val themeRepoFolder = themesFolder / themeHash
     if os.exists(themeRepoFolder) && useCache then {
       logger.debug("Theme is already downloaded. Skipping download.")
     } else {
+      val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
       logger.info(s"Downloading theme from ${httpCloneUrl}")
       // TODO fallback to ssh and api
-      os.makeDir.all(themeRepoFolder / os.up)
+      os.makeDir.all(themesFolder)
       os.call(
         ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
-        cwd = themeRepoFolder / os.up
+        cwd = themesFolder
       )
       logger.info(s"Downloaded theme from: ${url}")
     }
-    os.RelPath(qp.folder)
+    themeRepoFolder / os.RelPath(qp.folder)
   }
 
 }

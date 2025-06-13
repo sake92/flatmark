@@ -13,38 +13,36 @@ class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, nex
 
   private val resourceManager = new PathResourceManager(baseFolder.wrapped)
 
-  // IIFE so that HTMX boosting works correctly
   private val InjectedScript =
     s"""
       |<script>
-      |(function() {
-      |    const ws = new WebSocket("ws://${address}:${port}/ws");
+      |if (typeof ws === 'undefined') {
+      |    var swebserverWS = new WebSocket("ws://${address}:${port}/ws");
       |
-      |    ws.onopen = (event) => {
-      |        console.log("[Swebserver] WebSocket connection established.", event);
+      |    swebserverWS.onopen = (event) => {
+      |        console.log("[swebserver] WebSocket connection established.", event);
       |    };
-      |
-      |    ws.onmessage = (event) => {
-      |        console.log("[Swebserver] Message from server:", event.data);
+      |    
+      |    swebserverWS.onmessage = (event) => {
+      |        console.log("[swebserver] Message from server:", event.data);
       |        if (event.data === "reload") {
-      |            console.log("[Swebserver] Reloading page...");
+      |            console.log("[swebserver] Reloading page...");
       |            location.reload();
       |        }
       |    };
-      |
-      |    ws.onclose = (event) => {
-      |        console.warn("[Swebserver] WebSocket connection closed:", event);
-      |        // Attempt to reconnect after a short delay
+      |    
+      |    swebserverWS.onclose = (event) => {
+      |        console.warn("[swebserver] WebSocket connection closed:", event);
       |        setTimeout(() => {
-      |            console.log("[Swebserver] Attempting to reconnect...");
+      |            console.log("[swebserver] Attempting to reconnect...");
       |            window.location.reload();
       |        }, 1000);
       |    };
-      |
-      |    ws.onerror = (error) => {
-      |        console.error("[Swebserver] WebSocket error:", error);
+      |    
+      |    swebserverWS.onerror = (error) => {
+      |        console.error("[swebserver] WebSocket error:", error);
       |    };
-      |})(); // IIFE
+      |}
       |</script>
       |""".stripMargin
 
