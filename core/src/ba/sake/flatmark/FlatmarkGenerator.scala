@@ -22,13 +22,8 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     if !os.exists(siteRootFolder) then throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw RuntimeException(s"Site root is not a folder: ${siteRootFolder}")
 
-    val customClassloader = new java.net.URLClassLoader(
-      Array((siteRootFolder / "_i18n").toIO.toURI.toURL),
-      Thread.currentThread.getContextClassLoader
-    )
-
     val outputFolder = siteRootFolder / "_site"
-    
+
     // TODO remove files that are not part of this build
     /*os.list(outputFolder).foreach { file =>
       os.remove.all(file, ignoreErrors = true)
@@ -57,13 +52,31 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     }
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
+    val themeFolder = cacheFolder / "themes" / siteConfig.theme
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerPort, webDriverHolder, fileCache)
     val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerPort, webDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(ssrServerPort, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
-    val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder)
+    // TODO hash theme etc..
+    val customClassloader = new java.net.URLClassLoader(
+      Array(siteRootFolder / "_i18n", themeFolder / "_i18n").map(_.toIO.toURI.toURL),
+      Thread.currentThread.getContextClassLoader
+    )
+    val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder, themeFolder)
+
+    // copy theme static files
+    os.walk(themeFolder / "static").foreach { file =>
+      os.copy(
+        file,
+        outputFolder / file.relativeTo(themeFolder),
+        replaceExisting = true,
+        createFolders = true,
+        mergeFolders = true,
+        followLinks = false
+      )
+    }
 
     val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
     val templatedContentFiles = mutable.ArrayBuffer.empty[os.Path]
@@ -106,7 +119,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         case Some(contentPages) =>
           contentByLangAndCategory.update(key, contentPages.appended(cr.pageContext))
         case None =>
-          // noop for a top level page without category: about.md etc
+        // noop for a top level page without category: about.md etc
       }
     }
     templatedIndexFiles.foreach { file =>

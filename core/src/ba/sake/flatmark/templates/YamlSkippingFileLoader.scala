@@ -1,16 +1,13 @@
 package ba.sake.flatmark.templates
 
-import io.pebbletemplates.pebble.error.LoaderException
-import io.pebbletemplates.pebble.loader.FileLoader
-import io.pebbletemplates.pebble.utils.PathUtils
-
 import java.io.{File, Reader, StringReader}
 import java.nio.charset.StandardCharsets
-import java.nio.file.Files
+import java.nio.file.{Files, Path}
 import scala.util.boundary
+import io.pebbletemplates.pebble.error.LoaderException
+import io.pebbletemplates.pebble.loader.FileLoader
 
-// skips YAML front matter (triple dash lines) in the content files
-class CustomLoader extends FileLoader {
+class YamlSkippingFileLoader(rootFolder: Path) extends FileLoader {
 
   override def getReader(templateName: String): Reader = {
     val file = getFile(templateName)
@@ -54,27 +51,11 @@ class CustomLoader extends FileLoader {
   }
 
   private def getFile(originalTemplateName: String) = {
-    // add the prefix and ensure the prefix ends with a separator character
-    val path = new StringBuilder
-    if (this.getPrefix != null) {
-      path.append(this.getPrefix)
-      if (!this.getPrefix.endsWith(String.valueOf(File.separatorChar))) path.append(File.separatorChar)
-    }
-    var templateName = originalTemplateName + (if (this.getSuffix == null) "" else this.getSuffix)
-    /*
-     * if template name contains path segments, move those segments into the
-     * path variable. The below technique needs to know the difference
-     * between the path and file name.
-     */
-    val pathSegments = PathUtils.PATH_SEPARATOR_REGEX.split(templateName)
-    if (pathSegments.length > 1) {
-      // file name is the last segment
-      templateName = pathSegments(pathSegments.length - 1)
-    }
-    for (i <- 0 until (pathSegments.length - 1)) {
-      path.append(pathSegments(i)).append(File.separatorChar)
-    }
-    // try to load File
-    new File(path.toString, templateName)
+    val normalizedPrefix = Option(getPrefix).getOrElse("").dropWhile(_ == File.separatorChar).reverse.dropWhile(_ == File.separatorChar).reverse
+    val normalizedTemplateName = originalTemplateName.dropWhile(_ == File.separatorChar).reverse.dropWhile(_ == File.separatorChar).reverse
+    val normalizedSuffix = Option(getSuffix).getOrElse("")
+    val templateName = (if normalizedPrefix.isEmpty then "" else s"${normalizedPrefix}/") +
+      normalizedTemplateName + (if normalizedSuffix.isEmpty then "" else normalizedSuffix)
+    rootFolder.resolve(templateName).toFile
   }
 }

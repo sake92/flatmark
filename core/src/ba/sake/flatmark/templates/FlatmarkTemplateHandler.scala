@@ -5,25 +5,33 @@ import java.util as ju
 import java.util.Locale
 import org.slf4j.LoggerFactory
 import io.pebbletemplates.pebble.PebbleEngine
-import io.pebbletemplates.pebble.loader.{DelegatingLoader, FileLoader}
+import io.pebbletemplates.pebble.loader.DelegatingLoader
 import ba.sake.flatmark.templates.i18n.I18nExtension
 
-class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: os.Path) {
+class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: os.Path, themeFolder: os.Path) {
 
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val engine = locally {
-    val layoutsLoader = new FileLoader()
-    val relPath = siteRootFolder.relativeTo(os.pwd).toString
-    val relPathPrefix = if (relPath.isEmpty) "" else s"${relPath}/"
-    layoutsLoader.setPrefix(s"${relPathPrefix}_layouts/")
+    // theme layouts,includes
+    val themeLayoutsLoader = new YamlSkippingFileLoader(themeFolder.wrapped)
+    themeLayoutsLoader.setPrefix("_layouts")
+    themeLayoutsLoader.setSuffix(".peb")
+    val themeIncludesLoader = new YamlSkippingFileLoader(themeFolder.wrapped)
+    themeIncludesLoader.setPrefix("_includes")
+    themeIncludesLoader.setSuffix(".peb")
+    // local layouts,includes
+    val layoutsLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
+    layoutsLoader.setPrefix("_layouts")
     layoutsLoader.setSuffix(".peb")
-    val includesLoader = new FileLoader()
-    includesLoader.setPrefix(s"${relPathPrefix}_includes/")
+    val includesLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
+    includesLoader.setPrefix("_includes")
     includesLoader.setSuffix(".peb")
-    val contentLoader = new CustomLoader()
-    contentLoader.setPrefix(s"${relPathPrefix}content/")
-    val loader = new DelegatingLoader(ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader))
+    val contentLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
+    contentLoader.setPrefix("content")
+    val loader = new DelegatingLoader(
+      ju.Arrays.asList(contentLoader, layoutsLoader, includesLoader, themeLayoutsLoader, themeIncludesLoader)
+    )
     new PebbleEngine.Builder()
       .loader(loader)
       .registerExtensionCustomizer(e => FlatmarkExtensionCustomizer(e))

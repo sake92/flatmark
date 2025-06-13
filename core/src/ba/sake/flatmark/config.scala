@@ -1,9 +1,8 @@
 package ba.sake.flatmark
 
-import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.util.{Locale, TimeZone}
-import scala.util.{Try, boundary}
+import scala.util.boundary
 import org.virtuslab.yaml.*
 import YamlInstances.given
 
@@ -16,6 +15,13 @@ case class TemplateConfig(
     page: PageConfig
 ) derives YamlCodec
 
+// theme: https://github.com/sake92/my_theme?branch=main&folder=my_folder (po defaultu main branch i root folder uzet)
+// ako ne postoji .flatmark-cache/themes/md5(https://github.com/sake92/my_theme?branch=main&folder=my_folder)
+// probat u ovom redoslijedu:
+//    - git clone https://github.com/sake92/my_theme.git
+//    - git clone git@github.com:sake92/my_theme.git (SSH)
+//    - CURL https://api.github.com/repos/sake92/my_theme/zipball/REF (ako folder ne postoji)
+// i onda unzippat u .flatmark-cache/themes/
 case class SiteConfig(
     name: String = "My Site",
     description: String = "",
@@ -23,6 +29,7 @@ case class SiteConfig(
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "default",
+   // TODO theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes/default",
     categories: Map[String, CategoryConfig] = Map.empty,
     tags: Map[String, TagConfig] = Map.empty
 ) derives YamlCodec
