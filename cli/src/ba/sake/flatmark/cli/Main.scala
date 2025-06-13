@@ -11,7 +11,7 @@ object Main {
   def run(
       @arg(positional = true)
       command: String = "build",
-      @arg(short = 'i', doc = "Path to input directory, default is current directory")
+      @arg(short = 'i', doc = "Path to input folder, default is current folder")
       input: String = ".",
       @arg(short = 'p', doc = "Server port, default is 5555")
       port: Int = 5555,

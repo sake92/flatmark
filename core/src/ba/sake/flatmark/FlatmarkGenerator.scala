@@ -22,8 +22,8 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
 
   def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
     logger.info(s"Generating site in '${siteRootFolder}'")
-    if !os.exists(siteRootFolder) then throw RuntimeException(s"Site root folder does not exist: ${siteRootFolder}")
-    if !os.isDir(siteRootFolder) then throw RuntimeException(s"Site root is not a folder: ${siteRootFolder}")
+    if !os.exists(siteRootFolder) then throw FlatmarkException(s"Site root folder does not exist: ${siteRootFolder}")
+    if !os.isDir(siteRootFolder) then throw FlatmarkException(s"Site root is not a folder: ${siteRootFolder}")
 
     val outputFolder = siteRootFolder / "_site"
 
@@ -35,7 +35,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val siteConfigFile = siteRootFolder / "_config.yaml"
     val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
-      throw RuntimeException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
+      throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
     }
     logger.debug(s"Site configuration: ${siteConfig}")
 
@@ -45,14 +45,18 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
     val processFiles = mutable.ArrayBuffer.empty[os.Path]
     val translationsLangCodes = mutable.ArrayBuffer.empty[String]
-    os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
-      Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
-        val rootRelPath = file.relativeTo(contentFolder)
-        val firstSegment = rootRelPath.segments.head
-        if Iso2LanguageCodes(firstSegment) then translationsLangCodes += firstSegment
-        processFiles += file
+    if os.exists(contentFolder) then
+      if !os.isDir(contentFolder) then
+        throw FlatmarkException(s"The 'content/' folder is not a folder: ${contentFolder}")
+      os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
+        Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
+          val rootRelPath = file.relativeTo(contentFolder)
+          val firstSegment = rootRelPath.segments.head
+          if Iso2LanguageCodes(firstSegment) then translationsLangCodes += firstSegment
+          processFiles += file
+        }
       }
-    }
+    else logger.debug(s"The 'content/' folder does not exist, skipping content processing.")
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesFolder = cacheFolder / "themes"
@@ -76,14 +80,15 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val themeStaticFolder = themeFolder / "static"
     if os.exists(themeStaticFolder) then
       os.walk(themeStaticFolder).foreach { file =>
-        os.copy(
-          file,
-          outputFolder / file.relativeTo(themeFolder),
-          replaceExisting = true,
-          createFolders = true,
-          mergeFolders = true,
-          followLinks = false
-        )
+        if os.isFile(file) then
+          os.copy(
+            file,
+            outputFolder / file.relativeTo(themeFolder),
+            replaceExisting = true,
+            createFolders = true,
+            mergeFolders = true,
+            followLinks = false
+          )
       }
 
     val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
@@ -156,14 +161,15 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val staticFolder = siteRootFolder / "static"
     if os.exists(staticFolder) then
       os.walk(staticFolder).foreach { file =>
-        os.copy(
-          file,
-          outputFolder / file.relativeTo(staticFolder),
-          replaceExisting = true,
-          createFolders = true,
-          mergeFolders = true,
-          followLinks = false
-        )
+        if os.isFile(file) then
+          os.copy(
+            file,
+            outputFolder / file.relativeTo(staticFolder),
+            replaceExisting = true,
+            createFolders = true,
+            mergeFolders = true,
+            followLinks = false
+          )
       }
     logger.info("Site generated successfully")
   }
@@ -352,6 +358,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
         ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
         cwd = themeRepoFolder / os.up
       )
+      logger.info(s"Downloaded theme from: ${url}")
     }
     os.RelPath(qp.folder)
   }
@@ -366,3 +373,5 @@ case class ThemeUrlQP(
     branch: String = "main",
     folder: String = "."
 ) derives QueryStringRW
+
+class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)

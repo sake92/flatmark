@@ -82,9 +82,7 @@ private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): 
       .as[PageConfig]
       .left
       .map { error =>
-        throw new RuntimeException(
-          s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}"
-        )
+        throw FlatmarkException(s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}")
       }
       .getOrElse(PageConfig())
   } else PageConfig()
