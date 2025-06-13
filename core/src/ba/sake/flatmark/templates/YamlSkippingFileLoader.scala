@@ -51,8 +51,14 @@ class YamlSkippingFileLoader(rootFolder: Path) extends FileLoader {
   }
 
   private def getFile(originalTemplateName: String) = {
-    val normalizedPrefix = Option(getPrefix).getOrElse("").dropWhile(_ == File.separatorChar).reverse.dropWhile(_ == File.separatorChar).reverse
-    val normalizedTemplateName = originalTemplateName.dropWhile(_ == File.separatorChar).reverse.dropWhile(_ == File.separatorChar).reverse
+    val normalizedPrefix = Option(getPrefix)
+      .getOrElse("")
+      .dropWhile(_ == File.separatorChar)
+      .reverse
+      .dropWhile(_ == File.separatorChar)
+      .reverse
+    val normalizedTemplateName =
+      originalTemplateName.dropWhile(_ == File.separatorChar).reverse.dropWhile(_ == File.separatorChar).reverse
     val normalizedSuffix = Option(getSuffix).getOrElse("")
     val templateName = (if normalizedPrefix.isEmpty then "" else s"${normalizedPrefix}/") +
       normalizedTemplateName + (if normalizedSuffix.isEmpty then "" else normalizedSuffix)

@@ -2,8 +2,10 @@ package ba.sake.flatmark
 
 import java.util.Locale
 import org.slf4j.LoggerFactory
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import org.virtuslab.yaml.*
+import io.undertow.util.QueryParameterUtils
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
@@ -11,6 +13,7 @@ import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
+import ba.sake.querson.*
 
 class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -52,14 +55,17 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     }
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
-    val themeFolder = cacheFolder / "themes" / siteConfig.theme
+    val themesFolder = cacheFolder / "themes"
+    val themeHash = HashUtils.generate(siteConfig.theme)
+    val themeRepoFolder = themesFolder / themeHash
+    val relThemeFolder = downloadThemeRepo(siteConfig.theme, themeHash, themeRepoFolder)
+    val themeFolder = themeRepoFolder / relThemeFolder
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerPort, webDriverHolder, fileCache)
     val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerPort, webDriverHolder, fileCache)
     val mathRenderer = FlatmarkMathRenderer(ssrServerPort, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
-    // TODO hash theme etc..
     val customClassloader = new java.net.URLClassLoader(
       Array(siteRootFolder / "_i18n", themeFolder / "_i18n").map(_.toIO.toURI.toURL),
       Thread.currentThread.getContextClassLoader
@@ -67,16 +73,18 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder, themeFolder)
 
     // copy theme static files
-    os.walk(themeFolder / "static").foreach { file =>
-      os.copy(
-        file,
-        outputFolder / file.relativeTo(themeFolder),
-        replaceExisting = true,
-        createFolders = true,
-        mergeFolders = true,
-        followLinks = false
-      )
-    }
+    val themeStaticFolder = themeFolder / "static"
+    if os.exists(themeStaticFolder) then
+      os.walk(themeStaticFolder).foreach { file =>
+        os.copy(
+          file,
+          outputFolder / file.relativeTo(themeFolder),
+          replaceExisting = true,
+          createFolders = true,
+          mergeFolders = true,
+          followLinks = false
+        )
+      }
 
     val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
     val templatedContentFiles = mutable.ArrayBuffer.empty[os.Path]
@@ -146,16 +154,17 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     }
     // copy static files (e.g. images, css..)
     val staticFolder = siteRootFolder / "static"
-    os.walk(staticFolder).foreach { file =>
-      os.copy(
-        file,
-        outputFolder / file.relativeTo(staticFolder),
-        replaceExisting = true,
-        createFolders = true,
-        mergeFolders = true,
-        followLinks = false
-      )
-    }
+    if os.exists(staticFolder) then
+      os.walk(staticFolder).foreach { file =>
+        os.copy(
+          file,
+          outputFolder / file.relativeTo(staticFolder),
+          replaceExisting = true,
+          createFolders = true,
+          mergeFolders = true,
+          followLinks = false
+        )
+      }
     logger.info("Site generated successfully")
   }
 
@@ -323,8 +332,37 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     )
   }
 
+  /** returns the folder that contains theme */
+  private def downloadThemeRepo(url: String, themeHash: String, themeRepoFolder: os.Path): os.RelPath = {
+    val parsedUri = java.net.URI.create(url)
+    val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
+    val qp = QueryParameterUtils
+      .parseQueryString(parsedUri.getQuery, "utf-8")
+      .asScala
+      .map((k, v) => k -> v.asScala.toSeq)
+      .toMap
+      .parseQueryStringMap[ThemeUrlQP]
+    if os.exists(themeRepoFolder) then {
+      logger.debug(s"Theme repo already exists at: ${themeRepoFolder}. Skipping download.")
+    } else {
+      logger.info(s"Downloading theme repo from: ${url} to: ${themeRepoFolder}")
+      // TODO fallback to ssh and api
+      os.makeDir.all(themeRepoFolder / os.up)
+      os.call(
+        ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
+        cwd = themeRepoFolder / os.up
+      )
+    }
+    os.RelPath(qp.folder)
+  }
+
 }
 
 case class RenderResult(
     pageContext: PageContext
 )
+
+case class ThemeUrlQP(
+    branch: String = "main",
+    folder: String = "."
+) derives QueryStringRW

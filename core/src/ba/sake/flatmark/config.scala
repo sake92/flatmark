@@ -28,8 +28,7 @@ case class SiteConfig(
     baseUrl: String = "",
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
-    theme: String = "default",
-   // TODO theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes/default",
+    theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
     categories: Map[String, CategoryConfig] = Map.empty,
     tags: Map[String, TagConfig] = Map.empty
 ) derives YamlCodec
