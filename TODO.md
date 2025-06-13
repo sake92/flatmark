@@ -1,4 +1,6 @@
 
+- init command to scaffold a new site
+
 # content
 - headings anchors
 - static search
@@ -10,14 +12,7 @@
 - page image for preview
 
 
-
-## themes
-- git clone (+ folder) by default, else use GH API
-
-
-
-## Dev loop
-- `flatmark serve` live reload
+## flatmark serve
 - show a label down below with a warning that this is a dev server
 - render even the posts that are not published, and future-date posts! (and show a nice warning)
 
@@ -26,3 +21,7 @@
 
 ## Migrating from other platforms
 - import from wordpress, jekyll itd
+
+
+
+

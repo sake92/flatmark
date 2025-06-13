@@ -48,6 +48,8 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     if os.exists(contentFolder) then
       if !os.isDir(contentFolder) then
         throw FlatmarkException(s"The 'content/' folder is not a folder: ${contentFolder}")
+      if os.list(contentFolder).isEmpty then
+        logger.warn(s"The 'content/' folder is empty, no content to process.")
       os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
         Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
           val rootRelPath = file.relativeTo(contentFolder)
@@ -56,13 +58,13 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
           processFiles += file
         }
       }
-    else logger.debug(s"The 'content/' folder does not exist, skipping content processing.")
+    else logger.warn(s"The 'content/' folder does not exist, skipping content processing.")
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesFolder = cacheFolder / "themes"
     val themeHash = HashUtils.generate(siteConfig.theme)
     val themeRepoFolder = themesFolder / themeHash
-    val relThemeFolder = downloadThemeRepo(siteConfig.theme, themeHash, themeRepoFolder)
+    val relThemeFolder = downloadThemeRepo(siteConfig.theme, themeHash, themeRepoFolder, useCache)
     val themeFolder = themeRepoFolder / relThemeFolder
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
@@ -339,7 +341,7 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
   }
 
   /** returns the folder that contains theme */
-  private def downloadThemeRepo(url: String, themeHash: String, themeRepoFolder: os.Path): os.RelPath = {
+  private def downloadThemeRepo(url: String, themeHash: String, themeRepoFolder: os.Path, useCache: Boolean): os.RelPath = {
     val parsedUri = java.net.URI.create(url)
     val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
     val qp = QueryParameterUtils
@@ -348,10 +350,10 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
       .map((k, v) => k -> v.asScala.toSeq)
       .toMap
       .parseQueryStringMap[ThemeUrlQP]
-    if os.exists(themeRepoFolder) then {
-      logger.debug(s"Theme repo already exists at: ${themeRepoFolder}. Skipping download.")
+    if os.exists(themeRepoFolder) && useCache then {
+      logger.debug("Theme is already downloaded. Skipping download.")
     } else {
-      logger.info(s"Downloading theme repo from: ${url} to: ${themeRepoFolder}")
+      logger.info(s"Downloading theme from ${httpCloneUrl}")
       // TODO fallback to ssh and api
       os.makeDir.all(themeRepoFolder / os.up)
       os.call(
