@@ -16,7 +16,8 @@ content/
     bs/                 <-- translations live in lang-code/ named folders
         index.md
         blog/mypost.md    <-- translated post
-    # static assets can live anywhere
+
+static/                 <-- static files, copied as-is to the output
     images/favicon.ico
     styles/main.css
     scripts/main.js

@@ -27,7 +27,7 @@ object Main {
   ): Unit = {
     val siteRootFolder = os.Path(Paths.get(input).toAbsolutePath)
     val logLevelValue = logLevel.julLevel
-    val cli = FlatmarkCli(siteRootFolder, port, logLevelValue, !noCache.value)
+    val cli = FlatmarkCli(siteRootFolder, host, port, logLevelValue, !noCache.value)
     command.toLowerCase match {
       case "build" => cli.build()
       case "serve" => cli.serve()

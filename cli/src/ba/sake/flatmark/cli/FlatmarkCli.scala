@@ -23,8 +23,9 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
     val ssrServerPort = NetworkUtils.getFreePort()
+    val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
-    val generator = FlatmarkGenerator(ssrServerPort, webDriverHolder)
+    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
     try generator.generate(siteRootFolder, useCache)
     finally
       webDriverHolder.close()
@@ -40,7 +41,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
     logger.info("Flatmark serve started")
     val webDriverHolder = WebDriverHolder()
-    startFlatmarkServer(port)
+    startFlatmarkServer()
     val ssrServerPort = NetworkUtils.getFreePort()
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     startFlatmarkSsrServer(ssrServerPort)
@@ -60,7 +61,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     )
   }
 
-  private def startFlatmarkServer(host: String, port: Int): Undertow =
+  private def startFlatmarkServer(): Undertow = {
     logger.debug("Flatmark server starting...")
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
@@ -85,8 +86,9 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     )
     logger.info(s"Flatmark server started at http://${host}:${port}")
     server
+  }
 
-  private def startFlatmarkSsrServer(port: Int): UndertowSharafServer =
+  private def startFlatmarkSsrServer(port: Int): UndertowSharafServer = {
     logger.debug("Flatmark SSR server starting...")
     val server = UndertowSharafServer(
       "localhost",
@@ -96,4 +98,5 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     server.start()
     logger.debug(s"Flatmark SSR server started at http://localhost:${port}")
     server
+  }
 }

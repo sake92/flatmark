@@ -9,7 +9,7 @@ import io.undertow.server.{HttpHandler, HttpServerExchange}
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceChangeListener}
 import io.undertow.util.Headers
 
-class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, next: HttpHandler) extends HttpHandler {
+class SwebserverFileHandler(baseFolder: os.Path, host: String, port: Int, next: HttpHandler) extends HttpHandler {
 
   private val resourceManager = new PathResourceManager(baseFolder.wrapped)
 
@@ -17,7 +17,7 @@ class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, nex
     s"""
       |<script>
       |if (typeof swebserverWS === 'undefined') {
-      |    var swebserverWS = new WebSocket("ws://${address}:${port}/ws");
+      |    var swebserverWS = new WebSocket("ws://${host}:${port}/ws");
       |
       |    swebserverWS.onopen = (event) => {
       |        console.log("[swebserver] WebSocket connection established.", event);
