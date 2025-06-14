@@ -1,5 +1,6 @@
 
 {% if paginator.totalItems %}
+    <hr>
     {% for item in paginator.items %}
     <li><a href="{{ item.url }}">{{ item.title }}</a></li>
     {% endfor %}

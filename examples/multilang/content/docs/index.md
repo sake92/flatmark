@@ -1,5 +1,2 @@
----
-layout: index
----
 
 # My Docs

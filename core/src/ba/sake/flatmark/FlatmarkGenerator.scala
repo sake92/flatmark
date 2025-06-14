@@ -48,8 +48,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     if os.exists(contentFolder) then
       if !os.isDir(contentFolder) then
         throw FlatmarkException(s"The 'content/' folder is not a folder: ${contentFolder}")
-      if os.list(contentFolder).isEmpty then
-        logger.warn(s"The 'content/' folder is empty, no content to process.")
+      if os.list(contentFolder).isEmpty then logger.warn(s"The 'content/' folder is empty, no content to process.")
       os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
         Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
           val rootRelPath = file.relativeTo(contentFolder)
@@ -210,6 +209,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             languages,
             locale,
             templateConfig,
+            defaultLayout = "index",
             rootRelPath,
             paginatedItemsGroup,
             currentPage = i + 1,
@@ -235,6 +235,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           languages,
           locale,
           templateConfig,
+          defaultLayout = "page",
           _ => rootRelPath,
           Seq.empty,
           currentPage = 0,
@@ -283,6 +284,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       languages: Seq[Locale],
       lang: Locale,
       templateConfig: TemplateConfig,
+      defaultLayout: String,
       rootRelPath: Int => os.RelPath,
       items: Seq[PageContext],
       currentPage: Int,
@@ -317,7 +319,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) }
       ),
       PageContext(
-        layout = templateConfig.page.layout,
+        layout = templateConfig.page.layout.getOrElse(defaultLayout),
         title = templateConfig.page.title,
         description = templateConfig.page.description,
         content = "",
@@ -338,7 +340,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
   }
 
   /** returns the folder that contains theme */
-  private def downloadThemeRepo(url: String, themesFolder : os.Path, useCache: Boolean): os.Path = {
+  private def downloadThemeRepo(url: String, themesFolder: os.Path, useCache: Boolean): os.Path = {
     val parsedUri = java.net.URI.create(url)
     val qp = QueryParameterUtils
       .parseQueryString(parsedUri.getQuery, "utf-8")
@@ -346,7 +348,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       .map((k, v) => k -> v.asScala.toSeq)
       .toMap
       .parseQueryStringMap[ThemeUrlQP]
-    val themeHash = s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(url)}".replace("/", "-")
+    val themeHash =
+      s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(url)}".replace("/", "-")
     val themeRepoFolder = themesFolder / themeHash
     if os.exists(themeRepoFolder) && useCache then {
       logger.debug("Theme is already downloaded. Skipping download.")
