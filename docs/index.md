@@ -21,8 +21,6 @@ To use code syntax highlighting, use the code block syntax with the language spe
 
 ````markdown
 ```scala
-````markdown
-```scala
 val x = 5
 ```
 ````

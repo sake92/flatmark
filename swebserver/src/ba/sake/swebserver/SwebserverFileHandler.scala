@@ -16,7 +16,7 @@ class SwebserverFileHandler(baseFolder: os.Path, address: String, port: Int, nex
   private val InjectedScript =
     s"""
       |<script>
-      |if (typeof ws === 'undefined') {
+      |if (typeof swebserverWS === 'undefined') {
       |    var swebserverWS = new WebSocket("ws://${address}:${port}/ws");
       |
       |    swebserverWS.onopen = (event) => {
