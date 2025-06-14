@@ -15,7 +15,7 @@ import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.querson.*
 
-class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
+class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
@@ -64,10 +64,10 @@ class FlatmarkGenerator(ssrServerPort: Int, webDriverHolder: WebDriverHolder) {
     val themesFolder = cacheFolder / "themes"
     val themeFolder = downloadThemeRepo(siteConfig.theme, themesFolder, useCache)
     val fileCache = FileCache(cacheFolder, useCache)
-    val codeHighlighter = FlatmarkCodeHighlighter(ssrServerPort, webDriverHolder, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerPort, webDriverHolder, fileCache)
-    val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerPort, webDriverHolder, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(ssrServerPort, webDriverHolder, fileCache)
+    val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
+    val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
+    val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerUrl, webDriverHolder, fileCache)
+    val mathRenderer = FlatmarkMathRenderer(ssrServerUrl, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
     val customClassloader = new java.net.URLClassLoader(
       Array(siteRootFolder / "_i18n", themeFolder / "_i18n").map(_.toIO.toURI.toURL),

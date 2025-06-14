@@ -10,7 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
 
-class FlatmarkGraphvizRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkGraphvizRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
 
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
@@ -20,7 +20,7 @@ class FlatmarkGraphvizRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHol
         logger.debug("Render graphviz start")
         val encodedDotStr = URLEncoder.encode(dotStr, "utf-8")
         val encodedEngine = URLEncoder.encode(engine, "utf-8")
-        val url = s"http://localhost:${ssrServerPort}/ssr/graphviz?source=${encodedDotStr}&engine=${encodedEngine}"
+        val url = s"${ssrServerUrl}/ssr/graphviz?source=${encodedDotStr}&engine=${encodedEngine}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

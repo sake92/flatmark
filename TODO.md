@@ -27,7 +27,7 @@
 - show a label down below with a warning that this is a dev server
 - render even the posts that are not published, and future-date posts! (and show a nice warning)
 - automatically open the browser
-- set host
+
 
 ## Migrating from other platforms
 - import from wordpress, jekyll itd

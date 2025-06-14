@@ -13,6 +13,8 @@ object Main {
       command: String = "build",
       @arg(short = 'i', doc = "Path to input folder, default is current folder")
       input: String = ".",
+      @arg(short = 'h', doc = "Server host, default is localhost")
+      host: String = "localhost",
       @arg(short = 'p', doc = "Server port, default is 5555")
       port: Int = 5555,
       @arg(
@@ -25,11 +27,10 @@ object Main {
   ): Unit = {
     val siteRootFolder = os.Path(Paths.get(input).toAbsolutePath)
     val logLevelValue = logLevel.julLevel
+    val cli = FlatmarkCli(siteRootFolder, port, logLevelValue, !noCache.value)
     command.toLowerCase match {
-      case "build" =>
-        FlatmarkCli(siteRootFolder, port, logLevelValue, !noCache.value).build()
-      case "serve" =>
-        FlatmarkCli(siteRootFolder, port, logLevelValue, !noCache.value).serve()
+      case "build" => cli.build()
+      case "serve" => cli.serve()
       case _ =>
         println(s"Unknown command: $command. Use 'build' or 'serve'.")
         System.exit(1)

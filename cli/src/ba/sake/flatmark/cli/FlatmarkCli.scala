@@ -12,7 +12,7 @@ import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.swebserver.SwebserverFileHandler
 import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 
-class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache: Boolean) {
+class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def build(): Unit = {
@@ -42,8 +42,9 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     val webDriverHolder = WebDriverHolder()
     startFlatmarkServer(port)
     val ssrServerPort = NetworkUtils.getFreePort()
+    val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     startFlatmarkSsrServer(ssrServerPort)
-    val generator = FlatmarkGenerator(ssrServerPort, webDriverHolder)
+    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
     generator.generate(siteRootFolder, useCache)
     os.watch.watch(
       Seq(siteRootFolder),
@@ -59,17 +60,17 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
     )
   }
 
-  private def startFlatmarkServer(port: Int): Undertow =
+  private def startFlatmarkServer(host: String, port: Int): Undertow =
     logger.debug("Flatmark server starting...")
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
-    val fileHandler = SwebserverFileHandler(generatedSiteFolder, "localhost", port, ResourceHandler(resourceManager))
+    val fileHandler = SwebserverFileHandler(generatedSiteFolder, host, port, ResourceHandler(resourceManager))
     val changes = new java.util.concurrent.atomic.AtomicBoolean(false)
     val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(changes))
     val server = Undertow
       .builder()
-      .addHttpListener(port, "localhost")
+      .addHttpListener(port, host)
       .setHandler(
         Handlers
           .path()
@@ -82,7 +83,7 @@ class FlatmarkCli(siteRootFolder: os.Path, port: Int, logLevel: Level, useCache:
       Seq(generatedSiteFolder),
       _ => changes.set(true)
     )
-    logger.info(s"Flatmark server started at http://localhost:${port}")
+    logger.info(s"Flatmark server started at http://${host}:${port}")
     server
 
   private def startFlatmarkSsrServer(port: Int): UndertowSharafServer =

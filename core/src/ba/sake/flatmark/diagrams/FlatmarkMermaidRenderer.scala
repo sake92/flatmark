@@ -10,7 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
 
-class FlatmarkMermaidRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
+class FlatmarkMermaidRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
   
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
@@ -19,7 +19,7 @@ class FlatmarkMermaidRenderer(ssrServerPort: Int, webDriverHolder: WebDriverHold
       try {
         logger.debug("Render mermaid start")
         val encodedSource = URLEncoder.encode(source, "utf-8")
-        val url = s"http://localhost:${ssrServerPort}/ssr/mermaid?source=${encodedSource}"
+        val url = s"${ssrServerUrl}/ssr/mermaid?source=${encodedSource}"
         webDriverHolder.driver.get(url)
         val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
         waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)
