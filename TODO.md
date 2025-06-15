@@ -3,6 +3,7 @@
 
 # content
 - headings anchors
+- TOC helper, collapsible
 - static search
 - translation_url filter
 - post-process internal links to use the base url or to be relative
@@ -10,7 +11,12 @@
 - RSS
 - custom skip files?
 - page image for preview
-
+- nifty features like:
+  - code blocks with line numbers
+  - code blocks with copy button
+  - code blocks with language selection
+  - code blocks with download button
+  - https://welpo.github.io/tabi/blog/shortcodes/
 
 
 # flatmark init

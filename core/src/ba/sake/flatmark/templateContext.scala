@@ -77,6 +77,8 @@ case class PageContext(
     lang: LanguageContext,
     publishDate: Option[java.time.ZonedDateTime],
     rootRelPath: os.RelPath
+    // TODO summary: String = "", // Optional summary field
+    // TODO toc: Tree[PageLinkContext] = Tree.empty // Optional table of contents, only link and title for now
 ) {
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(

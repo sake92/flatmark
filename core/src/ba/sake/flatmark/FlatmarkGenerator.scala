@@ -6,6 +6,7 @@ import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import org.virtuslab.yaml.*
 import io.undertow.util.QueryParameterUtils
+import ba.sake.querson.*
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
@@ -13,7 +14,6 @@ import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
-import ba.sake.querson.*
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -33,9 +33,16 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     }*/
 
     val siteConfigFile = siteRootFolder / "_config.yaml"
-    val siteConfigYaml = if os.exists(siteConfigFile) then os.read(siteConfigFile) else "name: My Site"
-    val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig].toOption.getOrElse {
-      throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.")
+    val defaultSiteConfig = "name: My Site"
+    val siteConfigYaml = if os.exists(siteConfigFile) then {
+      val siteConfigYamlStr = os.read(siteConfigFile)
+      // virtuslab yaml library does not support empty strings, so we use a default config
+      if siteConfigYamlStr.isBlank then defaultSiteConfig else siteConfigYamlStr
+    } else defaultSiteConfig
+    val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig] match {
+      case Right(config) => config
+      case Left(error) =>
+        throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.", error)
     }
     logger.debug(s"Site configuration: ${siteConfig}")
 
@@ -341,6 +348,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
 
   /** returns the folder that contains theme */
   private def downloadThemeRepo(url: String, themesFolder: os.Path, useCache: Boolean): os.Path = {
+    // TODO support local path in _themes/ folder
     val parsedUri = java.net.URI.create(url)
     val qp = QueryParameterUtils
       .parseQueryString(parsedUri.getQuery, "utf-8")
