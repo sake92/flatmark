@@ -199,9 +199,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         Locale.forLanguageTag(fileRelPath.segments.head)
       else siteConfig.lang
     Locale.setDefault(Locale.Category.DISPLAY, locale) // set locale for rendering language names in current language
-
     paginateItems match {
-      case Some(allItems) =>
+      case Some(allItems) if allItems.nonEmpty =>
         val pageSize = 10
         val paginatedItems = allItems.grouped(pageSize).toSeq
         for (paginatedItemsGroup, i) <- paginatedItems.zipWithIndex yield {
@@ -233,16 +232,17 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             locale
           )
         }
-      case None =>
+      case _ =>
         val rootRelPath = os.RelPath(
           if fileRelPath.segments.length == 1 then s"${file.baseName}.html"
           else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
         )
+        val defaultLayout = if paginateItems.isDefined then "index" else "page"
         val contentContext = templateContext(
           languages,
           locale,
           templateConfig,
-          defaultLayout = "page",
+          defaultLayout = defaultLayout,
           _ => rootRelPath,
           Seq.empty,
           currentPage = 0,
