@@ -1,4 +1,5 @@
 
 <footer class="pico container">
-    {{site.name}} | {{site.description}}
+    {{site.name}}
+    {% if site.description %} | {{site.description}} {% endif %}
 </footer>

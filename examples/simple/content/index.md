@@ -7,6 +7,3 @@ description: Home page
 
 This is the home page.
 
-{{ i18n("messages", "greeting.someone", "Jacob") }}
-
-ffff
