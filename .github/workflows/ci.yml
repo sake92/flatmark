@@ -21,15 +21,15 @@ jobs:
           java-version: 11
       - run: |
           ./mill -i cli.assembly
-          cp cli/assembly.dest/out.jar flatmark
-          cp cli/assembly.dest/out.jar flatmark.bat
-      - name: Archive native-executable
+          cp out/cli/assembly.dest/out.jar flatmark
+          cp out/cli/assembly.dest/out.jar flatmark.bat
+      - name: Archive executable-jar
         uses: actions/upload-artifact@v4
         with:
           name: flatmark-executable-jar
           path: flatmark
           retention-days: 30
-      - name: Archive native-executable
+      - name: Archive executable-windows-jar
         uses: actions/upload-artifact@v4
         with:
           name: flatmark-executable-windows-jar
