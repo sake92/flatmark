@@ -1,0 +1,5 @@
+
+<footer>
+    {{site.name}}
+    {% if site.description %} | {{site.description}} {% endif %}
+</footer>

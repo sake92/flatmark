@@ -1,0 +1,10 @@
+
+<header>
+    <nav>
+        <a href="{{ page.lang.url }}">Home</a>
+        {% for cat in site.categories %}
+            | <a href="/{{ cat.key }}">{{ cat.value.label }}</a>
+        {% endfor %}
+    </nav>
+</header>
+    
