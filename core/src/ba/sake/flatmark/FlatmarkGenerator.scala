@@ -378,6 +378,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
         logger.info(s"Downloading theme from ${httpCloneUrl}")
         // TODO fallback to ssh and api
+        os.remove.all(themesCacheFolder, ignoreErrors = true)
         os.makeDir.all(themesCacheFolder)
         os.call(
           ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
