@@ -23,5 +23,3 @@ nodejs-helpers/bundle.min.mjs
 .flatmark-cache
 _site/
 
-# just for testing..
-site1/

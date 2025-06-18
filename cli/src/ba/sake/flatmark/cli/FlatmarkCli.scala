@@ -66,7 +66,8 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
-    val fileHandler = SwebserverFileHandler(generatedSiteFolder, host, port, ResourceHandler(resourceManager))
+    val fallbackResourceHandler = ResourceHandler(resourceManager).setDirectoryListingEnabled(true)
+    val fileHandler = SwebserverFileHandler(generatedSiteFolder, host, port, fallbackResourceHandler)
     val changes = new java.util.concurrent.atomic.AtomicBoolean(false)
     val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(changes))
     val server = Undertow

@@ -2,6 +2,7 @@ package ba.sake.flatmark
 
 import java.util.Locale
 import org.slf4j.LoggerFactory
+
 import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 import org.virtuslab.yaml.*
@@ -15,12 +16,14 @@ import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 
+import scala.util.control.NonFatal
+
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
-  def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = {
+  def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = try {
     logger.info(s"Generating site in '${siteRootFolder}'")
     if !os.exists(siteRootFolder) then throw FlatmarkException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw FlatmarkException(s"Site root is not a folder: ${siteRootFolder}")
@@ -67,8 +70,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     else logger.warn(s"The 'content/' folder does not exist, skipping content processing.")
 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
-    val themesFolder = cacheFolder / "themes"
-    val themeFolder = downloadThemeRepo(siteConfig.theme, themesFolder, useCache)
+    val themesCacheFolder = cacheFolder / "themes"
+    val localThemesFolder = siteRootFolder / "_themes"
+    val themeFolder = downloadThemeRepo(siteConfig.theme, localThemesFolder, themesCacheFolder, useCache)
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
@@ -88,7 +92,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         if os.isFile(file) then
           os.copy(
             file,
-            outputFolder / file.relativeTo(themeFolder),
+            outputFolder / file.relativeTo(themeStaticFolder),
             replaceExisting = true,
             createFolders = true,
             mergeFolders = true,
@@ -177,6 +181,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           )
       }
     logger.info("Site generated successfully")
+  } catch {
+    case NonFatal(e) =>
+      logger.error("Error during site generation", e)
   }
 
   private def renderTemplatedFile(
@@ -347,32 +354,50 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
   }
 
   /** returns the folder that contains theme */
-  private def downloadThemeRepo(url: String, themesFolder: os.Path, useCache: Boolean): os.Path = {
-    // TODO support local path in _themes/ folder
-    val parsedUri = java.net.URI.create(url)
-    val qp = QueryParameterUtils
-      .parseQueryString(parsedUri.getQuery, "utf-8")
-      .asScala
-      .map((k, v) => k -> v.asScala.toSeq)
-      .toMap
-      .parseQueryStringMap[ThemeUrlQP]
-    val themeHash =
-      s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(url)}".replace("/", "-")
-    val themeRepoFolder = themesFolder / themeHash
-    if os.exists(themeRepoFolder) && useCache then {
-      logger.debug("Theme is already downloaded. Skipping download.")
-    } else {
-      val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
-      logger.info(s"Downloading theme from ${httpCloneUrl}")
-      // TODO fallback to ssh and api
-      os.makeDir.all(themesFolder)
-      os.call(
-        ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
-        cwd = themesFolder
+  private def downloadThemeRepo(
+      themeSource: String,
+      localThemesFolder: os.Path,
+      themesCacheFolder: os.Path,
+      useCache: Boolean
+  ): os.Path = {
+    val parsedUri = java.net.URI.create(themeSource)
+    if parsedUri.getScheme == "http" || parsedUri.getScheme == "https" then {
+      val qp = QueryParameterUtils
+        .parseQueryString(parsedUri.getQuery, "utf-8")
+        .asScala
+        .map((k, v) => k -> v.asScala.toSeq)
+        .toMap
+        .parseQueryStringMap[ThemeUrlQP]
+      val themeHash =
+        s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(themeSource)}"
+          .replace("/", "-")
+      val themeRepoFolder = themesCacheFolder / themeHash
+      if os.exists(themeRepoFolder) && useCache then {
+        logger.debug("Theme is already downloaded. Skipping download.")
+      } else {
+        val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
+        logger.info(s"Downloading theme from ${httpCloneUrl}")
+        // TODO fallback to ssh and api
+        os.makeDir.all(themesCacheFolder)
+        os.call(
+          ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
+          cwd = themesCacheFolder
+        )
+        logger.info(s"Downloaded theme from: ${themeSource}")
+      }
+      themeRepoFolder / os.RelPath(qp.folder)
+    } else if parsedUri.getScheme == null then {
+      val folder = localThemesFolder / os.SubPath(themeSource)
+      if !os.exists(folder) then throw FlatmarkException(
+        s"Local theme folder does not exist: ${folder}. Please create it or use a valid theme URL."
       )
-      logger.info(s"Downloaded theme from: ${url}")
+      folder
+    } else {
+      throw FlatmarkException(
+        s"Unsupported theme URL scheme: ${parsedUri.getScheme}. Only 'http', 'https' or no scheme (folder in _themes) are supported."
+      )
     }
-    themeRepoFolder / os.RelPath(qp.folder)
+
   }
 
 }

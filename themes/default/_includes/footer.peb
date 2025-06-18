@@ -1,4 +1,4 @@
 
-<footer>
+<footer class="pico container">
     {{site.name}} | {{site.description}}
 </footer>

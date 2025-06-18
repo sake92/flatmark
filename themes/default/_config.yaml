@@ -1,0 +1,17 @@
+
+name: My Cool Site
+description: My Cool Site Descriptionn
+timezone: Europe/Sarajevo
+theme: my_custom_theme
+categories:
+  blog:
+    label: Blog
+    description: The blog section of the site
+  docs:
+    label: Documentation
+    description: The documentation section of the site
+
+tags:
+  programming:
+    label: Programming
+    description: Posts related to programming

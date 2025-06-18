@@ -1,24 +1,23 @@
 
-{% if paginator.totalItems %}
-    <hr>
-    {% for item in paginator.items %}
-    <li><a href="{{ item.url }}">{{ item.title }}</a></li>
-    {% endfor %}
 
-    {% if paginator.hasPrev %}
-    <a href="{{ paginator.prevUrl }}">Prev</a>
-    {% else %}
-    <span>Prev</span>
-    {% endif %}
+<aside>
+    <nav>
+        <ul>
+        {% for item in paginator.items %}
+        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+        {% endfor %}
+        </ul>
+    </nav>
 
-    <b>{{ paginator.current }}</b>
-    
-    {% if paginator.hasNext %}
-    <a href="{{ paginator.nextUrl }}">Next</a>
-    {% else %}
-    <span>Next</span>
-    {% endif %}
-
-{% else %}
-<p>There are no posts. #sad </p>
+{% if paginator.totalPages > 1 %}
+    <div>
+        {% set prev = paginator.hasPrev ? paginator.prevUrl : '#' %}    
+        {% set next = paginator.hasNext ? paginator.nextUrl : '#' %}    
+        <a href="{{ prev }}" {{ paginator.hasPrev ? "" : "disabled" }} role="button">Prev</a>
+        <span role="button" class="outline" disabled>{{ paginator.current }}</span>
+        <a href="{{ next }}" {{ paginator.hasNext ? "" : "disabled" }} role="button">Next</a>
+    </div>
 {% endif %}
+
+</aside>
+
