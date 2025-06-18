@@ -24,7 +24,7 @@ Task items:
 
 With attributes:
 
-![cat](/images/cat.jpg){width=640}
+![cat](https://images.pexels.com/photos/1521306/pexels-photo-1521306.jpeg){width=640}
 
 Photo by Kirsten Bühne from Pexels: https://www.pexels.com/photo/photo-of-british-shorthair-cat-sitting-on-grass-field-1521306/
 
