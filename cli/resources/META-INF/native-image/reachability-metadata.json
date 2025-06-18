@@ -22,6 +22,9 @@
       "type": "[Ljava.lang.String;"
     },
     {
+      "type": "[Ljava.net.URL;"
+    },
+    {
       "type": "[Ljava.nio.file.CopyOption;"
     },
     {
@@ -79,6 +82,14 @@
       "fields": [
         {
           "name": "derived$YamlCodec$lzy1"
+        }
+      ]
+    },
+    {
+      "type": "ba.sake.flatmark.ThemeUrlQP$",
+      "fields": [
+        {
+          "name": "derived$QueryStringRW$lzy1"
         }
       ]
     },
@@ -288,6 +299,14 @@
       "fields": [
         {
           "name": "lineNumberLookup$lzy1"
+        }
+      ]
+    },
+    {
+      "type": "geny.ByteData$Chunks",
+      "fields": [
+        {
+          "name": "bytes$lzy1"
         }
       ]
     },
@@ -2464,9 +2483,6 @@
       "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
     },
     {
-      "glob": "META-INF/services/java.util.spi.ResourceBundleControlProvider"
-    },
-    {
       "glob": "META-INF/services/org.jboss.logging.LoggerProvider"
     },
     {
@@ -2492,15 +2508,6 @@
     },
     {
       "glob": "logging.properties"
-    },
-    {
-      "glob": "messages.properties"
-    },
-    {
-      "glob": "messages_bs.properties"
-    },
-    {
-      "glob": "messages_en.properties"
     },
     {
       "glob": "org/jboss/threads/Version.properties"
@@ -2539,15 +2546,7 @@
       "glob": "jdk/jfr/internal/query/view.ini"
     }
   ],
-  "bundles": [
-    {
-      "name": "messages",
-      "locales": [
-        "bs",
-        "en"
-      ]
-    }
-  ],
+  "bundles": [],
   "jni": [
     {
       "type": "[Lcom.sun.management.internal.DiagnosticCommandArgumentInfo;"

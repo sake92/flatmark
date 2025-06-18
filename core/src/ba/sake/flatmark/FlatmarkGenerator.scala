@@ -378,20 +378,25 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
         logger.info(s"Downloading theme from ${httpCloneUrl}")
         // TODO fallback to ssh and api
-        os.remove.all(themesCacheFolder, ignoreErrors = true)
-        os.makeDir.all(themesCacheFolder)
-        os.call(
-          ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
-          cwd = themesCacheFolder
-        )
-        logger.info(s"Downloaded theme from: ${themeSource}")
+        if os.exists(themeRepoFolder) then {
+          os.call(("git", "pull"), cwd = themeRepoFolder)
+          logger.info(s"Pulled latest theme from: ${themeSource}")
+        } else {
+          os.makeDir.all(themesCacheFolder)
+          os.call(
+            ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
+            cwd = themesCacheFolder
+          )
+          logger.info(s"Cloned theme from: ${themeSource}")
+        }
       }
       themeRepoFolder / os.RelPath(qp.folder)
     } else if parsedUri.getScheme == null then {
       val folder = localThemesFolder / os.SubPath(themeSource)
-      if !os.exists(folder) then throw FlatmarkException(
-        s"Local theme folder does not exist: ${folder}. Please create it or use a valid theme URL."
-      )
+      if !os.exists(folder) then
+        throw FlatmarkException(
+          s"Local theme folder does not exist: ${folder}. Please create it or use a valid theme URL."
+        )
       folder
     } else {
       throw FlatmarkException(
