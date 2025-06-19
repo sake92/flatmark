@@ -3,17 +3,33 @@ package build
 import mill._
 import mill.scalalib._
 
-object cli extends ScalaModule /*with CustomNativeImageModule*/ {
-  def scalaVersion = "3.7.0"
-  def mainClass = Some("ba.sake.flatmark.cli.Main")
-  def moduleDeps = Seq(core, swebserver)
+object cli extends Module {
 
-  def forkArgs = Seq[String](
-    "-Dfile.encoding=UTF-8",
-    "-Dorg.jboss.logging.provider=jdk",
-    // https://github.com/scala/scala3/issues/9013
-    //"--sun-misc-unsafe-memory-access=allow"
-  )
+  object jvm extends CliCommonModule
+
+  object windows extends CliCommonModule with CustomJpackageModule {
+    def jpackageName = "flatmark"
+    def jpackageType = "msi"
+    def jpackageOptions = Seq(
+      "--win-console",
+      "--resource-dir",
+      (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString
+    )
+  }
+
+  trait CliCommonModule extends ScalaModule {
+    def scalaVersion = "3.7.0"
+    def mainClass = Some("ba.sake.flatmark.cli.Main")
+    def moduleDeps = Seq(core, swebserver)
+
+    def forkArgs = Seq[String](
+      "-Dfile.encoding=UTF-8",
+      "-Dorg.jboss.logging.provider=jdk"
+      // https://github.com/scala/scala3/issues/9013
+      // "--sun-misc-unsafe-memory-access=allow"
+    )
+  }
+
 }
 
 object core extends ScalaModule {
@@ -62,7 +78,50 @@ object ssr extends ScalaModule {
   )
 }
 
-// GraalVM kinda wotks, but it is pain to set up dynamic classpath
+trait CustomJpackageModule extends JpackageModule {
+  def jpackageOptions: T[Seq[String]] = Seq.empty[String]
+
+  def jpackageAppImage2: T[PathRef] = Task {
+    // materialize all jars into a "lib" dir
+    val libs = Task.dest / "lib"
+    val temp = Task.dest / "temp"
+    val cp = jpackageRunClasspath().map(_.path)
+    val jars = cp.filter(os.exists).zipWithIndex.map { case (p, idx) =>
+      val dest = libs / s"${idx + 1}-${p.last}"
+      os.copy(p, dest, createFolders = true)
+      dest
+    }
+
+    val appName = jpackageName()
+    val appType = jpackageType()
+    val mainClass = jpackageMainClass()
+    val mainJarName = jars.head.last
+
+    val args: Seq[String] = Seq(
+      mill.util.Jvm.jdkTool("jpackage", this.jvmWorker().javaHome().map(_.path)),
+      "--type",
+      appType,
+      "--name",
+      appName,
+      "--input",
+      libs.toString(),
+      "--main-jar",
+      mainJarName,
+      "--main-class",
+      mainClass,
+      "--temp",
+      temp.toString()
+    ) ++ jpackageOptions()
+
+    // run jpackage tool
+    val outDest = Task.dest / "image"
+    os.makeDir.all(outDest)
+    os.proc(args).call(cwd = outDest)
+    PathRef(outDest)
+  }
+}
+
+// GraalVM kinda works, but it is pain to set up dynamic classpath
 // for language bundles etc
 /*
 object ZincWorkerGraalvm extends JvmWorkerModule {
@@ -91,4 +150,4 @@ trait CustomNativeImageModule extends NativeImageModule {
     PathRef(executable)
   }
 }
-*/
+ */
