@@ -35,7 +35,8 @@ class FlatmarkMarkdownRenderer(
     InsExtension.create(),
     ImageAttributesExtension.create(),
     TaskListItemsExtension.create(),
-    FlatmarkStaticCodeRendererExtension(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
+    FlatmarkStaticCodeRendererExtension(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer),
+    InlineMathExtension.create(mathRenderer)
   )
   private val parser = Parser.builder.extensions(extensions).build
   private val renderer = HtmlRenderer.builder.extensions(extensions).build
@@ -68,7 +69,7 @@ class FlatmarkStaticCodeNodeRenderer(
     mathRenderer: FlatmarkMathRenderer
 ) extends NodeRenderer {
 
-  override def getNodeTypes: ju.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock]);
+  override def getNodeTypes: ju.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock])
 
   override def render(node: Node): Unit = {
     val html = context.getWriter

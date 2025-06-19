@@ -36,7 +36,11 @@ val x = 1
 ```
 
 ---
-## Math Blocks
+## Math
+
+This is an inline formula: $c = \pm\sqrt{a^2 + b^2}$ .
+
+This is a math block:
 
 ```math
 x = 5
