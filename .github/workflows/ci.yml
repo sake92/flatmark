@@ -8,8 +8,23 @@ on:
   workflow_call:  # allow this workflow to be called from other workflows
 
 jobs:
-  build-windows-msi:
-    runs-on: windows-latest
+  build-installer:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            mill-module: ubuntu
+            installer-name: flatmark-1.0.deb
+            artifact-name: flatmark-installer-deb-x64
+          - os: macos-latest
+            mill-module: macos
+            installer-name: flatmark-1.0.dmg
+            artifact-name: flatmark-installer-macos-arm64
+          - os: windows-latest
+            mill-module: windows
+            installer-name: flatmark-1.0.msi
+            artifact-name: flatmark-installer-windows-x64
     steps:
       - uses: actions/checkout@v4
         with:
@@ -19,12 +34,12 @@ jobs:
           distribution: 'zulu'
           java-version: 24
       - run: |
-          ./mill -i cli.windows.jpackageAppImage2
-      - name: Archive executable-jar
+          ./mill -i cli.${{ matrix.mill-module }}.jpackageAppImage2
+      - name: Archive ${{ matrix.artifact-name }}
         uses: actions/upload-artifact@v4
         with:
-          name: flatmark-windows-msi
-          path: out/cli/windows/jpackageAppImage2.dest/image/flatmark-1.0.msi
+          name: ${{ matrix.artifact-name }}
+          path: out/cli/windows/jpackageAppImage2.dest/image/${{ matrix.flatmark-1.0.dmg }}
           retention-days: 30
 
   build-assembly-jar:
@@ -89,7 +104,3 @@ jobs:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.exe-name }}
           retention-days: 30
-
-
-
-

@@ -7,6 +7,25 @@ object cli extends Module {
 
   object jvm extends CliCommonModule
 
+  object ubuntu extends CliCommonModule with CustomJpackageModule {
+    def jpackageName = "flatmark"
+    def jpackageType = "deb"
+    def jpackageOptions = Seq(
+      "--resource-dir",
+      (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
+    )
+  }
+  
+  object macos extends CliCommonModule with CustomJpackageModule {
+    def jpackageName = "flatmark"
+    def jpackageType = "msi"
+    def jpackageOptions = Seq(
+      "--win-console",
+      "--resource-dir",
+      (cli.moduleDir / "resources" / "jpackage" / "macos").wrapped.toString
+    )
+  }
+  
   object windows extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
     def jpackageType = "msi"
