@@ -3,6 +3,10 @@ package build
 import mill._
 import mill.scalalib._
 
+object Consts {
+  val version = "0.0.1"
+}
+
 object cli extends Module {
 
   object jvm extends CliCommonModule
@@ -15,7 +19,7 @@ object cli extends Module {
       (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
     )
   }
-  
+
   object macos extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
     def jpackageType = "dmg"
@@ -24,14 +28,16 @@ object cli extends Module {
       (cli.moduleDir / "resources" / "jpackage" / "macos").wrapped.toString
     )
   }
-  
+
   object windows extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
     def jpackageType = "msi"
     def jpackageOptions = Seq(
-      "--win-console",
+      "--app-version",
+      Consts.version,
       "--resource-dir",
-      (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString
+      (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString,
+      "--win-console"
     )
   }
 
