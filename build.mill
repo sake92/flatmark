@@ -41,7 +41,8 @@ object cli extends Module {
       Consts.jpackageVersion,
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString,
-      "--win-console"
+      "--win-console",
+      "--win-dir-chooser"
     )
   }
 
