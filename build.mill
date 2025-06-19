@@ -18,9 +18,8 @@ object cli extends Module {
   
   object macos extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
-    def jpackageType = "msi"
+    def jpackageType = "dmg"
     def jpackageOptions = Seq(
-      "--win-console",
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "macos").wrapped.toString
     )
