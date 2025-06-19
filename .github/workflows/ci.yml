@@ -7,9 +7,8 @@ on:
   pull_request:
   workflow_call:  # allow this workflow to be called from other workflows
 
-# TODO tag based
-env:
-  VERSION: 0.0.1
+# TODO tag based versioning
+
   
 jobs:
   build-installer:
@@ -19,15 +18,15 @@ jobs:
         include:
           - os: ubuntu-latest
             mill-module: ubuntu
-            installer-name: flatmark_${{ env.VERSION }}_amd64.deb
+            installer-name: flatmark_0.0.1_amd64.deb
             artifact-name: flatmark-installer-deb-x64
           - os: macos-latest
             mill-module: macos
-            installer-name: flatmark-${{ env.VERSION }}.dmg
+            installer-name: flatmark-0.0.1.dmg
             artifact-name: flatmark-installer-macos-arm64
           - os: windows-latest
             mill-module: windows
-            installer-name: flatmark-${{ env.VERSION }}.msi
+            installer-name: flatmark-0.0.1.msi
             artifact-name: flatmark-installer-windows-x64
     steps:
       - uses: actions/checkout@v4
