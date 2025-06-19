@@ -45,7 +45,7 @@ object cli extends Module {
     )
   }
 
-  trait CliCommonModule extends ScalaModule {
+  trait CliCommonModule extends PlatformScalaModule {
     def scalaVersion = "3.7.0"
     def mainClass = Some("ba.sake.flatmark.cli.Main")
     def moduleDeps = Seq(core, swebserver)
