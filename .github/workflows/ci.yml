@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: out/cli/windows/jpackageAppImage2.dest/image/${{ matrix.flatmark-1.0.dmg }}
+          path: out/cli/windows/jpackageAppImage2.dest/image/${{ matrix.installer-name }}
           retention-days: 30
 
   build-assembly-jar:
