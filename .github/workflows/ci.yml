@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
-          path: out/cli/windows/jpackageAppImage2.dest/image/${{ matrix.installer-name }}
+          path: out/cli/${{ matrix.mill-module }}/jpackageAppImage2.dest/image/${{ matrix.installer-name }}
           retention-days: 30
 
   build-assembly-jar:
@@ -65,7 +65,7 @@ jobs:
       - name: Archive executable-windows-jar
         uses: actions/upload-artifact@v4
         with:
-          name: flatmark-executable-windows-jar
+          name: flatmark-executable-jar-windows
           path: flatmark.bat
           retention-days: 30
 
