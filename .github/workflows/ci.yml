@@ -35,6 +35,7 @@ jobs:
           java-version: 24
       - run: |
           ./mill -i cli.${{ matrix.mill-module }}.jpackageAppImage2
+          ls -l out/cli/${{ matrix.mill-module }}/jpackageAppImage2.dest/image
       - name: Archive ${{ matrix.artifact-name }}
         uses: actions/upload-artifact@v4
         with:
@@ -62,7 +63,7 @@ jobs:
           name: flatmark-executable-jar
           path: flatmark
           retention-days: 30
-      - name: Archive executable-windows-jar
+      - name: Archive executable-jar-windows
         uses: actions/upload-artifact@v4
         with:
           name: flatmark-executable-jar-windows
