@@ -9,7 +9,6 @@ on:
 
 jobs:
   build-windows-msi:
-    name: build-assembly-jar
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +28,6 @@ jobs:
           retention-days: 30
 
   build-assembly-jar:
-    name: build-assembly-jar
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -58,7 +56,6 @@ jobs:
 
   build-native-executable:
     if: false
-    name: build-native-executable
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
