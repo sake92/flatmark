@@ -31,13 +31,16 @@ val routes = Routes {
     val qp = Request.current.queryParams[QP]
     Response.withBody(
       htmlPage(
+        pre(id := "input")(
+          raw(qp.source)
+        ),
         div(id := "result")(),
         script(`type` := "module")(
           raw(s"""
             import katex from '/katex.min.js';
-            const element = document.getElementById('result');
-            const katexSource = String.raw`${qp.source}`;
-            katex.render(katexSource, element, { throwOnError: true });
+            const input = document.getElementById('input');
+            const result = document.getElementById('result');
+            katex.render(input.innerText, result, { throwOnError: true });
             window.renderFinished = true;
           """)
         )

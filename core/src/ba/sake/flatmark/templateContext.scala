@@ -87,7 +87,7 @@ case class PageContext(
       "description" -> description,
       "content" -> content,
       "lang" -> lang.toPebbleContext,
-      "publishDate" -> publishDate.orNull,
+      "publish_date" -> publishDate.orNull,
       "url" -> s"/${rootRelPath.segments.mkString("/")}"
     ).asJava
   }

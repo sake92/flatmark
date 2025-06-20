@@ -1,7 +1,7 @@
 ---
 title: My Post 1
 description: My Post
-publishDate: 2023-06-04 10:15
+publish_date: 2023-06-04 10:15
 tags: [programming]
 ---
 
@@ -12,6 +12,6 @@ This is my first post!
 
 > TODO timezone doesnt work for some reason..
 
-{{ page.publishDate | date("yyyy-MM-dd HH:mm:ssX", timeZone="Pacific/Funafuti") }}
+{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX", timeZone="Pacific/Funafuti") }}
 
 

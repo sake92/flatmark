@@ -155,6 +155,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         key,
         contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
       )
+      // TODO sortirat categoryItems
       renderTemplatedFile(
         siteConfig,
         allUsedLanguages,

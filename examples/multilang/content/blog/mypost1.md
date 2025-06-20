@@ -1,7 +1,7 @@
 ---
 title: My Post 1
 description: My Post
-publishDate: 2023-06-04 10:15
+publish_date: 2023-06-04 10:15
 tags: [programming]
 ---
 
