@@ -36,12 +36,12 @@ jobs:
       - run: |
           ./mill -i cli.${{ matrix.mill-module }}.jpackageAppImage2
           ls -l out/cli/${{ matrix.mill-module }}/jpackageAppImage2.dest/image
-      - name: Archive ${{ matrix.artifact-name }}
+      - name: Upload ${{ matrix.artifact-name }}
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact-name }}
           path: out/cli/${{ matrix.mill-module }}/jpackageAppImage2.dest/image/${{ matrix.installer-name }}
-          retention-days: 30
+          retention-days: 1
 
   build-assembly-jar:
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
         with:
           name: flatmark-executable-jar-windows
           path: flatmark.bat
-          retention-days: 30
+          retention-days: 1
 
   build-native-executable:
     if: false
@@ -104,7 +104,7 @@ jobs:
         with:
           name: ${{ matrix.artifact-name }}
           path: ${{ matrix.exe-name }}
-          retention-days: 30
+          retention-days: 1
 
   release:
     needs: [build-installer, build-assembly-jar]
@@ -121,6 +121,8 @@ jobs:
           pattern: flatmark-*
           merge-multiple: true
           path: release-artifacts
+      - run: |
+          ls release-artifacts
       - name: Release
         uses: jreleaser/release-action@v2
         with:
