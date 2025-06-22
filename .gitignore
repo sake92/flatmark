@@ -17,6 +17,8 @@ node_modules/
 .vscode/
 .idea/
 
+jreleaser_out/
+
 # project specific
 nodejs-helpers/bundle.min.mjs
 

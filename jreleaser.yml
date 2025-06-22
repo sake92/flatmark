@@ -1,0 +1,37 @@
+
+project:
+  name: app
+  version: 1.0.0-SNAPSHOT
+  description: Flatmark
+  longDescription: Flatmark Static Site Generator
+  links:
+    homepage: https://sake92.github.io/flatmark/
+  authors:
+    - Sakib Hadziavdic
+  license: MIT
+  stereotype: CLI
+  inceptionYear: "2025"
+  languages:
+    java:
+      groupId: ba.sake
+      artifactId: flatmark
+      mainClass: ba.sake.flatmark.cli.Main
+      version: "11"
+
+release:
+  github:
+    owner: sake92
+
+distributions:
+  flatmark:
+    type: NATIVE_PACKAGE
+    artifacts:
+      - path: release-artifacts/flatmark-installer-deb-x64
+        platform: 'linux-x86_64'
+      - path: release-artifacts/flatmark-installer-macos-arm64
+        platform: 'osx-aarch_64'
+      - path: release-artifacts/flatmark-installer-windows-x64
+        platform: 'windows-x86_64'
+
+
+
