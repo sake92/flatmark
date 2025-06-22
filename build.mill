@@ -9,7 +9,13 @@ object Consts {
 
 object cli extends Module {
 
-  object jvm extends CliCommonModule
+  object jvm extends CliCommonModule {
+    object test extends ScalaTests with TestModule.Munit {
+      def ivyDeps = Agg(
+        ivy"org.scalameta::munit::1.1.0"
+      )
+    }
+  }
 
   object ubuntu extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
