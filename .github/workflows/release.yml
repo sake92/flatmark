@@ -110,13 +110,17 @@ jobs:
     needs: [build-installer, build-assembly-jar]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           pattern: flatmark-*
           merge-multiple: true
           path: release-artifacts
-
       - name: Release
         uses: jreleaser/release-action@v2
         with:
@@ -124,7 +128,6 @@ jobs:
         env:
           JRELEASER_PROJECT_VERSION: ${{ needs.precheck.outputs.VERSION }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: JReleaser output
         if: always()
         uses: actions/upload-artifact@v4
