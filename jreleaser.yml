@@ -26,11 +26,11 @@ distributions:
   flatmark:
     type: NATIVE_PACKAGE
     artifacts:
-      - path: release-artifacts/flatmark-installer-deb-x64.deb
+      - path: release-artifacts/flatmark-{{projectVersionNumber}}-ubuntu-amd64.deb
         platform: 'linux-x86_64'
-      - path: release-artifacts/flatmark-installer-macos-arm64.dmg
+      - path: release-artifacts/flatmark-{{projectVersionNumber}}.dmg
         platform: 'osx-aarch_64'
-      - path: release-artifacts/flatmark-installer-windows-x64.msi
+      - path: release-artifacts/flatmark-{{projectVersionNumber}}.msi
         platform: 'windows-x86_64'
 
 
