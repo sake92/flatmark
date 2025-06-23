@@ -24,7 +24,7 @@ jobs:
             artifact-name: flatmark-installer-macos-arm64
           - os: windows-latest
             mill-module: windows
-            installer-name: flatmark-${{ github.ref_name }}.msi
+            installer-name: flatmark-${{ github.ref_name }}.0.msi
             artifact-name: flatmark-installer-windows-x64
     steps:
       - uses: actions/checkout@v4
