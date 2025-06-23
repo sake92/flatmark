@@ -138,5 +138,5 @@ jobs:
           retention-days: 1
           name: jreleaser-release
           path: |
-            $JRELEASER_OUTPUT_DIRECTORY/jreleaser/trace.log
-            $JRELEASER_OUTPUT_DIRECTORY/jreleaser/output.properties
+            jreleaser_out/jreleaser/trace.log
+            jreleaser_out/jreleaser/output.properties
