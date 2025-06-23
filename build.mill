@@ -21,7 +21,7 @@ object cli extends Module {
     def jpackageType = "deb"
     def jpackageOptions = Seq(
       "--app-version",
-      VcsVersion.vcsState().format(),
+      VcsVersion.vcsState().lastTag.getOrElse("0.0.0"),
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
     )
@@ -43,7 +43,7 @@ object cli extends Module {
     def jpackageType = "msi"
     def jpackageOptions = Seq(
       "--app-version",
-      s"${VcsVersion.vcsState().lastTag.map(_.stripSuffix("-SNAPSHOT")).getOrElse("0.0.0")}.${VcsVersion.vcsState().commitsSinceLastTag}",
+      s"${VcsVersion.vcsState().lastTag.getOrElse("0.0.0")}.${VcsVersion.vcsState().commitsSinceLastTag}",
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString,
       "--win-console",
