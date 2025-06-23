@@ -1,7 +1,6 @@
 
 project:
   name: app
-  version: 0.0.10
   description: Flatmark
   longDescription: Flatmark Static Site Generator
   links:
