@@ -14,6 +14,8 @@ env:
 jobs:
   build-installer:
     runs-on: ${{ matrix.os }}
+    env:
+      VERSION: ${{ github.event.inputs.version }}
     strategy:
       matrix:
         include:
@@ -39,8 +41,7 @@ jobs:
           distribution: 'zulu'
           java-version: 24
       - run: |
-          ./mill -i cli.${{ matrix.mill-module }}.jpackageAppImage2
-          ls -l out/cli/${{ matrix.mill-module }}/jpackageAppImage2.dest/image
+          ./mill -i show cli.${{ matrix.mill-module }}.jpackageAppImage2
       - name: Upload ${{ matrix.artifact-name }}
         uses: actions/upload-artifact@v4
         with:
