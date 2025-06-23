@@ -17,9 +17,10 @@ jobs:
             mill-module: ubuntu
             installer-name: flatmark-${{ github.ref_name }}-ubuntu-amd64.deb
             artifact-name: flatmark-installer-deb-x64
+          # macos is hardcoded to 1.0.0 for now
           - os: macos-latest
             mill-module: macos
-            installer-name: flatmark-${{ github.ref_name }}.dmg
+            installer-name: flatmark-1.0.0.pkg
             artifact-name: flatmark-installer-macos-arm64
           - os: windows-latest
             mill-module: windows

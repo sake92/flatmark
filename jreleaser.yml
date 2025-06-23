@@ -28,9 +28,10 @@ distributions:
     artifacts:
       - path: release-artifacts/flatmark-{{projectVersionNumber}}-ubuntu-amd64.deb
         platform: 'linux-x86_64'
-      - path: release-artifacts/flatmark-{{projectVersionNumber}}.dmg
+      # macos is hardcoded to 1.0.0 for now
+      - path: release-artifacts/flatmark-1.0.0.pkg
         platform: 'osx-aarch_64'
-      - path: release-artifacts/flatmark-{{projectVersionNumber}}.msi
+      - path: release-artifacts/flatmark-{{projectVersionNumber}}.0.msi
         platform: 'windows-x86_64'
 
 

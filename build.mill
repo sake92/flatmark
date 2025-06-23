@@ -1,14 +1,13 @@
 package build
 
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
+
 import mill._
 import mill.scalalib._
-
-object Consts {
-  val jpackageVersion = "1.0.0" // macos doesnt accept 0.x.y ...
-}
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 
 object cli extends Module {
-
+  
   object jvm extends CliCommonModule {
     object test extends ScalaTests with TestModule.Munit {
       def ivyDeps = Agg(
@@ -22,7 +21,7 @@ object cli extends Module {
     def jpackageType = "deb"
     def jpackageOptions = Seq(
       "--app-version",
-      Consts.jpackageVersion,
+      VcsVersion.vcsState().format(),
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
     )
@@ -30,10 +29,10 @@ object cli extends Module {
 
   object macos extends CliCommonModule with CustomJpackageModule {
     def jpackageName = "flatmark"
-    def jpackageType = "dmg"
+    def jpackageType = "pkg"
     def jpackageOptions = Seq(
       "--app-version",
-      Consts.jpackageVersion,
+      "1.0.0", // macos has to be 1.x.y+ ,will bump to 1.10.0 for example when stable release
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "macos").wrapped.toString
     )
@@ -44,7 +43,7 @@ object cli extends Module {
     def jpackageType = "msi"
     def jpackageOptions = Seq(
       "--app-version",
-      Consts.jpackageVersion,
+      s"${VcsVersion.vcsState().lastTag.map(_.stripSuffix("-SNAPSHOT")).getOrElse("0.0.0")}.${VcsVersion.vcsState().commitsSinceLastTag}",
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString,
       "--win-console",
