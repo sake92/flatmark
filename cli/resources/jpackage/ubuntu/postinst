@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+INSTALLED_BINARY="/opt/flatmark/bin/flatmark"
+
+# Create a symbolic link to /usr/local/bin/flatmark
+if [ -x "$INSTALLED_BINARY" ]; then
+    ln -sf "$INSTALLED_BINARY" /usr/local/bin/flatmark
+fi
+
+exit 0
