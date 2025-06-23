@@ -5,6 +5,7 @@ on:
     tags: ["*"]
 
 env:
+  JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
   JRELEASER_OUTPUT_DIRECTORY: jreleaser_out
 
 jobs:
@@ -129,7 +130,6 @@ jobs:
         with:
           arguments: full-release
         env:
-          JRELEASER_PROJECT_VERSION: ${{ needs.precheck.outputs.VERSION }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: JReleaser output
         if: always()
