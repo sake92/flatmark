@@ -1,11 +1,14 @@
 name: Release
 
 on:
-  push:
-    tags: ["*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
 
 env:
-  JRELEASER_PROJECT_VERSION: ${{ github.ref_name }}
+  JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
   JRELEASER_OUTPUT_DIRECTORY: jreleaser_out
 
 jobs:
@@ -16,7 +19,7 @@ jobs:
         include:
           - os: ubuntu-latest
             mill-module: ubuntu
-            installer-name: flatmark_${{ github.ref_name }}_amd64.deb
+            installer-name: flatmark_${{ github.event.inputs.version }}_amd64.deb
             artifact-name: flatmark-installer-deb-x64
           # macos is hardcoded to 1.0.0 for now
           - os: macos-latest
@@ -25,7 +28,7 @@ jobs:
             artifact-name: flatmark-installer-macos-arm64
           - os: windows-latest
             mill-module: windows
-            installer-name: flatmark-${{ github.ref_name }}.0.msi
+            installer-name: flatmark-${{ github.event.inputs.version }}.0.msi
             artifact-name: flatmark-installer-windows-x64
     steps:
       - uses: actions/checkout@v4
