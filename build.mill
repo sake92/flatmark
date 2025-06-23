@@ -1,10 +1,7 @@
 package build
 
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.1`
-
 import mill._
 import mill.scalalib._
-import de.tobiasroeser.mill.vcs.version.VcsVersion
 
 object cli extends Module {
   
@@ -21,7 +18,7 @@ object cli extends Module {
     def jpackageType = "deb"
     def jpackageOptions = Seq(
       "--app-version",
-      VcsVersion.vcsState().lastTag.getOrElse("0.0.0"),
+      Task.env.getOrElse("VERSION", "0.0.0"),
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
     )
@@ -43,7 +40,7 @@ object cli extends Module {
     def jpackageType = "msi"
     def jpackageOptions = Seq(
       "--app-version",
-      s"${VcsVersion.vcsState().lastTag.getOrElse("0.0.0")}.${VcsVersion.vcsState().commitsSinceLastTag}",
+      s"${Task.env.getOrElse("VERSION", "0.0.0")}.0",
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "windows").wrapped.toString,
       "--win-console",
