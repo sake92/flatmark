@@ -26,7 +26,7 @@ distributions:
   flatmark:
     type: NATIVE_PACKAGE
     artifacts:
-      - path: release-artifacts/flatmark-{{projectVersionNumber}}.deb
+      - path: release-artifacts/flatmark_{{projectVersionNumber}}_amd64.deb
         platform: 'linux-x86_64'
       # macos is hardcoded to 1.0.0 for now
       - path: release-artifacts/flatmark-1.0.0.pkg

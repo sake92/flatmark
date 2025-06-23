@@ -15,7 +15,7 @@ jobs:
         include:
           - os: ubuntu-latest
             mill-module: ubuntu
-            installer-name: flatmark-${{ github.ref_name }}.deb
+            installer-name: flatmark_${{ github.ref_name }}_amd64.deb
             artifact-name: flatmark-installer-deb-x64
           # macos is hardcoded to 1.0.0 for now
           - os: macos-latest
