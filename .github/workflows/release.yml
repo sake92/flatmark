@@ -7,10 +7,6 @@ on:
         description: 'Release version'
         required: true
 
-env:
-  JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
-  JRELEASER_OUTPUT_DIRECTORY: jreleaser_out
-
 jobs:
   build-installer:
     runs-on: ${{ matrix.os }}
@@ -127,13 +123,13 @@ jobs:
           pattern: flatmark-*
           merge-multiple: true
           path: release-artifacts
-      - run: |
-          ls release-artifacts
       - name: Release
         uses: jreleaser/release-action@v2
         with:
           arguments: full-release
         env:
+          JRELEASER_PROJECT_VERSION: ${{ github.event.inputs.version }}
+          JRELEASER_OUTPUT_DIRECTORY: jreleaser_out
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: JReleaser output
         if: always()

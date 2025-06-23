@@ -4,7 +4,7 @@ import mill._
 import mill.scalalib._
 
 object cli extends Module {
-  
+
   object jvm extends CliCommonModule {
     object test extends ScalaTests with TestModule.Munit {
       def ivyDeps = Agg(
@@ -20,7 +20,11 @@ object cli extends Module {
       "--app-version",
       Task.env.getOrElse("VERSION", "0.0.0"),
       "--resource-dir",
-      (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString
+      (cli.moduleDir / "resources" / "jpackage" / "ubuntu").wrapped.toString,
+      "--linux-package-name",
+      "flatmark",
+      "--linux-deb-maintainer",
+      "sakib@sake.ba"
     )
   }
 
