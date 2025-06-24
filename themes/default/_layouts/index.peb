@@ -7,5 +7,9 @@
 
 {% block content %}
     {{page.content}}
-    {% include "pagination" %}
+
+    {% if not page.theme_props.pagination_disabled %}
+        {% include "pagination" %}
+    {% endif %}
+    
 {% endblock %}

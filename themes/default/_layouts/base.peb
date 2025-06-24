@@ -7,10 +7,10 @@
     <meta name="color-scheme" content="light dark">
     <title>{% block title %} {{site.name}} {% endblock %}</title>
     <link rel="shortcut icon" href="images/favicon.png" type="image/png">
-    {% if site.highlightCode %}
+    {% if site.highlight_code %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
     {% endif %}
-    {% if site.highlightMath %}
+    {% if site.highlight_math %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
     {% endif %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">

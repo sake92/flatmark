@@ -11,6 +11,7 @@
 - RSS
 - custom skip files?
 - page image for preview
+- series of posts, like tutorials 1, 2, 3..
 - nifty features like:
   - code blocks with line numbers
   - code blocks with copy button

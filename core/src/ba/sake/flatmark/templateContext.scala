@@ -33,8 +33,8 @@ case class SiteContext(
       "langs" -> langs.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
-      "highlightCode" -> Boolean.box(highlightCode),
-      "highlightMath" -> Boolean.box(highlightMath)
+      "highlight_code" -> Boolean.box(highlightCode),
+      "highlight_math" -> Boolean.box(highlightMath)
     ).asJava
   }
 }
@@ -81,11 +81,12 @@ case class PageContext(
     content: String,
     lang: LanguageContext,
     publishDate: Option[java.time.ZonedDateTime],
-    rootRelPath: os.RelPath
+    rootRelPath: os.RelPath,
+    themeProps: Map[String, Any]
     // TODO summary: String = "", // Optional summary field
     // TODO toc: Tree[PageLinkContext] = Tree.empty // Optional table of contents, only link and title for now
 ) {
-  def toPebbleContext: java.util.Map[String, Object] = {
+  def toPebbleContext: java.util.Map[String, Object] =
     Map(
       "layout" -> layout,
       "title" -> title,
@@ -93,9 +94,9 @@ case class PageContext(
       "content" -> content,
       "lang" -> lang.toPebbleContext,
       "publish_date" -> publishDate.orNull,
-      "url" -> s"/${rootRelPath.segments.mkString("/")}"
+      "url" -> s"/${rootRelPath.segments.mkString("/")}",
+      "theme_props" -> themeProps.asJava
     ).asJava
-  }
 
   override def toString: String =
     s"PageContext(layout=$layout, title=$title, description=$description, content=${content.take(20)}..., rootRelPath=$rootRelPath)"
@@ -117,16 +118,16 @@ case class PaginatorContext(
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
       "items" -> items.map(_.toPebbleContext).asJava,
-      "perPage" -> Integer.valueOf(pageSize),
-      "totalItems" -> Integer.valueOf(totalItems),
-      "totalPages" -> Integer.valueOf(totalPages),
+      "per_page" -> Integer.valueOf(pageSize),
+      "total_items" -> Integer.valueOf(totalItems),
+      "total_pages" -> Integer.valueOf(totalPages),
       "current" -> Integer.valueOf(currentPage),
       "prev" -> Integer.valueOf(currentPage - 1),
       "next" -> Integer.valueOf(currentPage + 1),
-      "hasPrev" -> Boolean.box(hasPrev),
-      "hasNext" -> Boolean.box(hasNext),
-      "prevUrl" -> s"/${rootRelPath(currentPage - 1).segments.mkString("/")}",
-      "nextUrl" -> s"/${rootRelPath(currentPage + 1).segments.mkString("/")}"
+      "has_prev" -> Boolean.box(hasPrev),
+      "has_next" -> Boolean.box(hasNext),
+      "prev_url" -> s"/${rootRelPath(currentPage - 1).segments.mkString("/")}",
+      "next_url" -> s"/${rootRelPath(currentPage + 1).segments.mkString("/")}"
     ).asJava
   }
 }

@@ -11,12 +11,12 @@ import YamlInstances.given
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
 
-// use all snake case!
 case class TemplateConfig(
-    site: SiteConfig,
-    page: PageConfig
+    site: SiteConfig, // _config.yaml
+    page: PageConfig // page yaml front matter
 ) derives YamlCodec
 
+// use all snake case props!
 case class SiteConfig(
     name: String = "My Site",
     description: String = "",
@@ -45,10 +45,11 @@ case class PageConfig(
     title: String = "Untitled",
     description: String = "",
     publish_date: Option[LocalDateTime] = None,
-    ext: Option[String] = None
+    ext: Option[String] = None,
+    theme_props: Map[String, String] = Map.empty
 ) derives YamlCodec
 
-private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
+private[flatmark] def parseConfig(file: os.Path, mdTemplateRaw: String): PageConfig = {
   var hasYamlFrontMatter = false
   var firstTripleDashIndex = -1
   var secondTripleDashIndex = -1
@@ -80,7 +81,7 @@ private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): 
       .as[PageConfig]
       .left
       .map { error =>
-        throw FlatmarkException(s"Failed to parse YAML front matter in file '$fileNameBase': ${error.getMessage}")
+        throw FlatmarkException(s"Failed to parse YAML front matter in file '$file': ${error.getMessage}")
       }
       .getOrElse(PageConfig())
   } else PageConfig()

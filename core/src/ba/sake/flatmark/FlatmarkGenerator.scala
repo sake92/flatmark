@@ -199,7 +199,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
   ): Seq[RenderResult] = {
     logger.debug(s"Rendering templated file: ${file}")
     val mdContentTemplateRaw = os.read(file)
-    val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
+    val pageConfig = parseConfig(file, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
     val fileExtension = pageConfig.ext.getOrElse("html")
@@ -343,7 +343,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         content = "",
         lang = langContext,
         publishDate = templateConfig.page.publish_date.map(_.atZone(templateConfig.site.timezone.toZoneId)),
-        rootRelPath = rootRelPath(currentPage)
+        rootRelPath = rootRelPath(currentPage),
+        themeProps = templateConfig.page.theme_props
       ),
       Option.when(items.nonEmpty)(
         PaginatorContext(
