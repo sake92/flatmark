@@ -1,0 +1,16 @@
+#!/bin/bash
+
+LAUNCHER_PATH="/Applications/flatmark.app/Contents/MacOS/flatmark"
+TARGET_BIN_DIR="/usr/local/bin"
+SYMLINK_NAME="flatmark"
+
+if [ -f "$LAUNCHER_PATH" ]; then
+    # Remove any old symlink first to avoid "File exists" error if updating
+    rm -f "${TARGET_BIN_DIR}/${SYMLINK_NAME}"
+    ln -s "$LAUNCHER_PATH" "${TARGET_BIN_DIR}/${SYMLINK_NAME}"
+else
+    echo "Error: Launcher not found at $LAUNCHER_PATH"
+    exit 1
+fi
+
+exit 0

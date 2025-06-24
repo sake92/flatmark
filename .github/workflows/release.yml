@@ -123,7 +123,7 @@ jobs:
           pattern: flatmark-*
           merge-multiple: true
           path: release-artifacts
-      - name: Release
+      - name: Release ${{ github.event.inputs.version }}
         uses: jreleaser/release-action@v2
         with:
           arguments: full-release
