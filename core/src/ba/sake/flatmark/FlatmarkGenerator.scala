@@ -332,7 +332,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },
-        tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) }
+        tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
+        highlightCode = templateConfig.site.highlightCode,
+        highlightMath = templateConfig.site.highlightMath,
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),

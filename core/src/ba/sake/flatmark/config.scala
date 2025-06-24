@@ -23,7 +23,9 @@ case class SiteConfig(
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
     categories: Map[String, CategoryConfig] = Map.empty, // TODO ordered map?
-    tags: Map[String, TagConfig] = Map.empty
+    tags: Map[String, TagConfig] = Map.empty,
+    highlightCode: Boolean = true,
+    highlightMath: Boolean = true
 ) derives YamlCodec
 
 case class CategoryConfig(

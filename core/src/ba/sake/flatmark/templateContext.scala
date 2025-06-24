@@ -21,7 +21,9 @@ case class SiteContext(
     description: String,
     langs: Seq[LanguageContext],
     categories: Map[String, CategoryContext],
-    tags: Map[String, TagContext]
+    tags: Map[String, TagContext],
+    highlightCode: Boolean,
+    highlightMath: Boolean
 ) {
   def toPebbleContext: java.util.Map[String, Object] = {
     Map(
@@ -29,7 +31,9 @@ case class SiteContext(
       "description" -> description,
       "langs" -> langs.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
-      "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava
+      "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
+      "highlightCode" -> Boolean.box(highlightCode),
+      "highlightMath" -> Boolean.box(highlightMath)
     ).asJava
   }
 }
