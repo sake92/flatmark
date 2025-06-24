@@ -60,7 +60,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         throw FlatmarkException(s"The 'content/' folder is not a folder: ${contentFolder}")
       if os.list(contentFolder).isEmpty then logger.warn(s"The 'content/' folder is empty, no content to process.")
       os.walk(contentFolder, skip = shouldSkip).flatMap { file =>
-        Option.when(os.isFile(file) && (file.ext == "md" || file.ext == "html")) {
+        Option.when(os.isFile(file) && (file.ext == "md" || file.ext.endsWith("html"))) {
           val rootRelPath = file.relativeTo(contentFolder)
           val firstSegment = rootRelPath.segments.head
           if Iso2LanguageCodes(firstSegment) then translationsLangCodes += firstSegment
@@ -202,6 +202,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val pageConfig = parseConfig(file.baseName, mdContentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
+    val fileExtension = pageConfig.ext.getOrElse("html")
     val locale =
       if fileRelPath.segments.length > 1 && Iso2LanguageCodes(fileRelPath.segments.head) then
         Locale.forLanguageTag(fileRelPath.segments.head)
@@ -215,8 +216,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           def rootRelPath(pageNum: Int): os.RelPath = {
             val pageNumSuffix = if pageNum == 1 then "" else s"-${pageNum}"
             os.RelPath(
-              if fileRelPath.segments.length == 1 then s"${file.baseName}${pageNumSuffix}.html"
-              else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.html"
+              if fileRelPath.segments.length == 1 then s"${file.baseName}${pageNumSuffix}.${fileExtension}"
+              else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
             )
           }
           val contentContext = templateContext(
@@ -242,8 +243,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         }
       case _ =>
         val rootRelPath = os.RelPath(
-          if fileRelPath.segments.length == 1 then s"${file.baseName}.html"
-          else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.html"
+          if fileRelPath.segments.length == 1 then s"${file.baseName}.${fileExtension}"
+          else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.${fileExtension}"
         )
         val defaultLayout = if paginateItems.isDefined then "index" else "page"
         val contentContext = templateContext(

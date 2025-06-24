@@ -40,7 +40,8 @@ case class PageConfig(
     layout: Option[String] = None,
     title: String = "Untitled",
     description: String = "",
-    publishDate: Option[LocalDateTime] = None
+    publishDate: Option[LocalDateTime] = None,
+    ext: Option[String] = None
 ) derives YamlCodec
 
 private[flatmark] def parseConfig(fileNameBase: String, mdTemplateRaw: String): PageConfig = {
