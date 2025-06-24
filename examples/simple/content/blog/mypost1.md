@@ -9,9 +9,6 @@ tags: [programming]
 
 This is my first post!
 
-
-> TODO doesnt work for some reason..
-
-{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX", timeZone="Pacific/Funafuti") }}
+{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX") }}
 
 

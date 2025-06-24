@@ -323,7 +323,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       )
       (res1, res2)
     }
-
+    
     TemplateContext(
       SiteContext(
         name = templateConfig.site.name,

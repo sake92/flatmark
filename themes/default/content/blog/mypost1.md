@@ -10,8 +10,10 @@ tags: [programming]
 This is my first post!
 
 
-> TODO timezone doesnt work for some reason..
+{{ page.publish_date | date("yyyy-MM-dd HH:mm:ss") }}
 
-{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX", timeZone="Pacific/Funafuti") }}
+
+
+
 
 
