@@ -6,4 +6,3 @@ description: Home page
 # Hello Flatmark!
 
 This is the home page.
-

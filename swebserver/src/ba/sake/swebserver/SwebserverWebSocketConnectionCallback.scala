@@ -1,28 +1,31 @@
 package ba.sake.swebserver
 
-import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicReference}
 import scala.jdk.CollectionConverters.*
 import org.slf4j.LoggerFactory
 import io.undertow.websockets.WebSocketConnectionCallback
 import io.undertow.websockets.core.{AbstractReceiveListener, StreamSourceFrameChannel, WebSocketChannel, WebSockets}
 import io.undertow.websockets.spi.WebSocketHttpExchange
 
-// TODO use lastChangeAt: Instant
-// and lastUpdateAt: Instant
-class SwebserverWebSocketConnectionCallback(changes: AtomicBoolean) extends WebSocketConnectionCallback {
+import java.time.Instant
+
+class SwebserverWebSocketConnectionCallback(lastChangeAt: AtomicReference[Instant])
+    extends WebSocketConnectionCallback {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val clients = new java.util.concurrent.ConcurrentHashMap[WebSocketChannel, Boolean]()
 
+  private var lastUpdateAt: Instant = Instant.MIN
+
   private val t = new Thread(() => {
     while true do {
-      if changes.get() then {
+      if lastChangeAt.get().isAfter(lastUpdateAt) then {
+        lastUpdateAt = Instant.now()
         clients.keys.asScala.foreach { channel =>
           if channel.isOpen then WebSockets.sendText("reload", channel, null)
         }
-        changes.set(false)
       }
-      Thread.sleep(100) // Check every 100ms at max
+      Thread.sleep(500) // Check every 100ms at max
     }
   })
   t.setDaemon(true)

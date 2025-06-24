@@ -1,7 +1,10 @@
 
 name: My Cool Site
-description: My Cool Site Descriptionn
+description: My Cool Site Description
 timezone: Europe/Sarajevo
+
+highlight_code: true
+highlight_math: true
 
 categories:
   docs:

@@ -12,6 +12,9 @@ import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.swebserver.SwebserverFileHandler
 import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 
+import java.time.Instant
+import java.util.concurrent.atomic.AtomicReference
+
 class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Level, useCache: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
@@ -68,8 +71,8 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
     val fallbackResourceHandler = ResourceHandler(resourceManager).setDirectoryListingEnabled(true)
     val fileHandler = SwebserverFileHandler(generatedSiteFolder, host, port, fallbackResourceHandler)
-    val changes = new java.util.concurrent.atomic.AtomicBoolean(false)
-    val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(changes))
+    val lastChangeAt = new AtomicReference(Instant.now())
+    val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(lastChangeAt))
     val server = Undertow
       .builder()
       .addHttpListener(port, host)
@@ -83,7 +86,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     server.start()
     os.watch.watch(
       Seq(generatedSiteFolder),
-      _ => changes.set(true)
+      _ => lastChangeAt.set(Instant.now())
     )
     logger.info(s"Flatmark server started at http://${host}:${port}")
     server
