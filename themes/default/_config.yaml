@@ -4,10 +4,9 @@ description: My Cool Site Descriptionn
 timezone: Europe/Sarajevo
 
 categories:
-  blog:
-    label: Blog
-    description: The blog section of the site
   docs:
     label: Documentation
     description: The documentation section of the site
-
+  blog:
+    label: Blog
+    description: The blog section of the site

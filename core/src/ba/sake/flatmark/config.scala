@@ -2,6 +2,7 @@ package ba.sake.flatmark
 
 import java.time.LocalDateTime
 import java.util.{Locale, TimeZone}
+import scala.collection.immutable.ListMap
 import scala.util.boundary
 import org.virtuslab.yaml.*
 import YamlInstances.given
@@ -22,8 +23,8 @@ case class SiteConfig(
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
-    categories: Map[String, CategoryConfig] = Map.empty, // TODO ordered map?
-    tags: Map[String, TagConfig] = Map.empty,
+    categories: ListMap[String, CategoryConfig] = ListMap.empty,
+    tags: ListMap[String, TagConfig] = ListMap.empty,
     highlightCode: Boolean = true,
     highlightMath: Boolean = true
 ) derives YamlCodec

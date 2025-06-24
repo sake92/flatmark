@@ -5,7 +5,9 @@ import java.time.LocalDateTime
 import java.util.{Locale, TimeZone}
 import scala.util.{Try, boundary}
 import org.virtuslab.yaml.*
-import org.virtuslab.yaml.Node.ScalarNode
+import org.virtuslab.yaml.Node.{MappingNode, ScalarNode}
+
+import scala.collection.immutable.ListMap
 
 object YamlInstances {
 
@@ -30,4 +32,37 @@ object YamlInstances {
 
   given YamlEncoder[Locale] = dt => ScalarNode(dt.toString)
 
+  
+  given [K, V](using
+      keyDecoder: YamlDecoder[K],
+      valueDecoder: YamlDecoder[V]
+  ): YamlDecoder[ListMap[K, V]] = YamlDecoder { case MappingNode(mappings, _) =>
+    val decoded: Seq[
+      Either[ConstructError, (K, V)]
+    ] = mappings.toSeq
+      .map { case (key, value) =>
+        keyDecoder.construct(key) -> valueDecoder.construct(value)
+      }
+      .map { case (key, value) =>
+        for {
+          k <- key
+          v <- value
+        } yield (k -> v)
+      }
+
+    decoded.partitionMap(identity) match {
+      case (lefts, _) if lefts.nonEmpty => Left(lefts.head)
+      case (_, rights)                  => Right(ListMap.from(rights))
+    }
+  }
+
+  given [K, V](using
+                            keyCodec: YamlEncoder[K],
+                            valueCodec: YamlEncoder[V]
+                           ): YamlEncoder[ListMap[K, V]] = { (nodes) =>
+    val mappings = nodes.map { case (key, value) =>
+      keyCodec.asNode(key) -> valueCodec.asNode(value)
+    }
+    Node.MappingNode(mappings)
+  }
 }

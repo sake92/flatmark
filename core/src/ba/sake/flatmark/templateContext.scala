@@ -1,5 +1,6 @@
 package ba.sake.flatmark
 
+import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 
 case class TemplateContext(
@@ -20,8 +21,8 @@ case class SiteContext(
     name: String,
     description: String,
     langs: Seq[LanguageContext],
-    categories: Map[String, CategoryContext],
-    tags: Map[String, TagContext],
+    categories: ListMap[String, CategoryContext],
+    tags: ListMap[String, TagContext],
     highlightCode: Boolean,
     highlightMath: Boolean
 ) {

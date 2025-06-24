@@ -7,6 +7,8 @@ import io.undertow.websockets.WebSocketConnectionCallback
 import io.undertow.websockets.core.{AbstractReceiveListener, StreamSourceFrameChannel, WebSocketChannel, WebSockets}
 import io.undertow.websockets.spi.WebSocketHttpExchange
 
+// TODO use lastChangeAt: Instant
+// and lastUpdateAt: Instant
 class SwebserverWebSocketConnectionCallback(changes: AtomicBoolean) extends WebSocketConnectionCallback {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
