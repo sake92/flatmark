@@ -9,13 +9,13 @@
         </ul>
     </nav>
 
-{% if paginator.totalPages > 1 %}
+{% if paginator.total_pages > 1 %}
     <div>
-        {% set prev = paginator.hasPrev ? paginator.prevUrl : '#' %}    
-        {% set next = paginator.hasNext ? paginator.nextUrl : '#' %}    
-        <a href="{{ prev }}" {{ paginator.hasPrev ? "" : "disabled" }} role="button">Prev</a>
+        {% set prev = paginator.has_prev ? paginator.prev_url : '#' %}    
+        {% set next = paginator.has_next ? paginator.next_url : '#' %}    
+        <a href="{{ prev }}" {{ paginator.has_prev ? "" : "disabled" }} role="button">Prev</a>
         <span role="button" disabled>{{ paginator.current }}</span>
-        <a href="{{ next }}" {{ paginator.hasNext ? "" : "disabled" }} role="button">Next</a>
+        <a href="{{ next }}" {{ paginator.has_next ? "" : "disabled" }} role="button">Next</a>
     </div>
 {% endif %}
 
