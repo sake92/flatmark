@@ -31,8 +31,8 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
     try generator.generate(siteRootFolder, useCache)
     finally
-      webDriverHolder.close()
       flatmarkSsrServer.stop()
+      webDriverHolder.close()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
     logger.info(s"Flatmark build finished in ${totalSeconds} s")
@@ -44,10 +44,10 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
     LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
     logger.info("Flatmark serve started")
     val webDriverHolder = WebDriverHolder()
-    startFlatmarkServer()
+    val flatmarkServer = startFlatmarkServer()
     val ssrServerPort = NetworkUtils.getFreePort()
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
-    startFlatmarkSsrServer(ssrServerPort)
+    val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
     val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
     generator.generate(siteRootFolder, useCache)
     os.watch.watch(
@@ -62,6 +62,11 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
         }
       }
     )
+    Runtime.getRuntime.addShutdownHook(new Thread(() => {
+      flatmarkSsrServer.stop()
+      flatmarkServer.stop()
+      webDriverHolder.close()
+    }))
   }
 
   private def startFlatmarkServer(): Undertow = {
