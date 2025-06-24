@@ -7,7 +7,7 @@
     <meta name="color-scheme" content="light dark">
     <meta name="description" content="{{ page.description }}">
     <title>{% block title %} {{site.name}} {% endblock %}</title>
-    <link rel="shortcut icon" href="images/favicon.png" type="image/png">
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
     {% if site.highlight_code %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
     {% endif %}
