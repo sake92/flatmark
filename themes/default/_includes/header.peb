@@ -17,11 +17,13 @@
                 <li>
                     <details class="dropdown">
                     <summary>
-                      Language
+                        {{ page.lang.label | capitalize }}
                     </summary>
                     <ul dir="rtl">
-                      {% for lang in site.langs %}
-                        <li><a href="{{ lang.url }}">{{ lang.label | capitalize }}</a></li>
+                        {% for lang in site.langs %}
+                            {% if lang.code != page.lang.code %}
+                                <li><a href="{{ lang.url }}">{{ lang.label | capitalize }}</a></li>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                   </details>

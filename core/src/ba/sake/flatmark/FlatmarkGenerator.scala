@@ -315,12 +315,12 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         val url = if templateConfig.site.lang == l then "/" else s"/${l.toLanguageTag}"
         LanguageContext(l.toLanguageTag, l.getDisplayLanguage, url)
       }
+      Locale.setDefault(Locale.Category.DISPLAY, originalLocale) // restore original locale
       val res2 = LanguageContext(
         lang.toLanguageTag,
         lang.getDisplayLanguage,
         if templateConfig.site.lang == lang then "/" else s"/${lang.toLanguageTag}"
       )
-      Locale.setDefault(Locale.Category.DISPLAY, originalLocale) // restore original locale
       (res1, res2)
     }
 
