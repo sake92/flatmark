@@ -11,6 +11,7 @@ import YamlInstances.given
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
 
+// use all snake case!
 case class TemplateConfig(
     site: SiteConfig,
     page: PageConfig
@@ -19,14 +20,14 @@ case class TemplateConfig(
 case class SiteConfig(
     name: String = "My Site",
     description: String = "",
-    baseUrl: String = "",
+    base_url: String = "",
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
     categories: ListMap[String, CategoryConfig] = ListMap.empty,
     tags: ListMap[String, TagConfig] = ListMap.empty,
-    highlightCode: Boolean = true,
-    highlightMath: Boolean = true
+    highlight_code: Boolean = true,
+    highlight_math: Boolean = true
 ) derives YamlCodec
 
 case class CategoryConfig(
@@ -43,7 +44,7 @@ case class PageConfig(
     layout: Option[String] = None,
     title: String = "Untitled",
     description: String = "",
-    publishDate: Option[LocalDateTime] = None,
+    publish_date: Option[LocalDateTime] = None,
     ext: Option[String] = None
 ) derives YamlCodec
 

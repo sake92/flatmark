@@ -154,8 +154,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       val categoryItems = contentByLangAndCategory.getOrElse(
         key,
         contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
-      )
-      // TODO sortirat categoryItems
+      ).sortBy(_.publishDate).reverse
+      // TODO configurable sort
       renderTemplatedFile(
         siteConfig,
         allUsedLanguages,
@@ -333,8 +333,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           key -> CategoryContext(value.label, value.description)
         },
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
-        highlightCode = templateConfig.site.highlightCode,
-        highlightMath = templateConfig.site.highlightMath,
+        highlightCode = templateConfig.site.highlight_code,
+        highlightMath = templateConfig.site.highlight_math,
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),
@@ -342,7 +342,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         description = templateConfig.page.description,
         content = "",
         lang = langContext,
-        publishDate = templateConfig.page.publishDate.map(_.atZone(templateConfig.site.timezone.toZoneId)),
+        publishDate = templateConfig.page.publish_date.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage)
       ),
       Option.when(items.nonEmpty)(
