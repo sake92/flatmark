@@ -1,0 +1,98 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="">
+    <title>    Untitled | My Site</title>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+    <link rel="stylesheet" href="/styles/default.css">
+</head>
+<body>
+
+
+<header class="pico container">
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+        <ul>
+                    
+                    </ul>
+    </nav>
+</header>
+    
+<main class="pico container">
+        <h1 id="flatmark-documentation">Flatmark Documentation</h1>
+<h2 id="markdown">Markdown</h2>
+<p>Syntax is based on <a href="https://commonmark.org/help/">commonmark standard</a> with some extensions:</p>
+<ul>
+<li><a href="https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables#creating-a-table">tables</a></li>
+<li>strikethrough with double tilde: <code>~~text~~</code></li>
+<li>autolink, turns plain text links into links, no need for markdown angle brackets: <code>https://example.com</code></li>
+<li>footnotes, use <code>[^1]</code> to create a footnote and <code>[1]: footnote text</code> to define it</li>
+<li>ins, use <code>++text++</code> to mark text as inserted (underlined)</li>
+<li>task-list-items, use <code>- [ ]</code> for unchecked and <code>- [x]</code> for checked items</li>
+<li>image-attributes, use <code>{width=100%}</code> to set image width, <code>{height=50px}</code> for height, and <code>{alt=alternative text}</code> for alt text etc.</li>
+<li>heading-anchor, automatically adds ids to headings</li>
+</ul>
+<p>You can <a href="https://commonmark.org/help//">learn markdown in 60 seconds</a>.</p>
+<h3 id="syntax-highlighting">Syntax Highlighting</h3>
+<p>To use code syntax highlighting, use the code block syntax with the language specified:</p>
+<pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```scala
+val x = 5
+```</span>
+</code></pre>
+<p>Syntax highlighting is done via <a href="https://highlightjs.org/">highlight.js</a>.</p>
+<h3 id="math">Math</h3>
+<p>To use math blocks, use the <code>math</code> code block syntax:</p>
+<pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```math
+x = 5
+```</span>
+</code></pre>
+<p>For more details, see <a href="https://katex.org/">KaTeX</a>.</p>
+<h3 id="mermaid-diagrams">Mermaid Diagrams</h3>
+<p>To create Mermaid diagrams, use the <code>diagram:mermaid</code> code block syntax:</p>
+<pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:mermaid
+sequenceDiagram
+        actor Alice
+        actor Bob
+        Alice-&gt;&gt;Bob: Hi Bob
+        Bob-&gt;&gt;Alice: Hi Alice
+```</span>
+</code></pre>
+<p>For more details, see <a href="https://mermaid-js.github.io/mermaid/#/">Mermaid documentation</a>.</p>
+<h3 id="graphviz-diagrams">Graphviz Diagrams</h3>
+<p>To create Graphviz diagrams, use the <code>diagram:graphviz</code> code block syntax:</p>
+<pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:graphviz
+digraph G {Hello-&gt;World}
+```</span>
+</code></pre>
+<p>For more details, see <a href="https://graphviz.org/documentation/">Graphviz documentation</a>.</p>
+
+            
+
+<aside>
+    <nav>
+        <ul>
+                </ul>
+    </nav>
+
+
+</aside>
+
+        
+</main>
+
+
+<footer class="pico container">
+    My Site    </footer>
+
+</body>
+</html>

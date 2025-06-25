@@ -1,0 +1,82 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="">
+    <title>    Untitled | My Site</title>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+    <link rel="stylesheet" href="/styles/default.css">
+</head>
+<body>
+
+
+<header class="pico container">
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+        </ul>
+        <ul>
+                    
+                    </ul>
+    </nav>
+</header>
+    
+<main class="pico container">
+    <h1 id="configuration">Configuration</h1>
+<h2 id="site-configuration">Site Configuration</h2>
+<p>Edit <code>_config.yaml</code> in the root folder:</p>
+<pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span> <span class="hljs-string">Description</span>
+
+<span class="hljs-attr">categories:</span>
+  <span class="hljs-comment"># content/blog/ folder</span>
+  <span class="hljs-attr">blog:</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">Blog</span>
+    <span class="hljs-attr">description:</span> <span class="hljs-string">The</span> <span class="hljs-string">blog</span> <span class="hljs-string">section</span> <span class="hljs-string">of</span> <span class="hljs-string">the</span> <span class="hljs-string">site</span>
+  <span class="hljs-comment"># content/docs/ folder</span>
+  <span class="hljs-attr">docs:</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">Documentation</span>
+    <span class="hljs-attr">description:</span> <span class="hljs-string">The</span> <span class="hljs-string">documentation</span> <span class="hljs-string">section</span> <span class="hljs-string">of</span> <span class="hljs-string">the</span> <span class="hljs-string">site</span>
+
+<span class="hljs-attr">tags:</span>
+  <span class="hljs-attr">programming:</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">Programming</span>
+    <span class="hljs-attr">description:</span> <span class="hljs-string">Posts</span> <span class="hljs-string">related</span> <span class="hljs-string">to</span> <span class="hljs-string">programming</span>
+
+<span class="hljs-comment"># default language</span>
+<span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+<span class="hljs-attr">timezone:</span> <span class="hljs-string">Europe/Sarajevo</span>
+<span class="hljs-attr">github_handle:</span> <span class="hljs-string">sake92</span>
+<span class="hljs-attr">twitter_handle:</span> <span class="hljs-string">sake92</span>
+<span class="hljs-string">...</span>
+</code></pre>
+<h2 id="page-configuration">Page Configuration</h2>
+<p>Put the configuration at the top of your page or post file, in YAML format, like this:</p>
+<pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
+<span class="hljs-attr">title:</span> <span class="hljs-string">Hello</span>
+<span class="hljs-attr">tags:</span> [<span class="hljs-string">scala</span>, <span class="hljs-string">java</span>]
+<span class="hljs-attr">publish_date:</span> <span class="hljs-number">2025-01-01 </span><span class="hljs-number">11</span><span class="hljs-string">:11</span>
+<span class="hljs-attr">publish:</span> <span class="hljs-literal">yes</span> <span class="hljs-string">|</span> <span class="hljs-literal">no</span> <span class="hljs-string">|</span> <span class="hljs-string">hide</span> <span class="hljs-comment"># hide means published but not listed/searched/google-indexed, default is yes</span>
+<span class="hljs-meta">---
+</span>
+<span class="hljs-comment"># Hello Untitled</span>
+<span class="hljs-string">This</span> <span class="hljs-string">is</span> <span class="hljs-string">my</span> <span class="hljs-string">first</span> <span class="hljs-string">post!</span>
+</code></pre>
+<p>The page configuration section is optional.
+The file needs to start with <code>---</code> and the config ends with another <code>---</code>.<br />
+This type of config is called &quot;YAML front matter&quot;.</p>
+</main>
+
+
+<footer class="pico container">
+    My Site    </footer>
+
+</body>
+</html>
