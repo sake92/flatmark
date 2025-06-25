@@ -20,9 +20,9 @@ jobs:
       - name: Build
         run: |
             ./mill -i cli.jvm.assembly
-            cp out/cli/jvm/assembly.dest/out.jar flatmark
-            chmod +x flatmark
-            flatmark build
+            cp out/cli/jvm/assembly.dest/out.jar ./flatmark
+            chmod +x ./flatmark
+            ./flatmark build
       - name: Deploy to GH Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
