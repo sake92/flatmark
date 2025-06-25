@@ -20,7 +20,7 @@ case class TemplateConfig(
 case class SiteConfig(
     name: String = "My Site",
     description: String = "",
-    base_url: String = "",
+    base_url: Option[String] = None,
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",

@@ -35,10 +35,10 @@ object Main {
       .build()
     server.start()
     os.watch.watch(
-      Seq(os.Path(baseFolder) / "_site"),
+      Seq(os.Path(baseFolder)),
       _ => lastChangeAt.set(Instant.now())
     )
-    println(s"HTTP server started on http://${host}:${port} ; Watching files in: ${baseFolder.toString}")
+    println(s"HTTP server started on http://${host}:${port} ; Watching files in: ${baseFolder}")
   }
 
   def main(args: Array[String]): Unit = ParserForMethods(this).runOrExit(args)

@@ -1,6 +1,5 @@
 package ba.sake.flatmark.cli
 
-import java.util.logging.{Level, LogManager}
 import org.slf4j.LoggerFactory
 import io.undertow.Undertow
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
@@ -15,13 +14,11 @@ import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
-class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Level, useCache: Boolean) {
+class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def build(): Unit = {
-    // set logging properties
-    LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
-    LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
+    
     logger.info("Flatmark build started")
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
@@ -39,9 +36,6 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, logLevel: Le
   }
 
   def serve(): Unit = {
-    // set logging properties
-    LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
-    LogManager.getLogManager.getLogger("").setLevel(logLevel) // set root logger level
     logger.info("Flatmark serve started")
     val webDriverHolder = WebDriverHolder()
     val flatmarkServer = startFlatmarkServer()

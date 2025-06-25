@@ -3,7 +3,7 @@ package ba.sake.flatmark.cli
 import mainargs.{Flag, ParserForMethods, TokensReader, arg, main}
 
 import java.nio.file.Paths
-import java.util.logging.Level
+import java.util.logging.{Level, LogManager}
 
 object Main {
 
@@ -27,7 +27,10 @@ object Main {
   ): Unit = {
     val siteRootFolder = os.Path(Paths.get(input).toAbsolutePath)
     val logLevelValue = logLevel.julLevel
-    val cli = FlatmarkCli(siteRootFolder, host, port, logLevelValue, !noCache.value)
+    // set logging properties
+    LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
+    LogManager.getLogManager.getLogger("").setLevel(logLevelValue) // set root logger level
+    val cli = FlatmarkCli(siteRootFolder, host, port, !noCache.value)
     command.toLowerCase match {
       case "build" => cli.build()
       case "serve" => cli.serve()

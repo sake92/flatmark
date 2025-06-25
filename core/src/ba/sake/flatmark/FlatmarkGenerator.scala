@@ -15,6 +15,7 @@ import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
+import org.jsoup.Jsoup
 
 import scala.util.control.NonFatal
 
@@ -43,7 +44,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       if siteConfigYamlStr.isBlank then defaultSiteConfig else siteConfigYamlStr
     } else defaultSiteConfig
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig] match {
-      case Right(config) => config
+      case Right(config) =>
+        val baseUrl = config.base_url.orElse {
+          System.getenv().asScala.get("FLATMARK_BASE_URL").filterNot(_.isBlank)
+        }.map(_.stripSuffix("/"))
+        config.copy(base_url = baseUrl)
       case Left(error) =>
         throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.", error)
     }
@@ -151,10 +156,13 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         if translationsLangCodes.contains(firstSegment)
         then (firstSegment, segments(1)) // (lang, category)
         else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
-      val categoryItems = contentByLangAndCategory.getOrElse(
-        key,
-        contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
-      ).sortBy(_.publishDate).reverse
+      val categoryItems = contentByLangAndCategory
+        .getOrElse(
+          key,
+          contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
+        )
+        .sortBy(_.publishDate)
+        .reverse
       // TODO configurable sort
       renderTemplatedFile(
         siteConfig,
@@ -181,6 +189,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             followLinks = false
           )
       }
+      
     logger.info("Site generated successfully")
   } catch {
     case NonFatal(e) =>
@@ -287,9 +296,20 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     // render final HTML file
     val layoutContext = contentContext.copy(page = contentContext.page.copy(content = contentHtml))
     val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
+    val finalFinalHtml = contentContext.site.baseUrl match {
+      case Some(baseUrl) =>
+        val document= Jsoup.parse(finalHtml)
+        val rootLinks = document.select("""a[href^="/"]""")
+        rootLinks.forEach{ link =>
+          val href = link.attr("href")
+          link.attr("href", baseUrl + href)
+        }
+        document.toString
+      case None => finalHtml
+    } 
     os.write.over(
       outputFolder / contentContext.page.rootRelPath,
-      finalHtml,
+      finalFinalHtml,
       createFolders = true
     )
     logger.debug(s"Rendered templated file: ${file}")
@@ -323,18 +343,19 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       )
       (res1, res2)
     }
-    
+
     TemplateContext(
       SiteContext(
         name = templateConfig.site.name,
         description = templateConfig.site.description,
+        baseUrl = templateConfig.site.base_url,
         langs = langContexts,
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
         highlightCode = templateConfig.site.highlight_code,
-        highlightMath = templateConfig.site.highlight_math,
+        highlightMath = templateConfig.site.highlight_math
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),

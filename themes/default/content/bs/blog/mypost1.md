@@ -10,8 +10,7 @@ tags: [programming]
 Ovo je moj prvi post!
 
 
-> TODO neće nešto datum..
 
-{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX", timeZone="Pacific/Funafuti") }}
+{{ page.publish_date | date("yyyy-MM-dd HH:mm:ssX") }}
 
 

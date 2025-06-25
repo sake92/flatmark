@@ -20,6 +20,7 @@ case class TemplateContext(
 case class SiteContext(
     name: String,
     description: String,
+    baseUrl: Option[String],
     langs: Seq[LanguageContext],
     categories: ListMap[String, CategoryContext],
     tags: ListMap[String, TagContext],

@@ -87,6 +87,7 @@ object core extends ScalaModule {
     ivy"org.virtuslab::scala-yaml:0.3.0",
     ivy"org.seleniumhq.selenium:selenium-chrome-driver:4.33.0",
     ivy"org.seleniumhq.selenium:selenium-support:4.33.0",
+    ivy"org.jsoup:jsoup:1.21.1",
     ivy"org.slf4j:slf4j-jdk14:2.0.17"
   )
   /* def repositoriesTask = Task.Anon {
