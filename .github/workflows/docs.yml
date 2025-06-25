@@ -1,0 +1,31 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Docs Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - name: Build
+        run: |
+            ./mill -i cli.jvm.assembly
+            cp out/cli/jvm/assembly.dest/out.jar flatmark
+            chmod +x flatmark
+            flatmark build
+      - name: Deploy to GH Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: gh-pages
+          folder: _site
