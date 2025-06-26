@@ -22,7 +22,11 @@
 {% include "header" %}
 
 <main class="pico container">
-    {% include "toc" %}
+    <div class="grid">
+        <div>{% include "toc" %}</div>
+        <div> </div>
+        <div> </div>
+    </div>
     
     {% block content %}
     {% endblock %}

@@ -3,7 +3,7 @@ name: My Cool Site
 description: My Cool Site Description
 timezone: Europe/Sarajevo
 
-base_url: https://example.com
+#base_url: https://example.com
 
 highlight_code: true
 highlight_math: true
