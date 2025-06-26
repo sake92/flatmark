@@ -22,7 +22,7 @@ Syntax is based on [commonmark standard](https://commonmark.org/help/) with some
 - footnotes, use `[^1]` to create a footnote and `[1]: footnote text` to define it
 - ins, use `++text++` to mark text as inserted (underlined)
 - task-list-items, use `- [ ]` for unchecked and `- [x]` for checked items
-- image-attributes, use `{width=100%}` to set image width, `{height=50px}` for height, and `{alt=alternative text}` for alt text etc.
+- image-attributes, use `{width=100%}` to set image width, `{height=50px}` for height etc.
 - heading-anchor, automatically adds ids to headings
 
 You can [learn markdown in 60 seconds](https://commonmark.org/help//).

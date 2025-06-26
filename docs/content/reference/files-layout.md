@@ -39,15 +39,28 @@ For example, the `content/blog/index.md` would receive `paginator` with all the 
 ```bash
 # config
 _config.yaml        <-- global config
+
 _layouts/           <-- templates
     default.peb       <-- default layout: for index page, about page etc
     post.peb          <-- layout for posts
+
 _includes/          <-- snippets/fragments/helpers
     header.peb        <-- header snippet
     footer.peb        <-- footer snippet
     search.peb        <-- search form snippet
     pagination.peb    <-- pagination snippet
+
+_i18n/              <-- translations for the site
+    my_translations.yaml            <-- default language translations
+    my_translations_de.yaml         <-- german translations
+
+_themes/           <-- custom, local themes
+    my_theme/          <-- local theme folder
+        _layouts/         <-- local theme layouts
+        _includes/        <-- local theme includes
+
 _site/              <-- result of rendering, this will be deployed
+
 .flatmark-cache     <-- cache for the flatmark results, can be deleted
 ```
 
