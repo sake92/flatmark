@@ -31,6 +31,7 @@
 
 </div>
 </details>
-{% endif %}
 
 <hr>
+{% endif %}
+

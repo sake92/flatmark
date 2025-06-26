@@ -10,6 +10,7 @@ theme_props:
 
 ```markdown
 Tutorials:
+{% verbatim %}
 {%
 set tutorials = [
     { "label": "My tutorial 1", "link": "/tutorials/tutorial1.html" },
@@ -17,9 +18,11 @@ set tutorials = [
 ]
 %}
 
+
 {% for tutorial in tutorials %}
 - [{{ tutorial.label }}]({{ tutorial.link }})
 {% endfor %}
+{% endverbatim  %}
 ```
 
 
@@ -33,11 +36,20 @@ set tutorials = [
 ### Can't add content to a template that extends another template
 When you extend a template:
 ```markdown
+{% verbatim %}
 {% extends "base" %}
 
 {% block title %}
     {{page.title}}
 {% endblock %}
+
+---
+<div>cant add this!!!</div>
+
+{% block hack %}
+    <div>cant add this either!!!</div>
+{% endblock %}
+{% endverbatim  %}
 ```
 
 note that **you can only override blocks that are defined in the base template**,  

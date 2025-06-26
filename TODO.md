@@ -7,7 +7,6 @@
 - translation_url filter
 - tabbed content e.g. windows/linux/mac
 - RSS
-- custom skip files?
 - page image for preview
 - nifty features like:
   - code blocks with line numbers
