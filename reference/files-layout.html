@@ -25,8 +25,8 @@
    </nav>
   </header>
   <main class="pico container">
-   <h1 id="file-layout">File Layout</h1>
-   <h2 id="content-structure">Content Structure</h2>
+   <h1 id="file-layout">File Layout<a href="#file-layout" class="flatmark-anchor" aria-label="Anchor">🔗</a></h1>
+   <h2 id="content-structure">Content Structure<a href="#content-structure" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
    <pre><code class="language-bash hljs" data-highlighted="yes">content/
     index.md            &lt;-- index page
     blog                  &lt;-- the blog category
@@ -48,18 +48,31 @@ static/                 &lt;-- static files, copied as-is to the output
 </code></pre>
    <p>First level of folders in <code>content/</code> are categories.</p>
    <p>The <code>index.md</code> (or <code>index.html</code>) pages are special. They get the list of all pages in the category in the <code>paginator</code> argument, so you can list those items there. For example, the <code>content/blog/index.md</code> would receive <code>paginator</code> with all the blog posts.</p>
-   <h2 id="other">Other</h2>
+   <h2 id="other">Other<a href="#other" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
    <pre><code class="language-bash hljs" data-highlighted="yes"><span class="hljs-comment"># config</span>
 _config.yaml        &lt;-- global config
+
 _layouts/           &lt;-- templates
     default.peb       &lt;-- default layout: <span class="hljs-keyword">for</span> index page, about page etc
     post.peb          &lt;-- layout <span class="hljs-keyword">for</span> posts
+
 _includes/          &lt;-- snippets/fragments/helpers
     header.peb        &lt;-- header snippet
     footer.peb        &lt;-- footer snippet
     search.peb        &lt;-- search form snippet
     pagination.peb    &lt;-- pagination snippet
+
+_i18n/              &lt;-- translations <span class="hljs-keyword">for</span> the site
+    my_translations.yaml            &lt;-- default language translations
+    my_translations_de.yaml         &lt;-- german translations
+
+_themes/           &lt;-- custom, <span class="hljs-built_in">local</span> themes
+    my_theme/          &lt;-- <span class="hljs-built_in">local</span> theme folder
+        _layouts/         &lt;-- <span class="hljs-built_in">local</span> theme layouts
+        _includes/        &lt;-- <span class="hljs-built_in">local</span> theme includes
+
 _site/              &lt;-- result of rendering, this will be deployed
+
 .flatmark-cache     &lt;-- cache <span class="hljs-keyword">for</span> the flatmark results, can be deleted
 </code></pre>
    <p>Notice that all folders that have prefix <code>_</code> or <code>.</code> are some kind of configuration.</p>
