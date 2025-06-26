@@ -26,9 +26,8 @@
   </header>
   <main class="pico container">
    <h1 id="file-layout">File Layout</h1>
-   <pre><code class="language-bash hljs" data-highlighted="yes">
-<span class="hljs-comment"># content</span>
-content/
+   <h2 id="content-structure">Content Structure</h2>
+   <pre><code class="language-bash hljs" data-highlighted="yes">content/
     index.md            &lt;-- index page
     blog                  &lt;-- the blog category
         index.md            &lt;-- index page <span class="hljs-keyword">for</span> blog posts
@@ -46,7 +45,11 @@ static/                 &lt;-- static files, copied as-is to the output
     styles/main.css
     scripts/main.js
 
-<span class="hljs-comment"># config</span>
+</code></pre>
+   <p>First level of folders in <code>content/</code> are categories.</p>
+   <p>The <code>index.md</code> (or <code>index.html</code>) pages are special. They get the list of all pages in the category in the <code>paginator</code> argument, so you can list those items there. For example, the <code>content/blog/index.md</code> would receive <code>paginator</code> with all the blog posts.</p>
+   <h2 id="other">Other</h2>
+   <pre><code class="language-bash hljs" data-highlighted="yes"><span class="hljs-comment"># config</span>
 _config.yaml        &lt;-- global config
 _layouts/           &lt;-- templates
     default.peb       &lt;-- default layout: <span class="hljs-keyword">for</span> index page, about page etc
@@ -59,7 +62,20 @@ _includes/          &lt;-- snippets/fragments/helpers
 _site/              &lt;-- result of rendering, this will be deployed
 .flatmark-cache     &lt;-- cache <span class="hljs-keyword">for</span> the flatmark results, can be deleted
 </code></pre>
-   <p>The <code>index.md</code> (or <code>index.html</code>) pages are special. They get the list of all pages in the category in the <code>paginator</code> argument, so you can list those items there. For example, the <code>content/blog/index.md</code> would receive <code>paginator</code> with all the blog posts.</p>
+   <p>Notice that all folders that have prefix <code>_</code> or <code>.</code> are some kind of configuration.</p>
+   <p>The <code>_config.yaml</code> file is the global configuration file.</p>
+   <p>The <code>_layouts/</code> folder contains templates for the pages.
+    <br>
+    You can override a theme layout by creating a <strong>file with the same name</strong> in the <code>_layouts/</code> folder, like <code>_layouts/page.peb</code>.</p>
+   <p>The <code>_includes/</code> folder contains reusable snippets, like header, footer, search form, etc. You can override a theme include by creating a <strong>file with the same name</strong> in the <code>_includes/</code> folder, like <code>_includes/footer.peb</code>.</p>
+   <p>The <code>_site/</code> folder is the output folder, where the rendered files will be placed.</p>
+   <p>The <code>.flatmark-cache</code> folder is used to store the cache for the flatmark results.
+    <br>
+    These are:</p>
+   <ul>
+    <li>cached diagram rendering results</li>
+    <li>downloaded themes</li>
+   </ul>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>
