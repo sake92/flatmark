@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="How Tos">
+  <title>    How Tos | Flatmark Docs</title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <details>
+    <summary>Table of Contents</summary>
+    <div>
+     <ul>
+      <li><a href="#how-to-make-a-series-of-tutorials">How to make a series of tutorials?</a></li>
+      <li><a href="#gotchas">Gotchas</a>
+       <ul>
+        <li><a href="#cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template</a></li>
+       </ul></li>
+     </ul>
+    </div>
+   </details>
+   <h2 id="how-to-make-a-series-of-tutorials">How to make a series of tutorials?<a href="#how-to-make-a-series-of-tutorials" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">Tutorials:
+
+<span class="hljs-bullet">-</span> [<span class="hljs-string">My tutorial 1</span>](<span class="hljs-link">/tutorials/tutorial1.html</span>)
+<span class="hljs-bullet">-</span> [<span class="hljs-string">My tutorial 2</span>](<span class="hljs-link">/tutorials/tutorial2.html</span>)
+</code></pre>
+   <hr>
+   <h2 id="gotchas">Gotchas<a href="#gotchas" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
+   <h3 id="cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template<a href="#cant-add-content-to-a-template-that-extends-another-template" class="flatmark-anchor" aria-label="Anchor">🔗</a></h3>
+   <p>When you extend a template:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">
+
+
+
+<span class="hljs-code">    
+    
+    
+    
+        How Tos
+    
+        
+            
+        
+    
+</span>
+
+
+
+
+<span class="hljs-code">    
+        
+            Home
+        
+        
+                                            Tutorials
+                                                            How Tos
+                                                            Reference
+                                    
+                    
+    
+</span>
+<span class="hljs-code">    
+</span>
+<span class="hljs-code">        
+    
+        
+</span>
+
+
+<span class="hljs-code">    Flatmark Docs    
+</span>
+
+
+</code></pre>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
