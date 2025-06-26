@@ -44,10 +44,10 @@ When you extend a template:
 {% endblock %}
 
 ---
-<div>cant add this!!!</div>
+cant add this!!!
 
 {% block hack %}
-    <div>cant add this either!!!</div>
+    cant add this either!!!
 {% endblock %}
 {% endverbatim  %}
 ```

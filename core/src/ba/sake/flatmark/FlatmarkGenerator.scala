@@ -1,13 +1,12 @@
 package ba.sake.flatmark
 
 import java.util.Locale
-import org.slf4j.LoggerFactory
-
 import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
+import scala.util.control.NonFatal
+import org.jsoup.Jsoup
+import org.slf4j.LoggerFactory
 import org.virtuslab.yaml.*
-import io.undertow.util.QueryParameterUtils
-import ba.sake.querson.*
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
 import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
@@ -15,9 +14,6 @@ import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
-import org.jsoup.Jsoup
-
-import scala.util.control.NonFatal
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -79,7 +75,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesCacheFolder = cacheFolder / "themes"
     val localThemesFolder = siteRootFolder / "_themes"
-    val themeFolder = downloadThemeRepo(siteConfig.theme, localThemesFolder, themesCacheFolder, useCache)
+    val themeFolder = ThemeResolver.resolve(siteConfig.theme, localThemesFolder, themesCacheFolder, useCache)
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
@@ -151,6 +147,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         // noop for a top level page without category: about.md etc
       }
     }
+    
+    // render index files with pagination
     templatedIndexFiles.foreach { file =>
       val segments = file.relativeTo(contentFolder).segments
       val firstSegment = segments.head
@@ -177,6 +175,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         paginateItems = Some(categoryItems)
       )
     }
+    
     // copy static files (e.g. images, css..)
     val staticFolder = siteRootFolder / "static"
     if os.exists(staticFolder) then
@@ -231,7 +230,6 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
               else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
             )
           }
-
           val contentContext = templateContext(
             languages,
             locale,
@@ -300,7 +298,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val fileRelPath = file.relativeTo(contentFolder)
     val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext, locale)
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
-    
+
     val toc = locally {
       val document = Jsoup.parse(contentHtml)
       val headingsTree = HeadingHierarchyExtractor.extract(document)
@@ -415,71 +413,10 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       )
     )
   }
-
-  /** returns the folder that contains theme */
-  private def downloadThemeRepo(
-      themeSource: String,
-      localThemesFolder: os.Path,
-      themesCacheFolder: os.Path,
-      useCache: Boolean
-  ): os.Path = {
-    val parsedUri = java.net.URI.create(themeSource)
-    if parsedUri.getScheme == "http" || parsedUri.getScheme == "https" then {
-      logger.debug(s"Using remote theme from URL: ${themeSource}")
-      val qp = QueryParameterUtils
-        .parseQueryString(parsedUri.getQuery, "utf-8")
-        .asScala
-        .map((k, v) => k -> v.asScala.toSeq)
-        .toMap
-        .parseQueryStringMap[ThemeUrlQP]
-      val themeHash =
-        s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(themeSource)}"
-          .replace("/", "-")
-      val themeRepoFolder = themesCacheFolder / themeHash
-      if os.exists(themeRepoFolder) && useCache then {
-        logger.debug("Theme is already downloaded. Skipping download.")
-      } else {
-        val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
-        logger.info(s"Downloading theme...")
-        // TODO fallback to ssh and api
-        if os.exists(themeRepoFolder) then {
-          os.call(("git", "pull"), cwd = themeRepoFolder)
-          logger.info(s"Pulled latest theme")
-        } else {
-          os.makeDir.all(themesCacheFolder)
-          os.call(
-            ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
-            cwd = themesCacheFolder
-          )
-          logger.info(s"Cloned theme")
-        }
-      }
-      themeRepoFolder / os.RelPath(qp.folder)
-    } else if parsedUri.getScheme == null then {
-      val folder = localThemesFolder / os.SubPath(themeSource)
-      logger.debug(s"Using local theme folder: ${folder}")
-      if !os.exists(folder) then
-        throw FlatmarkException(
-          s"Local theme folder does not exist. Please create it or use a valid theme URL."
-        )
-      folder
-    } else {
-      throw FlatmarkException(
-        s"Unsupported theme URL scheme: ${parsedUri.getScheme}. Only 'http', 'https' or no scheme (folder in _themes) are supported."
-      )
-    }
-
-  }
-
 }
 
 case class RenderResult(
     pageContext: PageContext
 )
-
-case class ThemeUrlQP(
-    branch: String = "main",
-    folder: String = "."
-) derives QueryStringRW
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
