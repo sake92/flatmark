@@ -2,7 +2,7 @@
 
 
 # content
-- headings anchors
+
 - TOC helper, collapsible
 - static search
 - translation_url filter

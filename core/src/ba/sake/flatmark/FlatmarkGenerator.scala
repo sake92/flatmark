@@ -297,10 +297,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
     // render final HTML file
     val layoutContext = contentContext.copy(page = contentContext.page.copy(content = contentHtml))
-    val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
-    val finalFinalHtml = contentContext.site.baseUrl match {
-      case Some(baseUrl) =>
-        val document = Jsoup.parse(finalHtml)
+    val finalHtml = locally {
+      val templatedHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
+      val document = Jsoup.parse(templatedHtml)
+      // prepend base URL to all relative URLs
+      contentContext.site.baseUrl.foreach { baseUrl =>
         // TODO handle srcset
         val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
         urlAttrs.foreach { attrName =>
@@ -309,12 +310,18 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             elem.attr("href", baseUrl + attrValue)
           }
         }
-        document.toString
-      case None => finalHtml
+      }
+      // add anchor links to headings
+      document.select("""h1,h2,h3,h4,h5,h6""").forEach { elem =>
+        val id = elem.attr("id").trim
+        if id.nonEmpty then elem.append(s"""<a href="#${id}" class="flatmark-anchor" aria-label="Anchor">🔗</a>""")
+      }
+      document.toString
     }
+
     os.write.over(
       outputFolder / contentContext.page.rootRelPath,
-      finalFinalHtml,
+      finalHtml,
       createFolders = true
     )
     logger.debug(s"Rendered templated file: ${file}")
