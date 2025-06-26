@@ -14,8 +14,9 @@
 
 {% include "header" %}
 
-
 <main>
+    {% include "toc" %}
+    
     {% block content %}
     {% endblock %}
 </main>

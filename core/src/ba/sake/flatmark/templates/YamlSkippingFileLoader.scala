@@ -1,5 +1,7 @@
 package ba.sake.flatmark.templates
 
+import ba.sake.flatmark.FrontMatterUtils
+
 import java.io.{File, Reader, StringReader}
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
@@ -16,37 +18,7 @@ class YamlSkippingFileLoader(rootFolder: Path) extends FileLoader {
     }
 
     val rawContent = Files.readString(file.toPath, StandardCharsets.UTF_8)
-    var hasYamlFrontMatter = false
-    var firstTripleDashIndex = -1
-    var secondTripleDashIndex = -1
-    boundary {
-      val iter = rawContent.linesIterator
-      var i = 0
-      while iter.hasNext do {
-        val line = iter.next().trim
-        if line.nonEmpty then {
-          if line == "---" then {
-            if (firstTripleDashIndex == -1) firstTripleDashIndex = i
-            else if (secondTripleDashIndex == -1) {
-              secondTripleDashIndex = i
-              hasYamlFrontMatter = true
-              boundary.break()
-            }
-          } else if (firstTripleDashIndex == -1) {
-            boundary.break() // first non-empty line is not triple dash -> no YAML front matter
-          }
-        }
-        i += 1
-      }
-    }
-    val rawContentNoYaml = if hasYamlFrontMatter then {
-      rawContent.linesIterator
-        .drop(secondTripleDashIndex + 1)
-        .mkString("\n")
-        .trim
-    } else {
-      rawContent
-    }
+    val (_, rawContentNoYaml) = FrontMatterUtils.extract(rawContent)
     new StringReader(rawContentNoYaml)
   }
 

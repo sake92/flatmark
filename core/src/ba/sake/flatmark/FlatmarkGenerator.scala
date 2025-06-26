@@ -209,8 +209,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       paginateItems: Option[Seq[PageContext]]
   ): Seq[RenderResult] = {
     logger.debug(s"Rendering templated file: ${file}")
-    val mdContentTemplateRaw = os.read(file)
-    val pageConfig = parseConfig(file, mdContentTemplateRaw)
+    val contentTemplateRaw = os.read(file)
+    val pageConfig = parseConfig(file, contentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
     val fileExtension = pageConfig.ext.getOrElse("html")
@@ -231,6 +231,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
               else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
             )
           }
+
           val contentContext = templateContext(
             languages,
             locale,
@@ -292,16 +293,39 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       templateHandler: FlatmarkTemplateHandler,
       locale: Locale
   ): RenderResult = {
+    // 1. we first render the content file with basic context (page title, description, etc.)
+    // 2. then we feed it to markdown renderer to convert markdown to HTML
+    // 3. and finally we render the layout with the content HTML
+
     val fileRelPath = file.relativeTo(contentFolder)
     val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext, locale)
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
+    
+    val toc = locally {
+      val document = Jsoup.parse(contentHtml)
+      val headingsTree = HeadingHierarchyExtractor.extract(document)
+      def toTocItem(heading: HeadingHierarchyExtractor.Heading): TocItemContext =
+        TocItemContext(
+          heading.level,
+          title = heading.text,
+          url = s"#${heading.id}",
+          children = heading.children.map(toTocItem).toSeq
+        )
+      headingsTree.map(toTocItem)
+    }
+
     // render final HTML file
-    val layoutContext = contentContext.copy(page = contentContext.page.copy(content = contentHtml))
+    val layoutContext = contentContext.copy(
+      page = contentContext.page.copy(
+        content = contentHtml,
+        toc = toc
+      )
+    )
     val finalHtml = locally {
-      val templatedHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
+      val templatedHtml = templateHandler.render(layoutContext.page.layout, layoutContext.toPebbleContext, locale)
       val document = Jsoup.parse(templatedHtml)
       // prepend base URL to all relative URLs
-      contentContext.site.baseUrl.foreach { baseUrl =>
+      layoutContext.site.baseUrl.foreach { baseUrl =>
         // TODO handle srcset
         val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
         urlAttrs.foreach { attrName =>
@@ -320,7 +344,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     }
 
     os.write.over(
-      outputFolder / contentContext.page.rootRelPath,
+      outputFolder / layoutContext.page.rootRelPath,
       finalHtml,
       createFolders = true
     )
@@ -377,7 +401,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         lang = langContext,
         publishDate = templateConfig.page.publish_date.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage),
-        themeProps = templateConfig.page.theme_props
+        themeProps = templateConfig.page.theme_props,
+        toc = Seq.empty // filled in later from markdown-rendered-HTML
       ),
       Option.when(items.nonEmpty)(
         PaginatorContext(
@@ -400,6 +425,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
   ): os.Path = {
     val parsedUri = java.net.URI.create(themeSource)
     if parsedUri.getScheme == "http" || parsedUri.getScheme == "https" then {
+      logger.debug(s"Using remote theme from URL: ${themeSource}")
       val qp = QueryParameterUtils
         .parseQueryString(parsedUri.getQuery, "utf-8")
         .asScala
@@ -414,26 +440,27 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         logger.debug("Theme is already downloaded. Skipping download.")
       } else {
         val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
-        logger.info(s"Downloading theme from ${httpCloneUrl}")
+        logger.info(s"Downloading theme...")
         // TODO fallback to ssh and api
         if os.exists(themeRepoFolder) then {
           os.call(("git", "pull"), cwd = themeRepoFolder)
-          logger.info(s"Pulled latest theme from: ${themeSource}")
+          logger.info(s"Pulled latest theme")
         } else {
           os.makeDir.all(themesCacheFolder)
           os.call(
             ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
             cwd = themesCacheFolder
           )
-          logger.info(s"Cloned theme from: ${themeSource}")
+          logger.info(s"Cloned theme")
         }
       }
       themeRepoFolder / os.RelPath(qp.folder)
     } else if parsedUri.getScheme == null then {
       val folder = localThemesFolder / os.SubPath(themeSource)
+      logger.debug(s"Using local theme folder: ${folder}")
       if !os.exists(folder) then
         throw FlatmarkException(
-          s"Local theme folder does not exist: ${folder}. Please create it or use a valid theme URL."
+          s"Local theme folder does not exist. Please create it or use a valid theme URL."
         )
       folder
     } else {

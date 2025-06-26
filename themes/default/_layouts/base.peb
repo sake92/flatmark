@@ -22,6 +22,8 @@
 {% include "header" %}
 
 <main class="pico container">
+    {% include "toc" %}
+    
     {% block content %}
     {% endblock %}
 </main>

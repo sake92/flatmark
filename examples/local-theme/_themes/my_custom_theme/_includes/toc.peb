@@ -1,0 +1,26 @@
+    
+{% if page.toc is not empty %}
+<details>
+<summary>Table of Contents</summary>
+<div>
+    <ul>
+    {% for h1 in page.toc %}
+        <li>
+            <a href="{{ h1.url }}">{{ h1.title }}</a>
+            {% if h1.children is not empty %}
+                <ul>
+                    {% for h2 in h1.children %}
+                        <li>
+                            <a href="{{ h2.url }}">{{ h2.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</div>
+</details>
+{% endif %}
+
+    

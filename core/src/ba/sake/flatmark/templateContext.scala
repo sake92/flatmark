@@ -8,13 +8,12 @@ case class TemplateContext(
     page: PageContext,
     paginator: Option[PaginatorContext] = None
 ) {
-  def toPebbleContext: java.util.Map[String, Object] = {
+  def toPebbleContext: java.util.Map[String, Object] =
     Map(
       "site" -> site.toPebbleContext,
       "page" -> page.toPebbleContext,
       "paginator" -> paginator.map(_.toPebbleContext).getOrElse(java.util.Collections.emptyMap())
     ).asJava
-  }
 }
 
 case class SiteContext(
@@ -27,7 +26,7 @@ case class SiteContext(
     highlightCode: Boolean,
     highlightMath: Boolean
 ) {
-  def toPebbleContext: java.util.Map[String, Object] = {
+  def toPebbleContext: java.util.Map[String, Object] =
     Map(
       "name" -> name,
       "description" -> description,
@@ -37,7 +36,6 @@ case class SiteContext(
       "highlight_code" -> Boolean.box(highlightCode),
       "highlight_math" -> Boolean.box(highlightMath)
     ).asJava
-  }
 }
 
 case class LanguageContext(
@@ -83,9 +81,9 @@ case class PageContext(
     lang: LanguageContext,
     publishDate: Option[java.time.ZonedDateTime],
     rootRelPath: os.RelPath,
-    themeProps: Map[String, Any]
+    themeProps: Map[String, Any],
+    toc: Seq[TocItemContext]
     // TODO summary: String = "", // Optional summary field
-    // TODO toc: Tree[PageLinkContext] = Tree.empty // Optional table of contents, only link and title for now
 ) {
   def toPebbleContext: java.util.Map[String, Object] =
     Map(
@@ -96,7 +94,8 @@ case class PageContext(
       "lang" -> lang.toPebbleContext,
       "publish_date" -> publishDate.orNull,
       "url" -> s"/${rootRelPath.segments.mkString("/")}",
-      "theme_props" -> themeProps.asJava
+      "theme_props" -> themeProps.asJava,
+      "toc" -> toc.map(_.toPebbleContext).asJava
     ).asJava
 
   override def toString: String =
@@ -116,7 +115,7 @@ case class PaginatorContext(
   private val hasNext: Boolean = currentPage < totalPages
   private val hasPrev: Boolean = currentPage > 1
 
-  def toPebbleContext: java.util.Map[String, Object] = {
+  def toPebbleContext: java.util.Map[String, Object] =
     Map(
       "items" -> items.map(_.toPebbleContext).asJava,
       "per_page" -> Integer.valueOf(pageSize),
@@ -130,5 +129,22 @@ case class PaginatorContext(
       "prev_url" -> s"/${rootRelPath(currentPage - 1).segments.mkString("/")}",
       "next_url" -> s"/${rootRelPath(currentPage + 1).segments.mkString("/")}"
     ).asJava
-  }
+}
+
+case class TocItemContext(
+    level: Int,
+    title: String,
+    url: String,
+    children: Seq[TocItemContext]
+) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(
+      "level" -> Integer.valueOf(level),
+      "title" -> title,
+      "url" -> url,
+      "children" -> children.map(_.toPebbleContext).asJava
+    ).asJava
+
+  override def toString: String = 
+    ("  " * level) + s"<h${level}>${title}\n" + children.mkString
 }

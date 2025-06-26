@@ -49,34 +49,11 @@ case class PageConfig(
     theme_props: Map[String, String] = Map.empty
 ) derives YamlCodec
 
+// TODO pass in just YAML
 private[flatmark] def parseConfig(file: os.Path, mdTemplateRaw: String): PageConfig = {
-  var hasYamlFrontMatter = false
-  var firstTripleDashIndex = -1
-  var secondTripleDashIndex = -1
-  boundary {
-    val iter = mdTemplateRaw.linesIterator
-    var i = 0
-    while iter.hasNext do {
-      val line = iter.next().trim
-      if line.nonEmpty then {
-        if line == "---" then {
-          if (firstTripleDashIndex == -1) firstTripleDashIndex = i
-          else if (secondTripleDashIndex == -1) {
-            secondTripleDashIndex = i
-            hasYamlFrontMatter = true
-            boundary.break()
-          }
-        } else if (firstTripleDashIndex == -1) {
-          boundary.break() // first non-empty line is not triple dash -> no YAML front matter
-        }
-      }
-      i += 1
-    }
-  }
-  if hasYamlFrontMatter then {
-    val rawYaml = mdTemplateRaw.linesIterator
-      .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
-      .mkString("\n")
+  val (rawYaml, _) = FrontMatterUtils.extract(mdTemplateRaw)
+  if rawYaml.trim.isEmpty then PageConfig()
+  else
     rawYaml
       .as[PageConfig]
       .left
@@ -84,5 +61,4 @@ private[flatmark] def parseConfig(file: os.Path, mdTemplateRaw: String): PageCon
         throw FlatmarkException(s"Failed to parse YAML front matter in file '$file': ${error.getMessage}")
       }
       .getOrElse(PageConfig())
-  } else PageConfig()
 }

@@ -5,5 +5,7 @@ timezone: Europe/Sarajevo
 categories:
   tutorials:
     label: Tutorials
+  howtos:
+    label: How Tos
   reference:
     label: Reference

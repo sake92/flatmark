@@ -1,5 +1,5 @@
 ---
-title: Flatmark Tutorials
+title: Tutorials
 description: Flatmark Tutorials
 theme_props:
   pagination_disabled: true
