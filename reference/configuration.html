@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="">
+  <title>    Configuration | Flatmark Docs</title>
+  <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <h1 id="configuration">Configuration</h1>
+   <h2 id="site-configuration">Site Configuration</h2>
+   <p>For global site config you edit the <code>_config.yaml</code> in the root folder:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span> <span class="hljs-string">Description</span>
+<span class="hljs-attr">theme:</span> <span class="hljs-string">my_theme</span>
+<span class="hljs-attr">base_url:</span> <span class="hljs-string">https://sake92.github.io/flatmark</span>
+
+<span class="hljs-attr">categories:</span>
+  <span class="hljs-comment"># content/blog/ folder</span>
+  <span class="hljs-attr">blog:</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">Blog</span>
+  <span class="hljs-comment"># content/docs/ folder</span>
+  <span class="hljs-attr">docs:</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">Documentation</span>
+
+<span class="hljs-comment"># default language</span>
+<span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+<span class="hljs-attr">timezone:</span> <span class="hljs-string">Europe/Sarajevo</span>
+<span class="hljs-string">...</span>
+</code></pre>
+   <p>The <code>base_url</code> can also be specified as an environment variable <code>FLATMARK_BASE_URL</code>.</p>
+   <h2 id="page-configuration">Page Configuration</h2>
+   <p>Put the configuration at the top of your page file, in YAML format, like this:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
+<span class="hljs-attr">title:</span> <span class="hljs-string">Hello</span>
+<span class="hljs-attr">tags:</span> [<span class="hljs-string">scala</span>, <span class="hljs-string">java</span>]
+<span class="hljs-attr">publish_date:</span> <span class="hljs-number">2025-01-01 </span><span class="hljs-number">11</span><span class="hljs-string">:11</span>  <span class="hljs-comment"># in timezone specified in the _config.yaml</span>
+<span class="hljs-attr">publish:</span> <span class="hljs-literal">yes</span> <span class="hljs-string">|</span> <span class="hljs-literal">no</span> <span class="hljs-string">|</span> <span class="hljs-string">hide</span>        <span class="hljs-comment"># hide means published but not listed/searched/google-indexed, default is yes</span>
+<span class="hljs-meta">---
+</span>
+<span class="hljs-comment"># Hello Configuration</span>
+<span class="hljs-string">This</span> <span class="hljs-string">is</span> <span class="hljs-string">my</span> <span class="hljs-string">first</span> <span class="hljs-string">post!</span>
+</code></pre>
+   <p>The page configuration section is optional.
+    <br>
+    The file needs to start with <code>---</code> and the config ends with another <code>---</code>.
+    <br>
+    This type of config is called "YAML front matter".</p>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>

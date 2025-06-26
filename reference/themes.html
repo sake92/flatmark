@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="">
+  <title>    Themes | Flatmark Docs</title>
+  <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <h1 id="themes">Themes</h1>
+   <p>Folders: <code>static</code>, <code>_layouts</code>, <code>_includes</code>, <code>_i18n</code></p>
+   <p>Theme can be specified in the <code>_config.yaml</code> file:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span> <span class="hljs-string">my_local_theme</span>
+<span class="hljs-comment"># or</span>
+<span class="hljs-attr">theme:</span> <span class="hljs-string">https://github.com/sake92/flatmark?branch=main&amp;folder=a_folder</span>
+</code></pre>
+   <p>In the first case, the theme is in the local <code>_themes</code> folder.
+    <br>
+    In the second case, it is downloaded from the GitHub repository, from a specific branch (default is <code>main</code>), and a specific folder (default is repo root <code>/</code>).</p>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
