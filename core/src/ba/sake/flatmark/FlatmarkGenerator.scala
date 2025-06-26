@@ -45,9 +45,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     } else defaultSiteConfig
     val siteConfig: SiteConfig = siteConfigYaml.as[SiteConfig] match {
       case Right(config) =>
-        val baseUrl = config.base_url.orElse {
-          System.getenv().asScala.get("FLATMARK_BASE_URL").filterNot(_.isBlank)
-        }.map(_.stripSuffix("/"))
+        val baseUrl = config.base_url
+          .orElse {
+            System.getenv().asScala.get("FLATMARK_BASE_URL").filterNot(_.isBlank)
+          }
+          .map(_.stripSuffix("/"))
         config.copy(base_url = baseUrl)
       case Left(error) =>
         throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.", error)
@@ -189,7 +191,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             followLinks = false
           )
       }
-      
+
     logger.info("Site generated successfully")
   } catch {
     case NonFatal(e) =>
@@ -298,15 +300,18 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val finalHtml = templateHandler.render(contentContext.page.layout, layoutContext.toPebbleContext, locale)
     val finalFinalHtml = contentContext.site.baseUrl match {
       case Some(baseUrl) =>
-        val document= Jsoup.parse(finalHtml)
-        val rootLinks = document.select("""a[href^="/"]""")
-        rootLinks.forEach{ link =>
-          val href = link.attr("href")
-          link.attr("href", baseUrl + href)
+        val document = Jsoup.parse(finalHtml)
+        // TODO handle srcset
+        val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
+        urlAttrs.foreach { attrName =>
+          document.select("""[href^="/"]""").forEach { elem =>
+            val attrValue = elem.attr(attrName)
+            elem.attr("href", baseUrl + attrValue)
+          }
         }
         document.toString
       case None => finalHtml
-    } 
+    }
     os.write.over(
       outputFolder / contentContext.page.rootRelPath,
       finalFinalHtml,
