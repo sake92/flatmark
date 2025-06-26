@@ -26,5 +26,6 @@ graalvm/java -agentlib:native-image-agent=config-output-dir=cli/resources/META-I
 
 
 
+https://realfavicongenerator.net/
 
 

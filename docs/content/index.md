@@ -1,6 +1,18 @@
+---
+title: Home
+description: Home page
+theme_props:
+  pagination_disabled: true
+---
 
 # Flatmark Documentation
 
+Flatmark tries to be a simple static site generator without too much configuration.  
+
+It is based on [Pebble](https://pebbletemplates.io/) for templating and uses [CommonMark](https://commonmark.org/) for markdown rendering.
+
+Most of rendering is done statically: code highlighting, math, diagrams, etc.  
+The only thing you usually need to add for those is CSS.
 
 ## Markdown
 Syntax is based on [commonmark standard](https://commonmark.org/help/) with some extensions:
@@ -25,6 +37,11 @@ val x = 5
 ```
 ````
 
+Result:
+```scala
+val x = 5
+```
+
 Syntax highlighting is done via [highlight.js](https://highlightjs.org/).
 
 ### Math
@@ -35,6 +52,11 @@ To use math blocks, use the `math` code block syntax:
 x = 5
 ```
 ````
+
+Result:
+```math
+x = 5
+```
 
 For more details, see [KaTeX](https://katex.org/).
 
@@ -52,6 +74,15 @@ sequenceDiagram
 ```
 ````
 
+Result:
+```diagram:mermaid
+sequenceDiagram
+        actor Alice
+        actor Bob
+        Alice->>Bob: Hi Bob
+        Bob->>Alice: Hi Alice
+```
+
 For more details, see [Mermaid documentation](https://mermaid-js.github.io/mermaid/#/).
 
 ### Graphviz Diagrams
@@ -63,6 +94,12 @@ To create Graphviz diagrams, use the `diagram:graphviz` code block syntax:
 digraph G {Hello->World}
 ```
 ````
+
+
+Result:
+```diagram:graphviz
+digraph G {Hello->World}
+```
 
 For more details, see [Graphviz documentation](https://graphviz.org/documentation/).
 
