@@ -52,30 +52,29 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor">🔗</a></h1>
-   <h2 id="site-configuration">Site Configuration<a href="#site-configuration" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
+   <h1 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="site-configuration">Site Configuration<a href="#site-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>For global site config you edit the <code>_config.yaml</code> in the root folder:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>
-<span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span> <span class="hljs-string">Description</span>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>                      <span class="hljs-comment"># website name</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span> <span class="hljs-string">Description</span>   <span class="hljs-comment"># website description</span>
+<span class="hljs-attr">base_url:</span> <span class="hljs-string">https://mydomain.com/subpath</span>  <span class="hljs-comment"># URL where website will be deployed</span>
+
 <span class="hljs-attr">theme:</span>
-  <span class="hljs-attr">source:</span> <span class="hljs-string">my_theme</span>
-<span class="hljs-attr">base_url:</span> <span class="hljs-string">https://sake92.github.io/flatmark</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">my_theme</span>                      <span class="hljs-comment"># website theme</span>
 
 <span class="hljs-attr">categories:</span>
-  <span class="hljs-comment"># content/blog/ folder</span>
-  <span class="hljs-attr">blog:</span>
+  <span class="hljs-attr">blog:</span>                 <span class="hljs-comment"># content/blog/ folder</span>
     <span class="hljs-attr">label:</span> <span class="hljs-string">Blog</span>
-  <span class="hljs-comment"># content/docs/ folder</span>
-  <span class="hljs-attr">docs:</span>
+  <span class="hljs-attr">docs:</span>                 <span class="hljs-comment"># content/docs/ folder</span>
     <span class="hljs-attr">label:</span> <span class="hljs-string">Documentation</span>
 
-<span class="hljs-comment"># default language</span>
-<span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+
+<span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>                <span class="hljs-comment"># default language</span>
 <span class="hljs-attr">timezone:</span> <span class="hljs-string">Europe/Sarajevo</span>
 <span class="hljs-string">...</span>
 </code></pre>
    <p>The <code>base_url</code> can also be specified as an environment variable <code>FLATMARK_BASE_URL</code>.</p>
-   <h2 id="page-configuration">Page Configuration<a href="#page-configuration" class="flatmark-anchor" aria-label="Anchor">🔗</a></h2>
+   <h2 id="page-configuration">Page Configuration<a href="#page-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Put the configuration at the top of your page file, in YAML format, like this:</p>
    <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
 <span class="hljs-attr">title:</span> <span class="hljs-string">Hello</span>
