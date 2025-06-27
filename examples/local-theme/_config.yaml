@@ -1,5 +1,6 @@
 
-theme: my_custom_theme
+theme:
+  source: my_custom_theme
 
 categories:
   blog:

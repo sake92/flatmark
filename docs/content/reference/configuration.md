@@ -10,7 +10,8 @@ For global site config you edit the `_config.yaml` in the root folder:
 ```yaml
 name: My Cool Blog
 description: My Cool Blog Description
-theme: my_theme
+theme:
+  source: my_theme
 base_url: https://sake92.github.io/flatmark
 
 categories:

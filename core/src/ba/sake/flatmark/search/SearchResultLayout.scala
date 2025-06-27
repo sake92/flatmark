@@ -2,7 +2,9 @@ package ba.sake.flatmark.search
 
 import ba.sake.flatmark.SiteConfig
 
-object SearchLayout {
+// TODO highlight all matches, not just the first one
+// TODO highlight matches in the text as well
+object SearchResultLayout {
 
   def build(siteConfig : SiteConfig): String =
     s"""
@@ -15,6 +17,7 @@ object SearchLayout {
       |{% endblock %}
       |
       |{% block scripts %}
+      |
       |<script type="module">
       |import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.mjs'
       |
@@ -26,7 +29,13 @@ object SearchLayout {
       |
       |
       |const fuse = new Fuse(entries, {
-      |  keys: [ "title", "text" ]
+      |  keys: [
+      |    { name: 'title', weight: 2  },
+      |    { name: 'text',  weight: 1 }
+      |  ],
+      |  includeMatches: true,
+      |  minMatchCharLength: 2,
+      |	 threshold: 0.5,
       |});
       |
       |const searchRes = fuse.search(qParam);
@@ -37,15 +46,28 @@ object SearchLayout {
       |} else {
       |    searchResultsContentElem.innerHTML = searchRes.map(r => {
       |    const page = r.item;
+      |    const highlightedTitle = highlightMatches(page.title, r.matches.filter(m => m.key === "title"));
       |    return `<div class="search-result-item">
-      |        <h2><a href="$${page.url}">$${page.title}</a></h2>
+      |        <h2><a href="$${page.url}">$${highlightedTitle}</a></h2>
       |        <p>$${page.text.substring(0, 200)}</p>
       |      </div>`;
       |    }).join("");
       |}
+      |
+      |function highlightMatches(text, matches) {
+      |   if (matches.length === 0) return text;
+      |   // only the first match is highlighted
+      |   const matchIndices = matches[0].indices[0];
+      |   const start = matchIndices[0];
+      |   const end = matchIndices[1] + 1;
+      |   const beforeMatchText = text.substring(0, start);
+      |   const matchText = text.substring(start, end);
+      |   const afterMatchText = text.substring(end, text.length);
+      |      console.log({text, matches, matchIndices, start, end, beforeMatchText, matchText, afterMatchText});
+      |   return beforeMatchText + `<mark>$${matchText}</mark>` + afterMatchText;
+      |}
       |</script>
-      |{% endblock %}
-      |    
-      |    
+      |
+      |{% endblock %} 
       |""".stripMargin
 }

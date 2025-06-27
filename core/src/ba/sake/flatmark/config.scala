@@ -23,11 +23,16 @@ case class SiteConfig(
     base_url: Option[String] = None,
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
-    theme: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
+    theme: ThemeConfig = ThemeConfig(),
     categories: ListMap[String, CategoryConfig] = ListMap.empty,
     tags: ListMap[String, TagConfig] = ListMap.empty,
-    highlight_code: Boolean = true,
-    highlight_math: Boolean = true
+    code_highlight: CodeHighlightConfig = CodeHighlightConfig(),
+    math_highlight: MathHighlightConfig = MathHighlightConfig()
+) derives YamlCodec
+
+case class ThemeConfig(
+    source: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
+    enabled: Boolean = true
 ) derives YamlCodec
 
 case class CategoryConfig(
@@ -38,6 +43,14 @@ case class CategoryConfig(
 case class TagConfig(
     label: String,
     description: String = ""
+) derives YamlCodec
+
+case class CodeHighlightConfig(
+    enabled: Boolean = true
+) derives YamlCodec
+
+case class MathHighlightConfig(
+    enabled: Boolean = true
 ) derives YamlCodec
 
 case class PageConfig(

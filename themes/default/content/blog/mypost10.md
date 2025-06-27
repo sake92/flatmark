@@ -1,5 +1,5 @@
 ---
-title: My Post 10
+title: My Post 10 Quick fox jumps over the lazy dog
 description: My Post
 tags: ["philosophy"]
 ---

@@ -23,8 +23,8 @@ case class SiteContext(
     langs: Seq[LanguageContext],
     categories: ListMap[String, CategoryContext],
     tags: ListMap[String, TagContext],
-    highlightCode: Boolean,
-    highlightMath: Boolean
+    codeHighlight: CodeHighlightContext,
+    mathHighlight: MathHighlightContext
 ) {
   def toPebbleContext: java.util.Map[String, Object] =
     Map(
@@ -34,8 +34,8 @@ case class SiteContext(
       "langs" -> langs.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
-      "highlight_code" -> Boolean.box(highlightCode),
-      "highlight_math" -> Boolean.box(highlightMath)
+      "code_highlight" -> codeHighlight.toPebbleContext,
+      "math_highlight" -> mathHighlight.toPebbleContext,
     ).asJava
 }
 
@@ -50,6 +50,20 @@ case class LanguageContext(
       "label" -> label,
       "url" -> url
     ).asJava
+}
+
+case class CodeHighlightContext(
+                                enabled: Boolean = true
+                              ) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(      "enabled" -> Boolean.box(enabled)    ).asJava
+}
+
+case class MathHighlightContext(
+                                enabled: Boolean = true
+                              ){
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map(      "enabled" -> Boolean.box(enabled)    ).asJava
 }
 
 case class CategoryContext(

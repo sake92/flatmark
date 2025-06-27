@@ -5,8 +5,14 @@ timezone: Europe/Sarajevo
 
 #base_url: https://example.com
 
-highlight_code: true
-highlight_math: true
+theme:
+  enabled: false # this theme does not *have a theme*
+
+code_highlight:
+  enabled: true
+math_highlight:
+  enabled: true
+
 
 categories:
   docs:

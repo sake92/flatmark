@@ -13,7 +13,7 @@ import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
-import ba.sake.flatmark.search.SearchLayout
+import ba.sake.flatmark.search.{SearchEntry, SearchResultLayout}
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
 
@@ -79,7 +79,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesCacheFolder = cacheFolder / "themes"
     val localThemesFolder = siteRootFolder / "_themes"
-    val themeFolder = ThemeResolver.resolve(siteConfig.theme, localThemesFolder, themesCacheFolder, useCache)
+    val themeFolder = ThemeResolver.resolve(siteConfig.theme.source, localThemesFolder, themesCacheFolder, useCache)
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
@@ -200,7 +200,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     // write search files
     // TODO configurable in _config.yaml
     val pageSearchEntries = (contentResults ++ indexResults).map { cr =>
-      PageSearchEntry(title = cr.pageContext.title, url = cr.pageContext.url, text = cr.pageContext.text)
+      SearchEntry(title = cr.pageContext.title, url = cr.pageContext.url, text = cr.pageContext.text)
     }
     os.write.over(
       outputFolder / "search/entries.json",
@@ -209,8 +209,19 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     )
     val searchResultsPage = templateHandler.renderFromString(
       "search/results",
-      SearchLayout.build(siteConfig),
-      Map.empty.asJava,
+      SearchResultLayout.build(siteConfig),
+      templateContext(
+        allUsedLanguages,
+        siteConfig.lang,
+        TemplateConfig(siteConfig, PageConfig(title = "Search Results")),
+        defaultLayout = "page",
+        rootRelPath = _ => os.RelPath("search/results.html"),
+        getUrl = _ => "",
+        Seq.empty,
+        currentPage = 1,
+        pageSize = 1,
+        totalItems = 1
+      ).toPebbleContext,
       siteConfig.lang
     )
     os.write.over(
@@ -418,8 +429,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           key -> CategoryContext(value.label, value.description)
         },
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
-        highlightCode = templateConfig.site.highlight_code,
-        highlightMath = templateConfig.site.highlight_math
+        codeHighlight = CodeHighlightContext(templateConfig.site.code_highlight.enabled),
+        mathHighlight = MathHighlightContext(templateConfig.site.math_highlight.enabled)
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),
@@ -453,8 +464,3 @@ case class RenderResult(
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 
-case class PageSearchEntry(
-    title: String,
-    url: String,
-    text: String
-) derives JsonRW

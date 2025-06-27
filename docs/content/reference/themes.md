@@ -10,9 +10,11 @@ It is based on [PicoCSS](https://picocss.com/docs/conditional).
 You can use a different theme by setting it in the `_config.yaml` file:
 
 ```yaml
-theme: my_local_theme
+theme:
+  source: my_local_theme
 # or
-theme: https://github.com/sake92/flatmark?branch=main&folder=a_folder
+theme:
+  source: https://github.com/sake92/flatmark?branch=main&folder=a_folder
 ```
 
 In the first case, the theme is taken from the local `_themes/my_local_theme` folder.  

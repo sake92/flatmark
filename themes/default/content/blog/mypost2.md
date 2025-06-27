@@ -9,6 +9,3 @@ tags: ["philosophy"]
 
 This is my second post!
 
-
-
-
