@@ -32,7 +32,7 @@ object Main {
     // set logging properties
     LogManager.getLogManager.readConfiguration(getClass.getClassLoader.getResource("logging.properties").openStream())
     LogManager.getLogManager.getLogger("").setLevel(logLevelValue) // set root logger level
-    val cli = FlatmarkCli(siteRootFolder, host, port, !noCache.value)
+    val cli = FlatmarkCli(siteRootFolder, host, port, !noCache.value, updateTheme.value)
     command.toLowerCase match {
       case "build" => cli.build()
       case "serve" => cli.serve()

@@ -17,7 +17,7 @@ import ba.sake.flatmark.search.SearchEntry
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
 
-class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
+class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, updateTheme: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
@@ -79,7 +79,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val cacheFolder = siteRootFolder / ".flatmark-cache"
     val themesCacheFolder = cacheFolder / "themes"
     val localThemesFolder = siteRootFolder / "_themes"
-    val themeFolder = ThemeResolver.resolve(siteConfig.theme.source, localThemesFolder, themesCacheFolder, useCache)
+    val themeFolder = Option.when(siteConfig.theme.enabled)(
+      ThemeResolver.resolve(siteConfig.theme.source, localThemesFolder, themesCacheFolder, updateTheme)
+    )
     val fileCache = FileCache(cacheFolder, useCache)
     val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
     val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
@@ -87,25 +89,28 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val mathRenderer = FlatmarkMathRenderer(ssrServerUrl, webDriverHolder, fileCache)
     val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
     val customClassloader = new java.net.URLClassLoader(
-      Array(siteRootFolder / "_i18n", themeFolder / "_i18n").map(_.toIO.toURI.toURL),
+      (Array(siteRootFolder / "_i18n") ++ themeFolder.map(_ / "_i18n").toArray).map(_.toIO.toURI.toURL),
       Thread.currentThread.getContextClassLoader
     )
     val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder, themeFolder)
 
     // copy theme static files
-    val themeStaticFolder = themeFolder / "static"
-    if os.exists(themeStaticFolder) then
-      os.walk(themeStaticFolder).foreach { file =>
-        if os.isFile(file) then
-          os.copy(
-            file,
-            outputFolder / file.relativeTo(themeStaticFolder),
-            replaceExisting = true,
-            createFolders = true,
-            mergeFolders = true,
-            followLinks = false
-          )
+    themeFolder.foreach { folder =>
+      val themeStaticFolder = folder / "static"
+      if os.exists(themeStaticFolder) then {
+        os.walk(themeStaticFolder).foreach { file =>
+          if os.isFile(file) then
+            os.copy(
+              file,
+              outputFolder / file.relativeTo(themeStaticFolder),
+              replaceExisting = true,
+              createFolders = true,
+              mergeFolders = true,
+              followLinks = false
+            )
+        }
       }
+    }
 
     val templatedContentFiles = mutable.ArrayBuffer.empty[os.Path]
     val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
@@ -437,4 +442,3 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
 }
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
-

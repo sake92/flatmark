@@ -14,18 +14,17 @@ import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
 
-class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Boolean) {
+class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Boolean, updateTheme: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def build(): Unit = {
-    
     logger.info("Flatmark build started")
     val startAtMillis = System.currentTimeMillis()
     val webDriverHolder = WebDriverHolder()
     val ssrServerPort = NetworkUtils.getFreePort()
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
-    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
+    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
     try generator.generate(siteRootFolder, useCache)
     finally
       flatmarkSsrServer.stop()
@@ -42,7 +41,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     val ssrServerPort = NetworkUtils.getFreePort()
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
-    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder)
+    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
     generator.generate(siteRootFolder, useCache)
     os.watch.watch(
       Seq(siteRootFolder),

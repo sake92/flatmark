@@ -17,6 +17,7 @@ Current design of the project:
   - the `core` is using `ssr` routes to render snippets of code and diagrams
 - `core` contains the core logic of the application, like parsing markdown, templates, rendering diagrams via Selenium etc.
 - `cli` contains the command line interface for the application
+- `swebserver` contains the static files webserver with live reload
 
 
 

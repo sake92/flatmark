@@ -13,31 +13,38 @@ object ThemeResolver {
       themeSource: String,
       localThemesFolder: os.Path,
       themesCacheFolder: os.Path,
-      useCache: Boolean
+      updateTheme: Boolean
   ): os.Path = {
     val parsedUri = java.net.URI.create(themeSource)
-    if parsedUri.getScheme == "http" || parsedUri.getScheme == "https" then {
-      logger.debug(s"Using remote theme from URL: ${themeSource}")
-      val qp = QueryParameterUtils
-        .parseQueryString(parsedUri.getQuery, "utf-8")
-        .asScala
-        .map((k, v) => k -> v.asScala.toSeq)
-        .toMap
-        .parseQueryStringMap[ThemeUrlQP]
-      val themeHash =
-        s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(themeSource)}"
-          .replace("/", "-")
-      val themeRepoFolder = themesCacheFolder / themeHash
-      if os.exists(themeRepoFolder) && useCache then {
-        logger.debug("Theme is already downloaded. Skipping download.")
-      } else {
-        val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
-        logger.info(s"Downloading theme...")
-        // TODO fallback to ssh and api
+    parsedUri.getScheme match {
+      case null =>
+        val folder = localThemesFolder / os.SubPath(themeSource)
+        logger.debug(s"Using local theme folder: ${folder}")
+        if !os.exists(folder) then
+          throw FlatmarkException(s"Local theme folder does not exist. Please create it or use a valid theme URL.")
+        folder
+      case "http" | "https" =>
+        logger.debug(s"Using remote theme from URL: ${themeSource}")
+        val qp = QueryParameterUtils
+          .parseQueryString(parsedUri.getQuery, "utf-8")
+          .asScala
+          .map((k, v) => k -> v.asScala.toSeq)
+          .toMap
+          .parseQueryStringMap[ThemeUrlQP]
+        val themeHash =
+          s"${parsedUri.getScheme}-${parsedUri.getHost}${parsedUri.getPath}-${HashUtils.generate(themeSource)}"
+            .replace("/", "-")
+        val themeRepoFolder = themesCacheFolder / themeHash
         if os.exists(themeRepoFolder) then {
-          os.call(("git", "pull"), cwd = themeRepoFolder)
-          logger.info(s"Pulled latest theme")
+          if updateTheme then
+            logger.info(s"Updating theme from ${themeSource}...")
+            os.call(("git", "pull"), cwd = themeRepoFolder)
+            logger.info(s"Pulled latest theme")
+          else logger.debug(s"Theme is already downloaded. Skipping update.")
         } else {
+          val httpCloneUrl = s"${parsedUri.getScheme}://${parsedUri.getHost}${parsedUri.getPath}.git"
+          logger.info(s"Downloading theme...")
+          // TODO fallback to ssh and api
           os.makeDir.all(themesCacheFolder)
           os.call(
             ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
@@ -45,26 +52,16 @@ object ThemeResolver {
           )
           logger.info(s"Cloned theme")
         }
-      }
-      themeRepoFolder / os.RelPath(qp.folder)
-    } else if parsedUri.getScheme == null then {
-      val folder = localThemesFolder / os.SubPath(themeSource)
-      logger.debug(s"Using local theme folder: ${folder}")
-      if !os.exists(folder) then
+        themeRepoFolder / os.RelPath(qp.folder)
+      case other =>
         throw FlatmarkException(
-          s"Local theme folder does not exist. Please create it or use a valid theme URL."
+          s"Unsupported theme URL scheme: ${other}. Only 'http', 'https' or no scheme (folder in _themes) are supported."
         )
-      folder
-    } else {
-      throw FlatmarkException(
-        s"Unsupported theme URL scheme: ${parsedUri.getScheme}. Only 'http', 'https' or no scheme (folder in _themes) are supported."
-      )
     }
   }
 
-
   case class ThemeUrlQP(
-                         branch: String = "main",
-                         folder: String = "."
-                       )derives QueryStringRW
+      branch: String = "main",
+      folder: String = "."
+  ) derives QueryStringRW
 }
