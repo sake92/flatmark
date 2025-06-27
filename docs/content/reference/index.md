@@ -7,6 +7,8 @@ theme_props:
   pagination_disabled: false
 ---
 
+# Reference
+
 {%
 set references = [
     { "label": "Configuration", "link": "/reference/configuration.html" },

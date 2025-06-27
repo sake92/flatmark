@@ -354,7 +354,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       // add anchor links to headings
       document.select("""h1,h2,h3,h4,h5,h6""").forEach { elem =>
         val id = elem.attr("id").trim
-        if id.nonEmpty then elem.append(s"""<a href="#${id}" class="flatmark-anchor" aria-label="Anchor">🔗</a>""")
+        if id.nonEmpty then elem.append(s"""<a href="#${id}" class="flatmark-anchor" aria-label="Anchor"> 🔗</a>""")
       }
       document.toString
     }

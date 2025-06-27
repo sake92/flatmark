@@ -8,22 +8,21 @@ title: Configuration
 
 For global site config you edit the `_config.yaml` in the root folder:
 ```yaml
-name: My Cool Blog
-description: My Cool Blog Description
+name: My Cool Blog                      # website name
+description: My Cool Blog Description   # website description
+base_url: https://mydomain.com/subpath  # URL where website will be deployed
+
 theme:
-  source: my_theme
-base_url: https://sake92.github.io/flatmark
+  source: my_theme                      # website theme
 
 categories:
-  # content/blog/ folder
-  blog:
+  blog:                 # content/blog/ folder
     label: Blog
-  # content/docs/ folder
-  docs:
+  docs:                 # content/docs/ folder
     label: Documentation
 
-# default language
-lang: en
+
+lang: en                # default language
 timezone: Europe/Sarajevo
 ...
 ```
