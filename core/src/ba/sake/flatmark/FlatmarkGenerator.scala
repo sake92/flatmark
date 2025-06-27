@@ -13,7 +13,9 @@ import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
+import ba.sake.flatmark.search.SearchLayout
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
+import ba.sake.tupson.{JsonRW, toJson}
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -54,8 +56,10 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
 
     // collect relevant content
     val contentFolder = siteRootFolder / "content"
+
     def shouldSkip(file: os.Path) =
       file.segments.exists(s => s.startsWith(".") || s.startsWith("_"))
+
     val processFiles = mutable.ArrayBuffer.empty[os.Path]
     val translationsLangCodes = mutable.ArrayBuffer.empty[String]
     if os.exists(contentFolder) then
@@ -103,8 +107,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           )
       }
 
-    val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
     val templatedContentFiles = mutable.ArrayBuffer.empty[os.Path]
+    val templatedIndexFiles = mutable.ArrayBuffer.empty[os.Path]
     processFiles.foreach { file =>
       if file.baseName == "index" then templatedIndexFiles += file
       else templatedContentFiles += file
@@ -128,6 +132,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         paginateItems = None
       )
     }.toSeq
+
     // generate index files with pagination and all
     val contentByLangAndCategory: mutable.Map[(String, String), Seq[PageContext]] = (for
       lang <- allUsedLanguages.map(_.toLanguageTag)
@@ -147,9 +152,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         // noop for a top level page without category: about.md etc
       }
     }
-    
+
     // render index files with pagination
-    templatedIndexFiles.foreach { file =>
+    val indexResults = templatedIndexFiles.flatMap { file =>
       val segments = file.relativeTo(contentFolder).segments
       val firstSegment = segments.head
       val key =
@@ -174,11 +179,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         templateHandler,
         paginateItems = Some(categoryItems)
       )
-    }
-    
+    }.toSeq
+
     // copy static files (e.g. images, css..)
     val staticFolder = siteRootFolder / "static"
-    if os.exists(staticFolder) then
+    if os.exists(staticFolder) then {
       os.walk(staticFolder).foreach { file =>
         if os.isFile(file) then
           os.copy(
@@ -190,6 +195,29 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
             followLinks = false
           )
       }
+    }
+
+    // write search files
+    // TODO configurable in _config.yaml
+    val pageSearchEntries = (contentResults ++ indexResults).map { cr =>
+      PageSearchEntry(title = cr.pageContext.title, url = cr.pageContext.url, text = cr.pageContext.text)
+    }
+    os.write.over(
+      outputFolder / "search/entries.json",
+      pageSearchEntries.toJson,
+      createFolders = true
+    )
+    val searchResultsPage = templateHandler.renderFromString(
+      "search/results",
+      SearchLayout.build(siteConfig),
+      Map.empty.asJava,
+      siteConfig.lang
+    )
+    os.write.over(
+      outputFolder / "search/results.html",
+      searchResultsPage,
+      createFolders = true
+    )
 
     logger.info("Site generated successfully")
   } catch {
@@ -208,6 +236,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       paginateItems: Option[Seq[PageContext]]
   ): Seq[RenderResult] = {
     logger.debug(s"Rendering templated file: ${file}")
+    val baseUrl = siteConfig.base_url.getOrElse("")
     val contentTemplateRaw = os.read(file)
     val pageConfig = parseConfig(file, contentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
@@ -223,19 +252,18 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         val pageSize = 10
         val paginatedItems = allItems.grouped(pageSize).toSeq
         for (paginatedItemsGroup, i) <- paginatedItems.zipWithIndex yield {
-          def rootRelPath(pageNum: Int): os.RelPath = {
+          def rootRelPath(pageNum: Int): String = {
             val pageNumSuffix = if pageNum == 1 then "" else s"-${pageNum}"
-            os.RelPath(
-              if fileRelPath.segments.length == 1 then s"${file.baseName}${pageNumSuffix}.${fileExtension}"
-              else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
-            )
+            if fileRelPath.segments.length == 1 then s"${file.baseName}${pageNumSuffix}.${fileExtension}"
+            else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
           }
           val contentContext = templateContext(
             languages,
             locale,
             templateConfig,
             defaultLayout = "index",
-            rootRelPath,
+            rootRelPath = n => os.RelPath(rootRelPath(n)),
+            getUrl = n => s"${baseUrl}/${rootRelPath(n)}",
             paginatedItemsGroup,
             currentPage = i + 1,
             pageSize = pageSize,
@@ -252,17 +280,17 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           )
         }
       case _ =>
-        val rootRelPath = os.RelPath(
+        val rootRelPath =
           if fileRelPath.segments.length == 1 then s"${file.baseName}.${fileExtension}"
           else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.${fileExtension}"
-        )
         val defaultLayout = if paginateItems.isDefined then "index" else "page"
         val contentContext = templateContext(
           languages,
           locale,
           templateConfig,
           defaultLayout = defaultLayout,
-          _ => rootRelPath,
+          rootRelPath = _ => os.RelPath(rootRelPath),
+          _ => s"${baseUrl}/${rootRelPath}",
           Seq.empty,
           currentPage = 0,
           pageSize = 0,
@@ -298,10 +326,10 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val fileRelPath = file.relativeTo(contentFolder)
     val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext, locale)
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
+    val jsoupDocument = Jsoup.parse(contentHtml)
 
     val toc = locally {
-      val document = Jsoup.parse(contentHtml)
-      val headingsTree = HeadingHierarchyExtractor.extract(document)
+      val headingsTree = HeadingHierarchyExtractor.extract(jsoupDocument)
       def toTocItem(heading: HeadingHierarchyExtractor.Heading): TocItemContext =
         TocItemContext(
           heading.level,
@@ -316,6 +344,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     val layoutContext = contentContext.copy(
       page = contentContext.page.copy(
         content = contentHtml,
+        text = jsoupDocument.text(),
         toc = toc
       )
     )
@@ -356,6 +385,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       templateConfig: TemplateConfig,
       defaultLayout: String,
       rootRelPath: Int => os.RelPath,
+      getUrl: Int => String,
       items: Seq[PageContext],
       currentPage: Int,
       pageSize: Int,
@@ -395,10 +425,12 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         layout = templateConfig.page.layout.getOrElse(defaultLayout),
         title = templateConfig.page.title,
         description = templateConfig.page.description,
-        content = "",
+        content = "", // filled in later from markdown-rendered-HTML
+        text = "", // filled in later from markdown-rendered-HTML
         lang = langContext,
         publishDate = templateConfig.page.publish_date.map(_.atZone(templateConfig.site.timezone.toZoneId)),
         rootRelPath = rootRelPath(currentPage),
+        url = getUrl(currentPage),
         themeProps = templateConfig.page.theme_props,
         toc = Seq.empty // filled in later from markdown-rendered-HTML
       ),
@@ -408,7 +440,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
           items = items,
           totalItems = totalItems,
           pageSize = pageSize,
-          rootRelPath = rootRelPath
+          getUrl = getUrl
         )
       )
     )
@@ -420,3 +452,9 @@ case class RenderResult(
 )
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
+
+case class PageSearchEntry(
+    title: String,
+    url: String,
+    text: String
+) derives JsonRW

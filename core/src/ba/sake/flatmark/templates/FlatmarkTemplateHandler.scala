@@ -48,4 +48,11 @@ class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: 
     writer.toString
   }
 
+  def renderFromString(templateName: String, templateValue: String, context: ju.Map[String, Object], locale: Locale): String = {
+    logger.debug(s"Rendering '${templateName}'")
+    val compiledTemplate = engine.getLiteralTemplate(templateValue)
+    val writer = new StringWriter()
+    compiledTemplate.evaluate(writer, context, locale)
+    writer.toString
+  }
 }

@@ -30,6 +30,7 @@ case class SiteContext(
     Map(
       "name" -> name,
       "description" -> description,
+      "base_url" -> baseUrl.orNull, // Use null if baseUrl is None
       "langs" -> langs.map(_.toPebbleContext).asJava,
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
@@ -78,9 +79,11 @@ case class PageContext(
     title: String,
     description: String,
     content: String,
+    text: String, // Raw text content, useful for search indexing
     lang: LanguageContext,
     publishDate: Option[java.time.ZonedDateTime],
     rootRelPath: os.RelPath,
+    url: String,
     themeProps: Map[String, Any],
     toc: Seq[TocItemContext]
     // TODO summary: String = "", // Optional summary field
@@ -93,13 +96,14 @@ case class PageContext(
       "content" -> content,
       "lang" -> lang.toPebbleContext,
       "publish_date" -> publishDate.orNull,
-      "url" -> s"/${rootRelPath.segments.mkString("/")}",
+      "rootRelPath" -> rootRelPath.toString,
+      "url" -> url,
       "theme_props" -> themeProps.asJava,
       "toc" -> toc.map(_.toPebbleContext).asJava
     ).asJava
 
   override def toString: String =
-    s"PageContext(layout=$layout, title=$title, description=$description, content=${content.take(20)}..., rootRelPath=$rootRelPath)"
+    s"PageContext(layout=$layout, title=$title, description=$description, content=${content.take(20)}..., url=$url)"
 }
 
 case class PaginatorContext(
@@ -107,7 +111,7 @@ case class PaginatorContext(
     items: Seq[PageContext],
     totalItems: Int,
     pageSize: Int,
-    rootRelPath: Int => os.RelPath
+    getUrl: Int => String
 ) {
   private val totalPages =
     if pageSize == 0 then 1 // Avoid division by zero
@@ -126,8 +130,8 @@ case class PaginatorContext(
       "next" -> Integer.valueOf(currentPage + 1),
       "has_prev" -> Boolean.box(hasPrev),
       "has_next" -> Boolean.box(hasNext),
-      "prev_url" -> s"/${rootRelPath(currentPage - 1).segments.mkString("/")}",
-      "next_url" -> s"/${rootRelPath(currentPage + 1).segments.mkString("/")}"
+      "prev_url" -> getUrl(currentPage - 1),
+      "next_url" -> getUrl(currentPage + 1)
     ).asJava
 }
 
