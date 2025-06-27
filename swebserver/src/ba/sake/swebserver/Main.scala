@@ -19,8 +19,8 @@ object Main {
       port: Int = 5555
   ): Unit = {
     val baseFolder = Paths.get(directory).toAbsolutePath
-    val resourceManager = new PathResourceManager(baseFolder)
-    val fileHandler = SwebserverFileHandler(os.Path(baseFolder), host, port, ResourceHandler(resourceManager))
+    val resourceHandler = ResourceHandler(new PathResourceManager(baseFolder))
+    val fileHandler = SwebserverFileHandler(os.Path(baseFolder), host, port, resourceHandler)
     val lastChangeAt = new AtomicReference(Instant.now())
     val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(lastChangeAt))
     val server = Undertow
