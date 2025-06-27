@@ -139,7 +139,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       cat <- siteConfig.categories.keys
     yield (lang, cat) -> Seq.empty[PageContext]).to(mutable.Map)
     contentResults.foreach { cr =>
-      val segments = cr.pageContext.rootRelPath.segments
+      val segments = cr.page.rootRelPath.segments
       val firstSegment = segments.head
       val key =
         if translationsLangCodes.contains(firstSegment)
@@ -147,7 +147,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
         else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
       contentByLangAndCategory.get(key) match {
         case Some(contentPages) =>
-          contentByLangAndCategory.update(key, contentPages.appended(cr.pageContext))
+          contentByLangAndCategory.update(key, contentPages.appended(cr.page))
         case None =>
         // noop for a top level page without category: about.md etc
       }
@@ -200,7 +200,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     // write search files
     // TODO configurable in _config.yaml
     val pageSearchEntries = (contentResults ++ indexResults).map { cr =>
-      SearchEntry(title = cr.pageContext.title, url = cr.pageContext.url, text = cr.pageContext.text)
+      SearchEntry(title = cr.page.title, url = cr.page.url, text = cr.page.text)
     }
     os.write.over(
       outputFolder / "search/entries.json",
@@ -223,7 +223,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler,
       paginateItems: Option[Seq[PageContext]]
-  ): Seq[RenderResult] = {
+  ): Seq[TemplateContext] = {
     logger.debug(s"Rendering templated file: ${file}")
     val baseUrl = siteConfig.base_url.getOrElse("")
     val contentTemplateRaw = os.read(file)
@@ -307,7 +307,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler,
       locale: Locale
-  ): RenderResult = {
+  ): TemplateContext = {
     // 1. we first render the content file with basic context (page title, description, etc.)
     // 2. then we feed it to markdown renderer to convert markdown to HTML
     // 3. and finally we render the layout with the content HTML
@@ -365,7 +365,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
       createFolders = true
     )
     logger.debug(s"Rendered templated file: ${file}")
-    RenderResult(layoutContext.page)
+    layoutContext
   }
 
   private def templateContext(
@@ -435,10 +435,6 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     )
   }
 }
-
-case class RenderResult(
-    pageContext: PageContext
-)
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 

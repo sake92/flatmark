@@ -23,7 +23,9 @@ object Main {
       )
       logLevel: LogLevel = LogLevel.INFO,
       @arg(doc = "Skip file cache, default is false")
-      noCache: Flag
+      noCache: Flag,
+      @arg(doc = "Update theme, default is false")
+      updateTheme: Flag
   ): Unit = {
     val siteRootFolder = os.Path(Paths.get(input).toAbsolutePath)
     val logLevelValue = logLevel.julLevel

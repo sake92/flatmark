@@ -6,8 +6,7 @@
     <div id="search-results-content"></div>
 {% endblock %}
 
-{# TODO highlight all matches, not just the first one #}
-{# TODO highlight matches in the text as well #}
+
     
 {% block scripts %}
 
@@ -16,19 +15,20 @@ import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.mjs'
 
 const urlParams = new URLSearchParams(window.location.search);
 const qParam = urlParams.get('q');
+{# TODO put q in input[name=q] value #}
 
 const entries = await fetch('{{ site.base_url }}/search/entries.json').then(r => r.json());
 console.log("All entries: ", entries);
 
 
 const fuse = new Fuse(entries, {
-  keys: [
-    { name: 'title', weight: 2  },
-    { name: 'text',  weight: 1 }
-  ],
-  includeMatches: true,
-  minMatchCharLength: 2,
-	 threshold: 0.5,
+    keys: [
+        { name: 'title', weight: 2  },
+        { name: 'text',  weight: 1 }
+    ],
+    includeMatches: true,
+    minMatchCharLength: 2,
+    threshold: 0.5,
 });
 
 const searchRes = fuse.search(qParam);
@@ -47,6 +47,8 @@ if (searchRes.length === 0) {
     }).join("");
 }
 
+{# TODO highlight all matches, not just the first one #}
+{# TODO highlight matches in the text as well #}
 function highlightMatches(text, matches) {
    if (matches.length === 0) return text;
    // only the first match is highlighted
