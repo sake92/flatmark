@@ -21,6 +21,7 @@ case class SiteContext(
     description: String,
     baseUrl: Option[String],
     langs: Seq[LanguageContext],
+    search: SearchContext,
     categories: ListMap[String, CategoryContext],
     tags: ListMap[String, TagContext],
     codeHighlight: CodeHighlightContext,
@@ -35,7 +36,7 @@ case class SiteContext(
       "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
       "code_highlight" -> codeHighlight.toPebbleContext,
-      "math_highlight" -> mathHighlight.toPebbleContext,
+      "math_highlight" -> mathHighlight.toPebbleContext
     ).asJava
 }
 
@@ -52,18 +53,25 @@ case class LanguageContext(
     ).asJava
 }
 
-case class CodeHighlightContext(
-                                enabled: Boolean = true
-                              ) {
+case class SearchContext(
+                                 enabled: Boolean = true
+                               ) {
   def toPebbleContext: java.util.Map[String, Object] =
-    Map(      "enabled" -> Boolean.box(enabled)    ).asJava
+    Map("enabled" -> Boolean.box(enabled)).asJava
+}
+
+case class CodeHighlightContext(
+    enabled: Boolean = true
+) {
+  def toPebbleContext: java.util.Map[String, Object] =
+    Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
 case class MathHighlightContext(
-                                enabled: Boolean = true
-                              ){
+    enabled: Boolean = true
+) {
   def toPebbleContext: java.util.Map[String, Object] =
-    Map(      "enabled" -> Boolean.box(enabled)    ).asJava
+    Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
 case class CategoryContext(
@@ -163,6 +171,6 @@ case class TocItemContext(
       "children" -> children.map(_.toPebbleContext).asJava
     ).asJava
 
-  override def toString: String = 
+  override def toString: String =
     ("  " * level) + s"<h${level}>${title}\n" + children.mkString
 }

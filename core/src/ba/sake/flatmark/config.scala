@@ -24,6 +24,7 @@ case class SiteConfig(
     lang: Locale = Locale.ENGLISH, // Default language
     timezone: TimeZone = TimeZone.getDefault,
     theme: ThemeConfig = ThemeConfig(),
+    search: SearchConfig = SearchConfig(),
     categories: ListMap[String, CategoryConfig] = ListMap.empty,
     tags: ListMap[String, TagConfig] = ListMap.empty,
     code_highlight: CodeHighlightConfig = CodeHighlightConfig(),
@@ -32,6 +33,10 @@ case class SiteConfig(
 
 case class ThemeConfig(
     source: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
+    enabled: Boolean = true
+) derives YamlCodec
+
+case class SearchConfig(
     enabled: Boolean = true
 ) derives YamlCodec
 

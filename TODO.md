@@ -1,10 +1,12 @@
 
 # content
 
+- highlight active category link
 - translation_url filter
 - tabbed content e.g. windows/linux/mac
 - RSS
 - page image for preview
+- _data/my_stuff.yaml files..
 - nifty features like:
   - code blocks with line numbers
   - code blocks with copy button
@@ -32,6 +34,10 @@
 ## Migrating from other platforms
 - import from wordpress, jekyll itd
 
-
+## themes
+Try copying the themes from:
+- https://jekyll-themes.com/
+- https://github.com/sharu725/online-cv/tree/master
+- https://jamstackthemes.dev/
 
 

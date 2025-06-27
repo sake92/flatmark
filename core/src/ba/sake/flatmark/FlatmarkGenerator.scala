@@ -408,6 +408,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         description = templateConfig.site.description,
         baseUrl = templateConfig.site.base_url,
         langs = langContexts,
+        search = SearchContext(templateConfig.site.search.enabled),
         categories = templateConfig.site.categories.map { case (key, value) =>
           key -> CategoryContext(value.label, value.description)
         },
