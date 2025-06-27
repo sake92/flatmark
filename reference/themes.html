@@ -53,9 +53,11 @@
     <br>
     It is based on <a href="https://picocss.com/docs/conditional">PicoCSS</a>.</p>
    <p>You can use a different theme by setting it in the <code>_config.yaml</code> file:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span> <span class="hljs-string">my_local_theme</span>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">my_local_theme</span>
 <span class="hljs-comment"># or</span>
-<span class="hljs-attr">theme:</span> <span class="hljs-string">https://github.com/sake92/flatmark?branch=main&amp;folder=a_folder</span>
+<span class="hljs-attr">theme:</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">https://github.com/sake92/flatmark?branch=main&amp;folder=a_folder</span>
 </code></pre>
    <p>In the first case, the theme is taken from the local <code>_themes/my_local_theme</code> folder.</p>
    <p>In the second case, it is downloaded from the GitHub repository, from a specific branch (default is <code>main</code>), and a specific folder (default is repo root <code>/</code>).</p>
