@@ -13,7 +13,7 @@ import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
 import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
 import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
 import ba.sake.flatmark.math.FlatmarkMathRenderer
-import ba.sake.flatmark.search.{SearchEntry, SearchResultLayout}
+import ba.sake.flatmark.search.SearchEntry
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
 
@@ -205,28 +205,6 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder) 
     os.write.over(
       outputFolder / "search/entries.json",
       pageSearchEntries.toJson,
-      createFolders = true
-    )
-    val searchResultsPage = templateHandler.renderFromString(
-      "search/results",
-      SearchResultLayout.build(siteConfig),
-      templateContext(
-        allUsedLanguages,
-        siteConfig.lang,
-        TemplateConfig(siteConfig, PageConfig(title = "Search Results")),
-        defaultLayout = "page",
-        rootRelPath = _ => os.RelPath("search/results.html"),
-        getUrl = _ => "",
-        Seq.empty,
-        currentPage = 1,
-        pageSize = 1,
-        totalItems = 1
-      ).toPebbleContext,
-      siteConfig.lang
-    )
-    os.write.over(
-      outputFolder / "search/results.html",
-      searchResultsPage,
       createFolders = true
     )
 

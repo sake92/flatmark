@@ -1,9 +1,6 @@
 
-
-
 # content
 
-- static search
 - translation_url filter
 - tabbed content e.g. windows/linux/mac
 - RSS
