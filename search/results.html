@@ -1,0 +1,76 @@
+
+
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="description" content="">
+    <title>Search Results</title>
+    <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+    <link rel="stylesheet" href="/styles/default.css">
+</head>
+<body>
+
+
+<header class="pico container">
+    <nav>
+        <ul>
+            <li><a href="">Home</a></li>
+        </ul>
+        <ul><li><form action="/search/results.html" method="GET"><input name="q" type="search" placeholder="Search"></form></li></ul>
+        <ul>
+                    
+                    </ul>
+    </nav>
+</header>
+    
+<main class="pico container">
+    <div class="grid">
+        <div>    
+</div>
+        <div> </div>
+        <div> </div>
+    </div>
+    
+        <div id="search-results-content"></div>
+</main>
+
+
+<footer class="pico container">
+        </footer>
+
+<script type="module">
+import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@7.1.0/dist/fuse.mjs'
+
+const urlParams = new URLSearchParams(window.location.search);
+const qParam = urlParams.get('q');
+
+const entries = await fetch('https://sake92.github.io/flatmark/search/entries.json').then(r => r.json());
+console.log("Entries:", entries);
+
+
+const fuse = new Fuse(entries, {
+  keys: [ "title", "text" ]
+});
+
+const searchRes = fuse.search(qParam);
+console.log("Search results for:", qParam, searchRes);
+const searchResultsContentElem = document.getElementById("search-results-content");
+if (searchRes.length === 0) {
+    document.getElementById("search-results-content").innerHTML = `<p>No results found for <strong>${qParam}</strong>.</p>`;
+} else {
+    searchResultsContentElem.innerHTML = searchRes.map(r => {
+    const page = r.item;
+    return `<div class="search-result-item">
+        <h2><a href="${page.url}">${page.title}</a></h2>
+        <p>${page.text.substring(0, 200)}</p>
+      </div>`;
+    }).join("");
+}
+</script>
+
+</body>
+</html>
