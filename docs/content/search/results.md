@@ -1,3 +1,3 @@
 ---
-layout: search-results
+layout: search-results.html
 ---
