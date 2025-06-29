@@ -24,7 +24,7 @@ class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: 
   private val jinjava = new Jinjava()
   jinjava.setResourceLocator(
     new CascadingResourceLocator(
-      resourceFolders.map(_.wrapped.toFile).map(new FileLocator(_))*
+      resourceFolders.filter(os.exists).map(_.wrapped.toFile).map(new FileLocator(_))*
     )
   )
 
