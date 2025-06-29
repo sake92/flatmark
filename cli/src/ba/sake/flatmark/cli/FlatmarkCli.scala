@@ -36,6 +36,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     logger.info(s"Flatmark build finished in ${totalSeconds} s")
   }
 
+  // TODO handle generation errors, and exit code accordingly
   def serve(): Unit = {
     logger.info("Flatmark serve started")
     val webDriverHolder = WebDriverHolder()

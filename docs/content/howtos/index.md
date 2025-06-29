@@ -8,21 +8,16 @@ theme_props:
 
 ## How to make a series of tutorials?
 
+{# we need {% raw %} for first pass (content) 
+and {{ '{%' }} for second (layout) #}
 ```markdown
 Tutorials:
-{% verbatim %}
-{%
-set tutorials = [
+{% raw %}
+{{ '{%' }} set tutorials = [
     { "label": "My tutorial 1", "link": "/tutorials/tutorial1.html" },
     { "label": "My tutorial 2", "link": "/tutorials/tutorial2.html" }
-]
-%}
-
-
-{% for tutorial in tutorials %}
-- [{{ tutorial.label }}]({{ tutorial.link }})
-{% endfor %}
-{% endverbatim  %}
+] %}
+{% endraw  %}
 ```
 
 
@@ -36,20 +31,20 @@ set tutorials = [
 ### Can't add content to a template that extends another template
 When you extend a template:
 ```markdown
-{% verbatim %}
-{% extends "base" %}
+{% raw %}
+{{ '{%' }} extends "base.html" %}
 
-{% block title %}
-    {{page.title}}
-{% endblock %}
+{{ '{%' }} block title %}
+    {{ '{{' }}page.title}}
+{{ '{%' }} endblock %}
 
 ---
 cant add this!!!
 
-{% block hack %}
+{{ '{%' }} block hack %}
     cant add this either!!!
-{% endblock %}
-{% endverbatim  %}
+{{ '{%' }} endblock %}
+{% endraw  %}
 ```
 
 note that **you can only override blocks that are defined in the base template**,  

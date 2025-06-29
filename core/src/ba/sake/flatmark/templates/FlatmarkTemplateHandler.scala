@@ -33,7 +33,7 @@ class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: 
       themeFolder.toSeq.map(_ / "_layouts")
 
   def render(templateName: String, context: ju.Map[String, Object], locale: Locale): String = {
-    logger.debug(s"Rendering '${templateName}'")
+    logger.debug(s"Rendering '${templateName}' with context: ${context}")
     val templatePath = locally {
       layoutLocations.map(_ / os.RelPath(templateName)).find(os.exists).getOrElse {
         throw FlatmarkException(s"Template '$templateName' not found in content/ or _layouts/ or theme _layouts/.")
