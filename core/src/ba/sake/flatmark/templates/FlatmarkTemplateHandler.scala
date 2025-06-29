@@ -1,68 +1,47 @@
 package ba.sake.flatmark.templates
 
-import java.io.StringWriter
 import java.util as ju
 import java.util.Locale
-import scala.jdk.CollectionConverters.*
 import org.slf4j.LoggerFactory
-import io.pebbletemplates.pebble.PebbleEngine
-import io.pebbletemplates.pebble.loader.DelegatingLoader
-import ba.sake.flatmark.templates.i18n.I18nExtension
+import com.hubspot.jinjava.Jinjava
+import com.hubspot.jinjava.loader.{CascadingResourceLocator, FileLocator}
+import ba.sake.flatmark.{FlatmarkException, FrontMatterUtils}
 
 class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: os.Path, themeFolder: Option[os.Path]) {
 
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
-  private val engine = locally {
-    // local layouts,includes
-    val layoutsLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
-    layoutsLoader.setPrefix("_layouts")
-    layoutsLoader.setSuffix(".peb")
-    val includesLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
-    includesLoader.setPrefix("_includes")
-    includesLoader.setSuffix(".peb")
-    val contentLoader = new YamlSkippingFileLoader(siteRootFolder.wrapped)
-    contentLoader.setPrefix("content")
-    val rootLoaders = List(layoutsLoader, includesLoader, contentLoader)
-    // theme layouts,includes
-    val themeLoaders = themeFolder.toList.flatMap { path =>
-      val themeLayoutsLoader = new YamlSkippingFileLoader(path.wrapped)
-      themeLayoutsLoader.setPrefix("_layouts")
-      themeLayoutsLoader.setSuffix(".peb")
-      val themeIncludesLoader = new YamlSkippingFileLoader(path.wrapped)
-      themeIncludesLoader.setPrefix("_includes")
-      themeIncludesLoader.setSuffix(".peb")
-      List(themeLayoutsLoader, themeIncludesLoader)
-    }
-    val loader = new DelegatingLoader(
-      (rootLoaders ++ themeLoaders).asJava
+  private val resourceFolders = Seq(
+    siteRootFolder / "_layouts",
+    siteRootFolder / "_includes"
+  ) ++ themeFolder.toSeq.flatMap { tf =>
+    Seq(
+      tf / "_layouts",
+      tf / "_includes"
     )
-    new PebbleEngine.Builder()
-      .loader(loader)
-      .registerExtensionCustomizer(e => FlatmarkExtensionCustomizer(e))
-      .extension(I18nExtension(flatmarkClassLoader))
-      .autoEscaping(false)
-      .build()
   }
+
+  private val jinjava = new Jinjava()
+  jinjava.setResourceLocator(
+    new CascadingResourceLocator(
+      resourceFolders.map(_.wrapped.toFile).map(new FileLocator(_))*
+    )
+  )
+
+  private val layoutLocations =
+    Seq(siteRootFolder / "content", siteRootFolder / "_layouts") ++
+      themeFolder.toSeq.map(_ / "_layouts")
 
   def render(templateName: String, context: ju.Map[String, Object], locale: Locale): String = {
     logger.debug(s"Rendering '${templateName}'")
-    val compiledTemplate = engine.getTemplate(templateName)
-    val writer = new StringWriter()
-    compiledTemplate.evaluate(writer, context, locale)
-    writer.toString
+    val templatePath = locally {
+      layoutLocations.map(_ / os.RelPath(templateName)).find(os.exists).getOrElse {
+        throw FlatmarkException(s"Template '$templateName' not found in content/ or _layouts/ or theme _layouts/.")
+      }
+    }
+    val rawTemplate = os.read(templatePath)
+    val (_, template) = FrontMatterUtils.extract(rawTemplate)
+    jinjava.render(template, context)
   }
 
-  def renderFromString(
-      templateName: String,
-      templateValue: String,
-      context: ju.Map[String, Object],
-      locale: Locale
-  ): String = {
-    logger.debug(s"Rendering '${templateName}'")
-    val compiledTemplate = engine.getLiteralTemplate(templateValue)
-    val writer = new StringWriter()
-    compiledTemplate.evaluate(writer, context, locale)
-    writer.toString
-  }
 }

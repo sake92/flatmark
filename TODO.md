@@ -14,6 +14,7 @@
   - code blocks with download button
   - https://welpo.github.io/tabi/blog/shortcodes/
 
+- sass support
 
 # flatmark init
 - command to scaffold a new site

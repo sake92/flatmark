@@ -1,5 +1,6 @@
 package ba.sake.flatmark
 
+import java.util as ju
 import scala.collection.immutable.ListMap
 import scala.jdk.CollectionConverters.*
 
@@ -8,11 +9,11 @@ case class TemplateContext(
     page: PageContext,
     paginator: Option[PaginatorContext] = None
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
-      "site" -> site.toPebbleContext,
-      "page" -> page.toPebbleContext,
-      "paginator" -> paginator.map(_.toPebbleContext).getOrElse(java.util.Collections.emptyMap())
+      "site" -> site.toJavaContext,
+      "page" -> page.toJavaContext,
+      "paginator" -> paginator.map(_.toJavaContext).getOrElse(ju.Collections.emptyMap())
     ).asJava
 }
 
@@ -25,18 +26,20 @@ case class SiteContext(
     categories: ListMap[String, CategoryContext],
     tags: ListMap[String, TagContext],
     codeHighlight: CodeHighlightContext,
-    mathHighlight: MathHighlightContext
+    mathHighlight: MathHighlightContext,
+    data: ju.Map[String, Object]
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "name" -> name,
       "description" -> description,
       "base_url" -> baseUrl.orNull, // Use null if baseUrl is None
-      "langs" -> langs.map(_.toPebbleContext).asJava,
-      "categories" -> categories.map { case (key, value) => key -> value.toPebbleContext }.asJava,
-      "tags" -> tags.map { case (key, value) => key -> value.toPebbleContext }.asJava,
-      "code_highlight" -> codeHighlight.toPebbleContext,
-      "math_highlight" -> mathHighlight.toPebbleContext
+      "langs" -> langs.map(_.toJavaContext).asJava,
+      "categories" -> categories.map { case (key, value) => key -> value.toJavaContext }.asJava,
+      "tags" -> tags.map { case (key, value) => key -> value.toJavaContext }.asJava,
+      "code_highlight" -> codeHighlight.toJavaContext,
+      "math_highlight" -> mathHighlight.toJavaContext,
+      "data" -> data
     ).asJava
 }
 
@@ -45,7 +48,7 @@ case class LanguageContext(
     label: String,
     url: String
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "code" -> code,
       "label" -> label,
@@ -56,21 +59,21 @@ case class LanguageContext(
 case class SearchContext(
                                  enabled: Boolean = true
                                ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
 case class CodeHighlightContext(
     enabled: Boolean = true
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
 case class MathHighlightContext(
     enabled: Boolean = true
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
@@ -78,7 +81,7 @@ case class CategoryContext(
     label: String,
     description: String = ""
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "label" -> label,
       "description" -> description
@@ -89,7 +92,7 @@ case class TagContext(
     label: String,
     description: String = ""
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "label" -> label,
       "description" -> description
@@ -110,18 +113,18 @@ case class PageContext(
     toc: Seq[TocItemContext]
     // TODO summary: String = "", // Optional summary field
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "layout" -> layout,
       "title" -> title,
       "description" -> description,
       "content" -> content,
-      "lang" -> lang.toPebbleContext,
+      "lang" -> lang.toJavaContext,
       "publish_date" -> publishDate.orNull,
       "rootRelPath" -> rootRelPath.toString,
       "url" -> url,
       "theme_props" -> themeProps.asJava,
-      "toc" -> toc.map(_.toPebbleContext).asJava
+      "toc" -> toc.map(_.toJavaContext).asJava
     ).asJava
 
   override def toString: String =
@@ -141,9 +144,9 @@ case class PaginatorContext(
   private val hasNext: Boolean = currentPage < totalPages
   private val hasPrev: Boolean = currentPage > 1
 
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
-      "items" -> items.map(_.toPebbleContext).asJava,
+      "items" -> items.map(_.toJavaContext).asJava,
       "per_page" -> Integer.valueOf(pageSize),
       "total_items" -> Integer.valueOf(totalItems),
       "total_pages" -> Integer.valueOf(totalPages),
@@ -163,12 +166,12 @@ case class TocItemContext(
     url: String,
     children: Seq[TocItemContext]
 ) {
-  def toPebbleContext: java.util.Map[String, Object] =
+  def toJavaContext: ju.Map[String, Object] =
     Map(
       "level" -> Integer.valueOf(level),
       "title" -> title,
       "url" -> url,
-      "children" -> children.map(_.toPebbleContext).asJava
+      "children" -> children.map(_.toJavaContext).asJava
     ).asJava
 
   override def toString: String =

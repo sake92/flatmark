@@ -4,14 +4,17 @@
         <ul>
             <li><a href="{{ page.lang.url }}">Home</a></li>
         </ul>
+        {# TODO search optional #}
         <ul><li><form action="{{ site.base_url }}/search/results.html" method="GET"><input name="q" type="search" placeholder="Search"></form></li></ul>
         <ul>
-            {% for cat in site.categories %}
-                {% if page.lang.url == "/" %}
-                <li><a href="/{{ cat.key }}">{{ cat.value.label }}</a></li>
+            
+            {% for catKey, catValue in site.categories.items() %}
+            {% if page.lang.url == "/" %}
+                <li><a href="/{{ catKey }}">{{ catValue.label }}</a></li>
                 {% else %}
-                <li><a href="{{ page.lang.url }}/{{ cat.key }}">{{ cat.value.label }}</a></li>
+                <li><a href="{{ page.lang.url }}/{{ catKey }}">{{ catValue.label }}</a></li>
                 {% endif %}
+                
             {% endfor %}
         
             {% if site.langs|length > 1 %}

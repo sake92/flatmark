@@ -16,6 +16,7 @@ import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.search.SearchEntry
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
+import YamlInstances.given
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, updateTheme: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -53,6 +54,20 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         throw FlatmarkException(s"Invalid site config in file: ${siteConfigFile}. Expected SiteConfig format.", error)
     }
     logger.debug(s"Site configuration: ${siteConfig}")
+
+    // read _data files
+    val dataFolder = siteRootFolder / "_data"
+    val dataYamls = if os.exists(dataFolder) then {
+      val dataYamlFiles = os.list(dataFolder).filter(_.ext == "yaml").filter(os.isFile(_))
+      dataYamlFiles.map { file =>
+        val yamlContent = os.read(file)
+        if yamlContent.isBlank then Map.empty
+        val yaml = yamlContent.as[Node].getOrElse {
+          throw FlatmarkException(s"Invalid YAML format in file: ${file}. Expected Map[String, Node].")
+        }
+        file.baseName -> yaml
+      }.toMap
+    } else Map.empty
 
     // collect relevant content
     val contentFolder = siteRootFolder / "content"
@@ -134,7 +149,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
-        paginateItems = None
+        paginateItems = None,
+        dataYamls = dataYamls
       )
     }.toSeq
 
@@ -182,7 +198,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
-        paginateItems = Some(categoryItems)
+        paginateItems = Some(categoryItems),
+        dataYamls = dataYamls
       )
     }.toSeq
 
@@ -227,7 +244,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       outputFolder: os.Path,
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler,
-      paginateItems: Option[Seq[PageContext]]
+      paginateItems: Option[Seq[PageContext]],
+      dataYamls: Map[String, Node]
   ): Seq[TemplateContext] = {
     logger.debug(s"Rendering templated file: ${file}")
     val baseUrl = siteConfig.base_url.getOrElse("")
@@ -255,13 +273,14 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
             languages,
             locale,
             templateConfig,
-            defaultLayout = "index",
+            defaultLayout = "index.html",
             rootRelPath = n => os.RelPath(rootRelPath(n)),
             getUrl = n => s"${baseUrl}/${rootRelPath(n)}",
             paginatedItemsGroup,
             currentPage = i + 1,
             pageSize = pageSize,
-            totalItems = allItems.length
+            totalItems = allItems.length,
+            dataYamls = dataYamls
           )
           renderTemplatedFileSingle(
             contentFolder,
@@ -277,7 +296,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         val rootRelPath =
           if fileRelPath.segments.length == 1 then s"${file.baseName}.${fileExtension}"
           else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.${fileExtension}"
-        val defaultLayout = if paginateItems.isDefined then "index" else "page"
+        val defaultLayout = if paginateItems.isDefined then "index.html" else "page.html"
         val contentContext = templateContext(
           languages,
           locale,
@@ -288,7 +307,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
           Seq.empty,
           currentPage = 0,
           pageSize = 0,
-          totalItems = 0
+          totalItems = 0,
+          dataYamls = dataYamls
         )
         Seq(
           renderTemplatedFileSingle(
@@ -318,7 +338,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     // 3. and finally we render the layout with the content HTML
 
     val fileRelPath = file.relativeTo(contentFolder)
-    val content = templateHandler.render(fileRelPath.toString, contentContext.toPebbleContext, locale)
+    val content = templateHandler.render(fileRelPath.toString, contentContext.toJavaContext, locale)
     val contentHtml = if file.ext == "md" then markdownRenderer.renderMarkdown(content) else content
     val jsoupDocument = Jsoup.parse(contentHtml)
 
@@ -343,7 +363,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       )
     )
     val finalHtml = locally {
-      val templatedHtml = templateHandler.render(layoutContext.page.layout, layoutContext.toPebbleContext, locale)
+      val templatedHtml = templateHandler.render(layoutContext.page.layout, layoutContext.toJavaContext, locale)
       val document = Jsoup.parse(templatedHtml)
       // prepend base URL to all relative URLs
       layoutContext.site.baseUrl.foreach { baseUrl =>
@@ -383,7 +403,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       items: Seq[PageContext],
       currentPage: Int,
       pageSize: Int,
-      totalItems: Int
+      totalItems: Int,
+      dataYamls: Map[String, Node]
   ): TemplateContext = {
     val (langContexts, langContext) = locally {
       val originalLocale = Locale.getDefault(Locale.Category.DISPLAY)
@@ -401,6 +422,10 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       )
       (res1, res2)
     }
+    
+    val data =  dataYamls.map { case (key, value) =>
+          key -> nodetoJavaContext(value)
+        }.asJava
 
     TemplateContext(
       SiteContext(
@@ -414,7 +439,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         },
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
         codeHighlight = CodeHighlightContext(templateConfig.site.code_highlight.enabled),
-        mathHighlight = MathHighlightContext(templateConfig.site.math_highlight.enabled)
+        mathHighlight = MathHighlightContext(templateConfig.site.math_highlight.enabled),
+        data =data
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),
@@ -439,6 +465,17 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         )
       )
     )
+  }
+
+  private def nodetoJavaContext(node: Node): Object = node match {
+    case sn: Node.ScalarNode =>
+      if sn.tag == Tag.nullTag then null
+      else if sn.tag == Tag.int then Integer.valueOf(sn.value.toInt)
+      else if sn.tag == Tag.float then Double.box(sn.value.toDouble)
+      else if sn.tag == Tag.boolean then Boolean.box(sn.value.toBoolean)
+      else sn.value
+    case mn: Node.MappingNode  => mn.mappings.map { case (key, value) => nodetoJavaContext(key) -> nodetoJavaContext(value) }.asJava
+    case sn: Node.SequenceNode => sn.nodes.map(nodetoJavaContext).asJava
   }
 }
 

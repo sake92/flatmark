@@ -1,5 +1,5 @@
 
-{% extends "base" %}
+{% extends "base.html" %}
 
 {% block title %}
     {{page.title}} | {{site.name}}
@@ -9,7 +9,7 @@
     {{page.content}}
 
     {% if not page.theme_props.pagination_disabled %}
-        {% include "pagination" %}
+        {% include "pagination.html" %}
     {% endif %}
     
 {% endblock %}

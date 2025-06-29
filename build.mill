@@ -83,7 +83,7 @@ object core extends ScalaModule {
     ivy"org.commonmark:commonmark-ext-ins:0.24.0",
     ivy"org.commonmark:commonmark-ext-image-attributes:0.24.0",
     ivy"org.commonmark:commonmark-ext-task-list-items:0.24.0",
-    ivy"io.pebbletemplates:pebble:3.2.4",
+    ivy"com.hubspot.jinjava:jinjava:2.8.0",
     ivy"org.virtuslab::scala-yaml:0.3.0",
     ivy"org.seleniumhq.selenium:selenium-chrome-driver:4.33.0",
     ivy"org.seleniumhq.selenium:selenium-support:4.33.0",

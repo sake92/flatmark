@@ -68,12 +68,12 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     logger.debug("Flatmark server starting...")
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
-    val notFoundHandler = SharafHandler(Routes{
-      case GET -> notFoundPath =>
-        // TODO use 404.html from _site if exists
-        Response.withBody(s"404 Not Found: ${notFoundPath.mkString("/")}")
-          .withStatus(sttp.model.StatusCode.NotFound)
-          .settingHeader("content-type", "text/html")
+    val notFoundHandler = SharafHandler(Routes { case GET -> notFoundPath =>
+      // TODO use 404.html from _site if exists
+      Response
+        .withBody(s"404 Not Found: ${notFoundPath.segments.mkString("/")}")
+        .withStatus(sttp.model.StatusCode.NotFound)
+        .settingHeader("content-type", "text/html")
     })
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
     val fallbackResourceHandler = ResourceHandler(resourceManager, notFoundHandler).setDirectoryListingEnabled(true)
