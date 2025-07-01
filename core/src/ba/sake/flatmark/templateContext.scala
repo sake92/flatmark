@@ -35,6 +35,7 @@ case class SiteContext(
       "description" -> description,
       "base_url" -> baseUrl.orNull, // Use null if baseUrl is None
       "langs" -> langs.map(_.toJavaContext).asJava,
+      "search" -> search.toJavaContext,
       "categories" -> categories.map { case (key, value) => key -> value.toJavaContext }.asJava,
       "tags" -> tags.map { case (key, value) => key -> value.toJavaContext }.asJava,
       "code_highlight" -> codeHighlight.toJavaContext,
@@ -57,14 +58,14 @@ case class LanguageContext(
 }
 
 case class SearchContext(
-                                 enabled: Boolean = true
-                               ) {
+    enabled: Boolean
+) {
   def toJavaContext: ju.Map[String, Object] =
     Map("enabled" -> Boolean.box(enabled)).asJava
 }
 
 case class CodeHighlightContext(
-    enabled: Boolean = true
+    enabled: Boolean
 ) {
   def toJavaContext: ju.Map[String, Object] =
     Map("enabled" -> Boolean.box(enabled)).asJava
@@ -79,7 +80,7 @@ case class MathHighlightContext(
 
 case class CategoryContext(
     label: String,
-    description: String = ""
+    description: String
 ) {
   def toJavaContext: ju.Map[String, Object] =
     Map(
@@ -90,7 +91,7 @@ case class CategoryContext(
 
 case class TagContext(
     label: String,
-    description: String = ""
+    description: String
 ) {
   def toJavaContext: ju.Map[String, Object] =
     Map(
