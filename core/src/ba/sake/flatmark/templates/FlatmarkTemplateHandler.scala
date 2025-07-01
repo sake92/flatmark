@@ -1,5 +1,7 @@
 package ba.sake.flatmark.templates
 
+import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
+
 import java.util as ju
 import java.util.Locale
 import org.slf4j.LoggerFactory
@@ -7,7 +9,9 @@ import com.hubspot.jinjava.Jinjava
 import com.hubspot.jinjava.loader.{CascadingResourceLocator, FileLocator}
 import ba.sake.flatmark.{FlatmarkException, FrontMatterUtils}
 
-class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: os.Path, themeFolder: Option[os.Path]) {
+class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, 
+                              siteRootFolder: os.Path, themeFolder: Option[os.Path],
+                             markdownRenderer: FlatmarkMarkdownRenderer) {
 
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
@@ -26,6 +30,9 @@ class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, siteRootFolder: 
     new CascadingResourceLocator(
       resourceFolders.filter(os.exists).map(_.wrapped.toFile).map(new FileLocator(_))*
     )
+  )
+  jinjava.getGlobalContext.registerFilter(
+    JinjaMarkdownFilter(markdownRenderer)
   )
 
   private val layoutLocations =

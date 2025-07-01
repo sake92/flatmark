@@ -107,7 +107,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       (Array(siteRootFolder / "_i18n") ++ themeFolder.map(_ / "_i18n").toArray).map(_.toIO.toURI.toURL),
       Thread.currentThread.getContextClassLoader
     )
-    val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder, themeFolder)
+    val templateHandler = FlatmarkTemplateHandler(customClassloader, siteRootFolder, themeFolder, markdownRenderer)
 
     // copy theme static files
     themeFolder.foreach { folder =>
