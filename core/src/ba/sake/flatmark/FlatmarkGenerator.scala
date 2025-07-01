@@ -391,9 +391,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         // TODO handle srcset
         val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
         urlAttrs.foreach { attrName =>
-          document.select("""[href^="/"]""").forEach { elem =>
+          document.select(s"""[${attrName}^="/"]""").forEach { elem =>
             val attrValue = elem.attr(attrName)
-            elem.attr("href", baseUrl + attrValue)
+            elem.attr(attrName, baseUrl + attrValue)
           }
         }
       }

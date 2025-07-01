@@ -67,6 +67,12 @@ case class PageConfig(
     theme_props: Map[String, String] = Map.empty
 ) derives YamlCodec
 
+case class PaginationConfig(
+    enabled: Boolean = false,
+    per_page: Int = 10,
+    sort_by: String = "-publish_date"
+) derives YamlCodec
+
 // TODO pass in just YAML
 private[flatmark] def parseConfig(file: os.Path, mdTemplateRaw: String): PageConfig = {
   val (rawYaml, _) = FrontMatterUtils.extract(mdTemplateRaw)
