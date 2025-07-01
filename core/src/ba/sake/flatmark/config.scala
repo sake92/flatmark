@@ -64,6 +64,7 @@ case class PageConfig(
     description: String = "",
     publish_date: Option[LocalDateTime] = None,
     ext: Option[String] = None,
+    pagination: PaginationConfig = PaginationConfig(),
     theme_props: Map[String, String] = Map.empty
 ) derives YamlCodec
 

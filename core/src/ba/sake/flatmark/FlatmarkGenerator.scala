@@ -18,6 +18,7 @@ import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
 import YamlInstances.given
 
+import java.time.{Instant, ZonedDateTime}
 import scala.util.Properties
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, updateTheme: Boolean) {
@@ -160,8 +161,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     val allUsedLanguages =
       translationsLangCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
     val contentResults = templatedContentFiles.flatMap { file =>
+      val contentTemplateRaw = os.read(file)
+      val pageConfig = parseConfig(file, contentTemplateRaw)
       renderTemplatedFile(
         siteConfig,
+        pageConfig,
         allUsedLanguages,
         contentFolder = contentFolder,
         file = file,
@@ -201,16 +205,29 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         if translationsLangCodes.contains(firstSegment)
         then (firstSegment, segments(1)) // (lang, category)
         else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
+
+      val contentTemplateRaw = os.read(file)
+      val pageConfig = parseConfig(file, contentTemplateRaw)
+      val sortOrder: Ordering[PageContext] = pageConfig.pagination.sort_by match {
+        case "publish_date" => Ordering.by(_.publishDate.getOrElse(ZonedDateTime.now().minusYears(1000)))
+        case "-publish_date" =>
+          Ordering.by((_: PageContext).publishDate.getOrElse(ZonedDateTime.now().minusYears(1000))).reverse
+        case "title"  => Ordering.by(_.title)
+        case "-title" => Ordering.by((_: PageContext).title).reverse
+        case other =>
+          throw FlatmarkException(
+            s"Unsupported sort order: ${other}. Supported: publish_date, -publish_date, title, -title."
+          )
+      }
       val categoryItems = contentByLangAndCategory
         .getOrElse(
           key,
           contentByLangAndCategory.filter(_._1._1 == key._1).values.flatten.toSeq // by default use all content pages
         )
-        .sortBy(_.publishDate)
-        .reverse
-      // TODO configurable sort
+        .sorted(using sortOrder)
       renderTemplatedFile(
         siteConfig,
+        pageConfig,
         allUsedLanguages,
         contentFolder = contentFolder,
         file = file,
@@ -239,15 +256,17 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     }
 
     // write search files
-    // TODO configurable in _config.yaml
-    val pageSearchEntries = (contentResults ++ indexResults).map { cr =>
-      SearchEntry(title = cr.page.title, url = cr.page.url, text = cr.page.text)
+    if siteConfig.search.enabled then {
+      logger.debug("Generating search entries...")
+      val pageSearchEntries = (contentResults ++ indexResults).map { cr =>
+        SearchEntry(title = cr.page.title, url = cr.page.url, text = cr.page.text)
+      }
+      os.write.over(
+        outputFolder / "search/entries.json",
+        pageSearchEntries.toJson,
+        createFolders = true
+      )
     }
-    os.write.over(
-      outputFolder / "search/entries.json",
-      pageSearchEntries.toJson,
-      createFolders = true
-    )
 
     logger.info("Site generated successfully")
     true
@@ -259,6 +278,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
 
   private def renderTemplatedFile(
       siteConfig: SiteConfig,
+      pageConfig: PageConfig,
       languages: Seq[Locale],
       contentFolder: os.Path,
       file: os.Path,
@@ -270,8 +290,6 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
   ): Seq[TemplateContext] = {
     logger.debug(s"Rendering templated file: ${file}")
     val baseUrl = siteConfig.base_url.getOrElse("")
-    val contentTemplateRaw = os.read(file)
-    val pageConfig = parseConfig(file, contentTemplateRaw)
     val templateConfig = TemplateConfig(siteConfig, pageConfig)
     val fileRelPath = file.relativeTo(contentFolder)
     val fileExtension = pageConfig.ext.getOrElse("html")
@@ -282,8 +300,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     Locale.setDefault(Locale.Category.DISPLAY, locale) // set locale for rendering language names in current language
     paginateItems match {
       case Some(allItems) if allItems.nonEmpty =>
-        val pageSize = 10
-        val paginatedItems = allItems.grouped(pageSize).toSeq
+        val paginatedItems = allItems.grouped(pageConfig.pagination.per_page).toSeq
         for (paginatedItemsGroup, i) <- paginatedItems.zipWithIndex yield {
           def rootRelPath(pageNum: Int): String = {
             val pageNumSuffix = if pageNum == 1 then "" else s"-${pageNum}"
@@ -299,7 +316,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
             getUrl = n => s"${baseUrl}/${rootRelPath(n)}",
             paginatedItemsGroup,
             currentPage = i + 1,
-            pageSize = pageSize,
+            pageSize = pageConfig.pagination.per_page,
             totalItems = allItems.length,
             dataYamls = dataYamls
           )
