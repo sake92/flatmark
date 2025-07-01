@@ -80,12 +80,14 @@ case class MathHighlightContext(
 
 case class CategoryContext(
     label: String,
-    description: String
+    description: String,
+    items: Seq[PageContext]
 ) {
   def toJavaContext: ju.Map[String, Object] =
     Map(
       "label" -> label,
-      "description" -> description
+      "description" -> description,
+      "items" -> items.map(_.toJavaContext).asJava
     ).asJava
 }
 
@@ -133,6 +135,7 @@ case class PageContext(
 }
 
 case class PaginatorContext(
+    enabled: Boolean,
     currentPage: Int,
     items: Seq[PageContext],
     totalItems: Int,
@@ -147,6 +150,7 @@ case class PaginatorContext(
 
   def toJavaContext: ju.Map[String, Object] =
     Map(
+      "enabled" -> Boolean.box(enabled),
       "items" -> items.map(_.toJavaContext).asJava,
       "per_page" -> Integer.valueOf(pageSize),
       "total_items" -> Integer.valueOf(totalItems),

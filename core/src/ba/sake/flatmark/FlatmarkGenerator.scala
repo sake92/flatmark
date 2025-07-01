@@ -19,6 +19,7 @@ import ba.sake.tupson.{JsonRW, toJson}
 import YamlInstances.given
 
 import java.time.{Instant, ZonedDateTime}
+import scala.collection.immutable.ListMap
 import scala.util.Properties
 
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, updateTheme: Boolean) {
@@ -173,6 +174,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         markdownRenderer,
         templateHandler,
         paginateItems = None,
+        categoryContexts = ListMap.empty,
         dataYamls = dataYamls
       )
     }.toSeq
@@ -198,6 +200,15 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     }
 
     // render index files with pagination
+    val categoryContextsPerLang = allUsedLanguages.map { lang =>
+      val categoryContexts = siteConfig.categories.map { case (catKey, catValue) =>
+        val categoryItems = contentByLangAndCategory
+          .getOrElse((lang.toLanguageTag, catKey), Seq.empty)
+        catKey -> CategoryContext(catValue.label, catValue.description, categoryItems)
+      }
+      lang.toLanguageTag -> categoryContexts
+    }.toMap
+
     val indexResults = templatedIndexFiles.flatMap { file =>
       val segments = file.relativeTo(contentFolder).segments
       val firstSegment = segments.head
@@ -235,6 +246,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         markdownRenderer,
         templateHandler,
         paginateItems = Some(categoryItems),
+        categoryContexts = categoryContextsPerLang(key._1), // TODO this might be moved into renderTemplatedFile
         dataYamls = dataYamls
       )
     }.toSeq
@@ -286,6 +298,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       markdownRenderer: FlatmarkMarkdownRenderer,
       templateHandler: FlatmarkTemplateHandler,
       paginateItems: Option[Seq[PageContext]],
+      categoryContexts: ListMap[String, CategoryContext],
       dataYamls: Map[String, Node]
   ): Seq[TemplateContext] = {
     logger.debug(s"Rendering templated file: ${file}")
@@ -318,6 +331,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
             currentPage = i + 1,
             pageSize = pageConfig.pagination.per_page,
             totalItems = allItems.length,
+            categoryContexts,
             dataYamls = dataYamls
           )
           renderTemplatedFileSingle(
@@ -346,6 +360,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
           currentPage = 0,
           pageSize = 0,
           totalItems = 0,
+          categoryContexts,
           dataYamls = dataYamls
         )
         Seq(
@@ -442,6 +457,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       currentPage: Int,
       pageSize: Int,
       totalItems: Int,
+      categoryContexts: ListMap[String, CategoryContext],
       dataYamls: Map[String, Node]
   ): TemplateContext = {
     val (langContexts, langContext) = locally {
@@ -472,9 +488,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         baseUrl = templateConfig.site.base_url,
         langs = langContexts,
         search = SearchContext(templateConfig.site.search.enabled),
-        categories = templateConfig.site.categories.map { case (key, value) =>
-          key -> CategoryContext(value.label, value.description)
-        },
+        categories = categoryContexts,
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
         codeHighlight = CodeHighlightContext(templateConfig.site.code_highlight.enabled),
         mathHighlight = MathHighlightContext(templateConfig.site.math_highlight.enabled),
@@ -495,6 +509,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       ),
       Option.when(items.nonEmpty)(
         PaginatorContext(
+          enabled = templateConfig.page.pagination.enabled,
           currentPage = currentPage,
           items = items,
           totalItems = totalItems,

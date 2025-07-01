@@ -69,7 +69,7 @@ case class PageConfig(
 ) derives YamlCodec
 
 case class PaginationConfig(
-    enabled: Boolean = false,
+    enabled: Boolean = true,
     per_page: Int = 10,
     sort_by: String = "-publish_date"
 ) derives YamlCodec
