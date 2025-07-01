@@ -18,6 +18,8 @@ import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
 import YamlInstances.given
 
+import scala.util.Properties
+
 class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, updateTheme: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
@@ -124,6 +126,23 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
               followLinks = false
             )
         }
+      }
+    }
+
+    // run sass
+    val sassFolder = siteRootFolder / "_sass"
+    if os.exists(sassFolder) then {
+      logger.debug("Compiling Sass files to _site/styles...")
+      val sassExe = if Properties.isWin then "sass.bat" else "sass"
+      var stderr = ""
+      val res = os.call(
+        (sassExe, s"${sassFolder}:${outputFolder}/styles"),
+        cwd = siteRootFolder,
+        stdout = os.ProcessOutput.Readlines(_ => ()),
+        stderr = os.ProcessOutput.Readlines(err => stderr += err)
+      )
+      if res.exitCode != 0 then {
+        logger.error(s"Sass compilation failed with exit code ${res.exitCode}:\n${stderr}")
       }
     }
 
@@ -424,10 +443,10 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       )
       (res1, res2)
     }
-    
-    val data =  dataYamls.map { case (key, value) =>
-          key -> nodetoJavaContext(value)
-        }.asJava
+
+    val data = dataYamls.map { case (key, value) =>
+      key -> nodetoJavaContext(value)
+    }.asJava
 
     TemplateContext(
       SiteContext(
@@ -442,7 +461,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         tags = templateConfig.site.tags.map { case (key, value) => key -> TagContext(value.label, value.description) },
         codeHighlight = CodeHighlightContext(templateConfig.site.code_highlight.enabled),
         mathHighlight = MathHighlightContext(templateConfig.site.math_highlight.enabled),
-        data =data
+        data = data
       ),
       PageContext(
         layout = templateConfig.page.layout.getOrElse(defaultLayout),
@@ -476,7 +495,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       else if sn.tag == Tag.float then Double.box(sn.value.toDouble)
       else if sn.tag == Tag.boolean then Boolean.box(sn.value.toBoolean)
       else sn.value
-    case mn: Node.MappingNode  => mn.mappings.map { case (key, value) => nodetoJavaContext(key) -> nodetoJavaContext(value) }.asJava
+    case mn: Node.MappingNode =>
+      mn.mappings.map { case (key, value) => nodetoJavaContext(key) -> nodetoJavaContext(value) }.asJava
     case sn: Node.SequenceNode => sn.nodes.map(nodetoJavaContext).asJava
   }
 }
