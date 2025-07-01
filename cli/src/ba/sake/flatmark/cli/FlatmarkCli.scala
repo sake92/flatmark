@@ -27,13 +27,18 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
     val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
-    try generator.generate(siteRootFolder, useCache)
-    finally
-      flatmarkSsrServer.stop()
-      webDriverHolder.close()
+    val success =
+      try generator.generate(siteRootFolder, useCache)
+      finally
+        flatmarkSsrServer.stop()
+        webDriverHolder.close()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
-    logger.info(s"Flatmark build finished in ${totalSeconds} s")
+    if success then logger.info(s"Flatmark build finished successfully in ${totalSeconds} s")
+    else {
+      logger.error(s"Flatmark build failed after ${totalSeconds} s")
+      System.exit(1)
+    }
   }
 
   // TODO handle generation errors, and exit code accordingly

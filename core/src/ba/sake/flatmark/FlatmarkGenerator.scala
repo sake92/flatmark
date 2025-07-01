@@ -23,7 +23,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
 
   private val Iso2LanguageCodes = Set(Locale.getISOLanguages*)
 
-  def generate(siteRootFolder: os.Path, useCache: Boolean): Unit = try {
+  def generate(siteRootFolder: os.Path, useCache: Boolean): Boolean = try {
     logger.info(s"Generating site in '${siteRootFolder}'")
     if !os.exists(siteRootFolder) then throw FlatmarkException(s"Site root folder does not exist: ${siteRootFolder}")
     if !os.isDir(siteRootFolder) then throw FlatmarkException(s"Site root is not a folder: ${siteRootFolder}")
@@ -231,9 +231,11 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
     )
 
     logger.info("Site generated successfully")
+    true
   } catch {
     case NonFatal(e) =>
       logger.error("Error during site generation", e)
+      false
   }
 
   private def renderTemplatedFile(

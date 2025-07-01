@@ -4,7 +4,10 @@
 - highlight active category link
 - translation_url filter
 - tabbed content e.g. windows/linux/mac
-- RSS
+- RSS+Atom feeds
+  - one global feed
+  - per language 
+  - per category
 - page image for preview
 - _data/my_stuff.yaml files..
 - nifty features like:

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
     <meta name="description" content="{{ page.description }}">
-    <title>{% block title %} {{site.name}} {% endblock %}</title>
+    <title>{% block title %} {{page.title}} | {{site.name}} {% endblock %}</title>
     <link rel="shortcut icon" href="/images/favicon.png" type="image/png">
     {% if site.code_highlight.enabled %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
