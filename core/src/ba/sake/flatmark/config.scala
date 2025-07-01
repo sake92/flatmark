@@ -32,7 +32,7 @@ case class SiteConfig(
 ) derives YamlCodec
 
 case class ThemeConfig(
-    source: String = "https://github.com/sake92/flatmark?branch=main&folder=themes%2Fdefault",
+    source: String = "https://github.com/sake92/flatmark-themes?branch=main&folder=default",
     enabled: Boolean = true
 ) derives YamlCodec
 
