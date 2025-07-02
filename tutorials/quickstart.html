@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="">
+  <title> Quickstart | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul></ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#quickstart">Quickstart</a>
+         <ul>
+          <li><a href="#installation">Installation</a></li>
+          <li><a href="#usage">Usage</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="quickstart">Quickstart<a href="#quickstart" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="installation">Installation<a href="#installation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Go to the <a href="https://github.com/sake92/flatmark/releases">releases page</a> and download the installer for your platform.</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark --version</span>
+Flatmark CLI 1.2.3
+</code></pre>
+   <h2 id="usage">Usage<a href="#usage" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Make a new folder for your site, e.g. <code>my_site</code>.
+    <br>
+    Then create a new folder in it, called <code>content</code>. Finally inside <code>content</code>, create a new file called <code>index.md</code> with the following content:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># Welcome to Flatmark!</span>
+</code></pre>
+   <p>The structure of your site should look like this:</p>
+   <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
+├─ content<span class="hljs-symbol">/</span>
+│  ├─ index.md
+</code></pre>
+   <p>Now you can run the Flatmark CLI to generate and serve your site locally. Open a terminal, navigate to your <code>my:site</code> folder, and run the following command:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark serve</span>
+</code></pre>
+   <p>Then open your browser and go to <code>http://localhost:5555</code>.
+    <br>
+    You should see your site with the content of <code>index.md</code>.</p>
+   <p>When you make changes to any file, the site will automatically rebuild and reload in the browser.</p>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
