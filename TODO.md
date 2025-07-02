@@ -9,7 +9,6 @@
   - per language 
   - per category
 - page image for preview
-- _data/my_stuff.yaml files..
 - nifty features like:
   - code blocks with line numbers
   - code blocks with copy button

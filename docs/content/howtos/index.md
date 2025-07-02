@@ -1,8 +1,8 @@
 ---
 title: How Tos
 description: How Tos
-theme_props:
-  pagination_disabled: true
+pagination:
+  enabled: false
 ---
 
 

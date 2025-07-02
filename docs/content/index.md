@@ -1,8 +1,8 @@
 ---
 title: Home
 description: Home page
-theme_props:
-  pagination_disabled: true
+pagination:
+  enabled: false
 ---
 
 # Flatmark Documentation
