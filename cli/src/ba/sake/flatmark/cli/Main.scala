@@ -13,6 +13,8 @@ object Main {
   def run(
       @arg(positional = true)
       command: String = "build",
+      @arg(short = 'v', doc = "Print version and exit")
+      version: Flag,
       @arg(short = 'i', doc = "Path to input folder, default is current folder")
       input: String = ".",
       @arg(short = 'h', doc = "Server host, default is localhost")
@@ -36,9 +38,14 @@ object Main {
     LogManager.getLogManager.getLogger("").setLevel(logLevelValue) // set root logger level
     val cli = FlatmarkCli(siteRootFolder, host, port, !noCache.value, updateTheme.value)
     command.toLowerCase match {
-      case "version" => println(getVersion)
-      case "build"   => cli.build()
-      case "serve"   => cli.serve()
+      case _ if version.value =>
+        println(s"Flatmark CLI ${getVersion}")
+      case "version" =>
+        println(getVersion)
+      case "build" =>
+        cli.build()
+      case "serve" =>
+        cli.serve()
       case _ =>
         println(s"Unknown command: $command. Use 'build' or 'serve'.")
         System.exit(1)
