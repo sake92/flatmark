@@ -2,7 +2,7 @@
 title: File Layout
 ---
 
-# File Layout
+# {{page.title}}
 
 ## Content Structure
 
