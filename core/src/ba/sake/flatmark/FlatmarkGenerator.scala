@@ -174,7 +174,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         markdownRenderer,
         templateHandler,
         paginateItems = None,
-        categoryContexts = ListMap.empty,
+        categoryContexts = siteConfig.categories.map { case (catKey, catValue) =>
+          catKey -> CategoryContext(catValue.label, catValue.description, Seq.empty)
+        },
         dataYamls = dataYamls
       )
     }.toSeq
