@@ -13,7 +13,7 @@ val routes = Routes {
         div(id := "result")(
           pre(
             code(cls := s"language-${qp.lang}")(
-              raw(qp.code)
+              qp.code
             )
           )
         ),
@@ -32,7 +32,7 @@ val routes = Routes {
     Response.withBody(
       htmlPage(
         pre(id := "input")(
-          raw(qp.source)
+          qp.source
         ),
         div(id := "result")(),
         script(`type` := "module")(
@@ -70,7 +70,7 @@ val routes = Routes {
       htmlPage(
         div(id := "result")(
           pre(cls := "mermaid")(
-            raw(qp.source)
+            qp.source
           )
         ),
         script(`type` := "module")(

@@ -28,7 +28,7 @@ and a specific folder (default is repo root `/`).
 The folders read from theme are: `static`, `_layouts`, `_includes`, `_i18n`
 
 You can override any file in those folders by mirroring them in your site folder.  
-For example, if you want to override the `default.peb` layout, you can create a `_layouts/default.peb` file in your site folder.
+For example, if you want to override the `page.html` layout, you can create a `_layouts/page.html` file in your site folder.
 
 
 

@@ -32,7 +32,7 @@ layout: search-results.html
 
 
 The default theme will do the rest.
-Note that `search.enabled` must be set to `true` in the `_config.yml` file (default is `true`).
+Note that `search.enabled` must be set to `true` in the `_config.yaml` file (default is `true`).
 
 
 

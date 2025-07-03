@@ -37,27 +37,27 @@ For example, the `content/blog/index.md` would receive `paginator` with all the 
 ## Other
 
 ```bash
-# config
-_config.yaml        <-- global config
+_config.yaml        <-- global site config
 
 _layouts/           <-- templates
-    default.peb       <-- default layout: for index page, about page etc
-    post.peb          <-- layout for posts
+├── base.html         <-- base layout extended by other layouts
+├── index.html        <-- index.md layout
+└── page.html         <-- pages layout
 
-_includes/          <-- snippets/fragments/helpers
-    header.peb        <-- header snippet
-    footer.peb        <-- footer snippet
-    search.peb        <-- search form snippet
-    pagination.peb    <-- pagination snippet
+_includes/          <-- snippets/fragments/helpers/
+├── header.html      <-- header snippet
+├── footer.html      <-- footer snippet
+├── toc.html         <-- table of contents snippet
+└── pagination.html  <-- pagination snippet
 
-_i18n/              <-- translations for the site
-    my_translations.yaml            <-- default language translations
-    my_translations_de.yaml         <-- german translations
+_i18n/                              <-- dynamic translations for the site
+├── my_translations.properties        <-- default language translations
+└── my_translations_de.properties     <-- german translations
 
-_themes/           <-- custom, local themes
-    my_theme/          <-- local theme folder
-        _layouts/         <-- local theme layouts
-        _includes/        <-- local theme includes
+_themes/            <-- custom local themes
+└── my_theme/         <-- local theme folder/
+    ├── _layouts/       <-- local theme layouts
+    └── _includes/      <-- local theme includes
 
 _site/              <-- result of rendering, this will be deployed
 
@@ -69,10 +69,10 @@ Notice that all folders that have prefix `_` or `.` are some kind of configurati
 The `_config.yaml` file is the global configuration file.
 
 The `_layouts/` folder contains templates for the pages.  
-You can override a theme layout by creating a **file with the same name** in the `_layouts/` folder, like `_layouts/page.peb`.
+You can override a theme layout by creating a **file with the same name** in the `_layouts/` folder, like `_layouts/page.html`.
 
 The `_includes/` folder contains reusable snippets, like header, footer, search form, etc.
-You can override a theme include by creating a **file with the same name** in the `_includes/` folder, like `_includes/footer.peb`.
+You can override a theme include by creating a **file with the same name** in the `_includes/` folder, like `_includes/footer.html`.
 
 The `_site/` folder is the output folder, where the rendered files will be placed.
 

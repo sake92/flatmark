@@ -10,7 +10,8 @@ pagination:
 {%
 set tutorials = [
     { "label": "Quickstart", "url": "/tutorials/quickstart.html" },
-    { "label": "Multilingual Site", "url": "/tutorials/multilang.html" }
+    { "label": "Multilingual Site", "url": "/tutorials/multilang.html" },
+    { "label": "Custom Local Theme", "url": "/tutorials/custom_local_theme.html" }
 ]
 %}
 

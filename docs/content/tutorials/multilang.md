@@ -5,11 +5,11 @@ description: Flatmark Multilingual Site tutorial
 
 # {{page.title}}
 
-This tutorial builds on the [Quickstart](/tutorials/quickstart.html) tutorial 
-and shows how to create a multilingual site with Flatmark.
+This tutorial builds on the [Quickstart](/tutorials/quickstart.html) tutorial.
+It shows how to create a multilingual site with Flatmark.
 
 We need to add a bit of configuration to our site.
-Create a file named `_config.yml` in the root of your site folder (`my_site/`) with the following content:
+Create a file named `_config.yaml` in the root of your site folder (`my_site/`) with the following content:
 
 ```yaml
 lang: en
