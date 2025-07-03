@@ -1,5 +1,6 @@
 ---
 title: Content How Tos
+description: How to do things with Flatmark content
 ---
 
 # {{page.title}}

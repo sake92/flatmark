@@ -1,5 +1,6 @@
 ---
 title: Quickstart
+description: Flatmark Quickstart tutorial
 ---
 
 # {{page.title}}

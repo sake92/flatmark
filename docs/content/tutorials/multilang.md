@@ -1,5 +1,6 @@
 ---
 title: Multilingual Site
+description: Flatmark Multilingual Site tutorial
 ---
 
 # {{page.title}}

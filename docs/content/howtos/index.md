@@ -1,6 +1,6 @@
 ---
 title: How Tos
-description: How Tos
+description: Flatmark How Tos
 pagination:
   enabled: false
 ---

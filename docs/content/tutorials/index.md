@@ -10,8 +10,7 @@ pagination:
 {%
 set tutorials = [
     { "label": "Quickstart", "url": "/tutorials/quickstart.html" },
-    { "label": "Multilingual Site", "url": "/tutorials/multilang.html" },
-    { "label": "Examples", "url": "https://github.com/sake92/flatmark/tree/main/examples" }
+    { "label": "Multilingual Site", "url": "/tutorials/multilang.html" }
 ]
 %}
 
