@@ -70,7 +70,7 @@ val routes = Routes {
       htmlPage(
         div(id := "result")(
           pre(cls := "mermaid")(
-            qp.source
+            raw(qp.source)
           )
         ),
         script(`type` := "module")(

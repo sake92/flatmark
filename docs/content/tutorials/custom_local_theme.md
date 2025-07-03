@@ -78,6 +78,10 @@ Let's add some content to the `index.html` layout:
 
 Success, now it works!
 
+The curly braces `{{ }}` are used to insert variables in the template.  
+This is a Jinja template, so we can use Jinja syntax to insert variables, 
+use control structures and its filters etc.
+
 ## Adding More Pages
 
 Let's add another page: `about.md` in the `content/` folder:
