@@ -69,18 +69,18 @@ Flatmark CLI 1.2.3
 </code></pre>
    <p>The structure of your site should look like this:</p>
    <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
-├─ content<span class="hljs-symbol">/</span>
-│  ├─ index.md
+└── content<span class="hljs-symbol">/</span>
+    └── index.md
 </code></pre>
    <h2 id="build-and-serve-the-site">Build and serve the site<a href="#build-and-serve-the-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Now you can run the Flatmark CLI to generate and serve your site locally. Open a terminal, navigate to your <code>my:site</code> folder, and run the following command:</p>
+   <p>Now you can run the Flatmark CLI to generate and serve your site locally. Open a terminal, navigate to your <code>my_site</code> folder, and run the following command:</p>
    <pre><code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark serve</span>
 </code></pre>
-   <p>Then open your browser and go to <code>http://localhost:5555</code>.
+   <p>Then open your browser and go to <a href="http://localhost:5555">http://localhost:5555</a>.
     <br>
     You should see your site with the content of <code>index.md</code>.</p>
    <blockquote>
-    <p>When you make changes to any file, the site will automatically rebuild and reload in the browser.</p>
+    <p>When you change a file, the site will automatically rebuild and browser will reload it.</p>
    </blockquote>
    <p>The generated site files will be in the <code>my_site/_site</code> folder.</p>
   </main>
