@@ -1,6 +1,6 @@
 ---
 title: Search
-description: Flatmark Search
+description: Flatmark Search Reference
 ---
 
 # {{page.title}}

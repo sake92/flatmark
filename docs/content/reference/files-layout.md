@@ -1,6 +1,6 @@
 ---
 title: Files Layout
-description: Flatmark Files Layout
+description: Flatmark Files Layout Reference
 ---
 
 # {{page.title}}

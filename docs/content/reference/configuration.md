@@ -1,6 +1,6 @@
 ---
 title: Configuration
-description: Flatmark Configuration
+description: Flatmark Configuration Reference
 ---
 
 # Configuration

@@ -1,4 +1,13 @@
 
+# docs
+- pagination
+- template context variables
+- theme authoring
+- sass
+- cli reference
+- categories
+- tags (not implemented yet)
+
 # content
 
 - highlight active category link

@@ -1,6 +1,6 @@
 ---
 title: Themes
-description: Flatmark Themes
+description: Flatmark Themes Reference
 ---
 
 # Themes
