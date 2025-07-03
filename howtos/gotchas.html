@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="How Tos">
-  <title> How Tos | Flatmark Docs </title>
+  <meta name="description" content="">
+  <title> Gotchas | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
@@ -39,7 +39,11 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#how-tos">How Tos</a></li>
+        <li><a href="#gotchas">Gotchas</a>
+         <ul>
+          <li><a href="#cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template</a></li>
+          <li><a href="#cant-use-toc-in-a-page">Can't use TOC in a page</a></li>
+         </ul></li>
        </ul>
       </div>
      </details>
@@ -48,15 +52,29 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="how-tos">How Tos<a href="#how-tos" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <ul>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/howtos/content.html">Content</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/howtos/gotchas.html">Gotchas</a></p>
-    </li>
-   </ul>
+   <h1 id="gotchas">Gotchas<a href="#gotchas" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template<a href="#cant-add-content-to-a-template-that-extends-another-template" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>When you extend a template:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">
+{% extends "base.html" %}
+
+{% block title %}
+<span class="hljs-code">    {{page.title}}
+{% endblock %}
+</span>
+---
+cant add this!!!
+
+{% block hack %}
+<span class="hljs-code">    cant add this either!!!
+{% endblock %}
+</span>
+</code></pre>
+   <p>note that <strong>you can only override blocks that are defined in the base template</strong>,
+    <br>
+    you cannot create new blocks or add content.</p>
+   <h2 id="cant-use-toc-in-a-page">Can't use TOC in a page<a href="#cant-use-toc-in-a-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>You must use it inside a template. This is a technical limitation, because we take the header ids from markdown-generated HTML.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

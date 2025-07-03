@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="How Tos">
-  <title> How Tos | Flatmark Docs </title>
+  <meta name="description" content="">
+  <title> Content How Tos | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
@@ -39,7 +39,10 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#how-tos">How Tos</a></li>
+        <li><a href="#content-how-tos">Content How Tos</a>
+         <ul>
+          <li><a href="#how-to-make-a-series-of-tutorials">How to make a series of tutorials?</a></li>
+         </ul></li>
        </ul>
       </div>
      </details>
@@ -48,15 +51,24 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="how-tos">How Tos<a href="#how-tos" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <ul>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/howtos/content.html">Content</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/howtos/gotchas.html">Gotchas</a></p>
-    </li>
-   </ul>
+   <h1 id="content-how-tos">Content How Tos<a href="#content-how-tos" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="how-to-make-a-series-of-tutorials">How to make a series of tutorials?<a href="#how-to-make-a-series-of-tutorials" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>The default pagination might not fit your use case. For example, you might want to have a series of tutorials, which are ordered in a fixed way (not by publish date or title..).</p>
+   <p>For this, you can use Jinja variables to define a list of tutorials. Then use a for loop to render them:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">Tutorials:
+
+{% set tutorials = [
+<span class="hljs-code">    { "label": "My tutorial 1", "url": "/tutorials/tutorial1.html" },
+    { "label": "My tutorial 2", "url": "/tutorials/tutorial2.html" }
+] %}
+</span>
+
+
+{% for tut in tutorials %}
+<span class="hljs-bullet">-</span> [<span class="hljs-string">{{ tut.label }}</span>](<span class="hljs-link">{{ tut.url }}</span>)
+{% endfor %}
+
+</code></pre>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>
