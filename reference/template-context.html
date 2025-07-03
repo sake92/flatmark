@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Flatmark Template Context Reference">
+  <title> Template Context | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#template-context">Template Context</a>
+         <ul>
+          <li><a href="#site-context">Site Context</a></li>
+          <li><a href="#page-context">Page Context</a></li>
+          <li><a href="#paginator-context">Paginator Context</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="template-context">Template Context<a href="#template-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>There are 3 contexts available in Flatmark templates:</p>
+   <ul>
+    <li><code>site</code> - information about the whole site</li>
+    <li><code>page</code> - contains information about the current page</li>
+    <li><code>paginator</code> - contains information for pagination (only available on <code>index.md</code> pages)</li>
+   </ul>
+   <h2 id="site-context">Site Context<a href="#site-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Most of these are just propagated from the <code>_config.yaml</code> file.</p>
+   <p>They are available through the <code>site</code> context in templates. For example, you can access the site name with <code>{{ site.name }}</code>.</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">"My Site"</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">"My site description"</span>
+<span class="hljs-attr">base_url:</span> <span class="hljs-string">https://example.com</span>
+
+<span class="hljs-attr">search:</span>
+  <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">code_highlight:</span>
+    <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">math_highlight:</span>
+    <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-comment"># languages used in the site</span>
+<span class="hljs-attr">langs:</span> [<span class="hljs-string">en</span>, <span class="hljs-string">bs</span> <span class="hljs-string">...</span>] 
+
+<span class="hljs-comment"># categories, folders in content/</span>
+<span class="hljs-attr">categories:</span> 
+ <span class="hljs-attr">blog:</span>
+   <span class="hljs-attr">label:</span> <span class="hljs-string">Blog</span>
+   <span class="hljs-attr">description:</span> <span class="hljs-string">..</span>
+   <span class="hljs-comment"># only available in index.md pages, empty otherwise</span>
+   <span class="hljs-comment"># list of page contexts</span>
+   <span class="hljs-attr">items:</span>
+     <span class="hljs-bullet">-</span> <span class="hljs-attr">title:</span> <span class="hljs-string">Post</span> <span class="hljs-number">1</span><span class="hljs-string">,</span>
+       <span class="hljs-attr">url:</span> <span class="hljs-string">/blog/post-1.html</span>
+       <span class="hljs-string">..</span>
+
+<span class="hljs-comment"># YAML files from _data/ folder</span>
+<span class="hljs-attr">data:</span>
+  <span class="hljs-attr">my_data_file:</span> <span class="hljs-string">"My data value"</span>
+
+</code></pre>
+   <p>The <code>langs</code>, <code>categories</code> and <code>data</code> are dynamic.</p>
+   <h2 id="page-context">Page Context<a href="#page-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>These are available through the <code>page</code> context in templates. For example, you can access the page title with <code>{{ page.title }}</code>.</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">title:</span> <span class="hljs-string">..</span>
+<span class="hljs-attr">description:</span> <span class="hljs-string">..</span>
+<span class="hljs-attr">content:</span> <span class="hljs-string">..</span>                     <span class="hljs-comment"># not empty only in _layouts/ and _includes/ </span>
+<span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+<span class="hljs-attr">publish_date:</span> <span class="hljs-string">..</span>
+<span class="hljs-attr">url:</span> <span class="hljs-string">..</span>
+<span class="hljs-attr">layout:</span> <span class="hljs-string">page.html</span>
+
+<span class="hljs-attr">toc:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">level:</span> <span class="hljs-number">1</span>
+    <span class="hljs-attr">title:</span> <span class="hljs-string">My</span> <span class="hljs-string">Heading</span> <span class="hljs-number">1</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">"#my-heading-1"</span>
+    <span class="hljs-attr">children:</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">level:</span> <span class="hljs-number">2</span>
+        <span class="hljs-attr">title:</span> <span class="hljs-string">My</span> <span class="hljs-string">Heading</span> <span class="hljs-number">2</span>
+        <span class="hljs-attr">url:</span> <span class="hljs-string">"#my-heading-2"</span>
+        <span class="hljs-string">...</span>
+  
+<span class="hljs-attr">theme_props:</span>
+    <span class="hljs-attr">my_theme_prop:</span> <span class="hljs-string">my_value</span>     <span class="hljs-comment"># theme specific properties</span>
+</code></pre>
+   <h2 id="paginator-context">Paginator Context<a href="#paginator-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>This context is available only on <code>index.md</code> pages, and it provides information about pagination.</p>
+   <p>They are available through the <code>paginator</code> context in templates. For example, you can access the site name with <code>{{ paginator.per_page }}</code> .</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>       <span class="hljs-comment"># if pagination is enabled in page config front matter</span>
+<span class="hljs-attr">items:</span>              <span class="hljs-comment"># list of page contexts</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">title:</span> <span class="hljs-string">Post</span> <span class="hljs-number">1</span><span class="hljs-string">,</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">/blog/post-1.html</span>
+    <span class="hljs-string">...</span>
+<span class="hljs-attr">per_page:</span> <span class="hljs-number">10</span>
+<span class="hljs-attr">total_items:</span> <span class="hljs-number">25</span>
+<span class="hljs-attr">total_pages:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">current:</span> <span class="hljs-number">2</span>          <span class="hljs-comment"># 1-based index of the current page</span>
+<span class="hljs-attr">prev:</span> <span class="hljs-number">1</span>
+<span class="hljs-attr">next:</span> <span class="hljs-number">3</span>
+<span class="hljs-attr">has_prev:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">has_next:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">prev_url:</span> <span class="hljs-string">/blog/index-1.html</span>
+<span class="hljs-attr">next_url:</span> <span class="hljs-string">/blog/index-3.html</span>
+</code></pre>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
