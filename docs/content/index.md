@@ -9,7 +9,7 @@ pagination:
 
 Flatmark tries to be a simple static site generator without too much configuration.  
 
-It is based on [Jinjava](https://github.com/HubSpot/jinjava/) for templating and uses [CommonMark](https://commonmark.org/) for markdown rendering.
+It is based on [Jinja](https://jinja.palletsprojects.com/en/stable/templates) for templating and uses [CommonMark](https://commonmark.org/) for markdown rendering.
 
 Most of rendering is done statically: code highlighting, math, diagrams, etc.  
 The only thing you usually need to add for those is CSS.

@@ -9,14 +9,14 @@ pagination:
 
 {%
 set tutorials = [
-    { "label": "Quickstart", "link": "/tutorials/quickstart.html" },
-    { "label": "Examples", "link": "https://github.com/sake92/flatmark/tree/main/examples" }
+    { "label": "Quickstart", "url": "/tutorials/quickstart.html" },
+    { "label": "Examples", "url": "https://github.com/sake92/flatmark/tree/main/examples" }
 ]
 %}
 
 
 {% for tut in tutorials %}
-- [{{ tut.label }}]({{ tut.link }})
+- [{{ tut.label }}]({{ tut.url }})
 {% endfor %}
 
 
