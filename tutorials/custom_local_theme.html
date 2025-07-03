@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Flatmark Custom Theme tutorial">
+  <title> Custom Local Theme | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#custom-local-theme">Custom Local Theme</a>
+         <ul>
+          <li><a href="#configuring-a-local-theme">Configuring a Local Theme</a></li>
+          <li><a href="#creating-a-layout-for-indexmd">Creating a Layout for index.md</a></li>
+          <li><a href="#adding-more-pages">Adding More Pages</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="custom-local-theme">Custom Local Theme<a href="#custom-local-theme" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>This tutorial builds on the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> tutorial. It shows how to use a local theme with Flatmark.</p>
+   <h2 id="configuring-a-local-theme">Configuring a Local Theme<a href="#configuring-a-local-theme" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Add this to <code>_config.yaml</code>:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">my_theme</span>
+</code></pre>
+   <p>This tells Flatmark to use our local theme called <code>my_theme</code>. It needs to be in the <code>_themes/</code> folder of your site.</p>
+   <p>The build fails because it can't find the theme:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes">ba.sake.flatmark.FlatmarkException: Local theme folder does not exist. Please create it or use a valid theme URL.
+</code></pre>
+   <p>Create a new folder in <code>my_site/</code>, called <code>_themes/my_theme/</code>. This part is fixed now.</p>
+   <h2 id="creating-a-layout-for-indexmd">Creating a Layout for index.md<a href="#creating-a-layout-for-indexmd" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>But we have a different error:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes">ba.sake.flatmark.FlatmarkException: Template 'index.html' not found in content/ or _layouts/ or theme _layouts/.
+</code></pre>
+   <p>We are missing the <code>index.html</code> layout, so let's fix that.
+    <br>
+    Inside <code>_themes/my_theme/</code> create a file <code>_layouts/index.html</code>.</p>
+   <blockquote>
+    <p>The <code>index.html</code> layout is used for all <code>index.md</code> files. (can be overriden)</p>
+   </blockquote>
+   <p>Now the build succeeds. The files structure should look like this:</p>
+   <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
+├── _config.yaml
+├── content<span class="hljs-symbol">/</span>
+│   └── index.md
+└── _themes<span class="hljs-symbol">/</span>
+    └── my_theme<span class="hljs-symbol">/</span>
+        └── _layouts<span class="hljs-symbol">/</span>
+            └── index.html
+</code></pre>
+   <hr>
+   <p>But we get an empty page because we don't have any content in the layout. Let's add some content to the <code>index.html</code> layout:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span> <span class="hljs-attr">lang</span>=<span class="hljs-string">"en"</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">charset</span>=<span class="hljs-string">"UTF-8"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"viewport"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"width=device-width, initial-scale=1.0"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">meta</span> <span class="hljs-attr">name</span>=<span class="hljs-string">"color-scheme"</span> <span class="hljs-attr">content</span>=<span class="hljs-string">"light dark"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>{{ site.name }}<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css"</span>&gt;</span>
+    <span class="hljs-tag">&lt;<span class="hljs-name">link</span> <span class="hljs-attr">rel</span>=<span class="hljs-string">"stylesheet"</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">main</span>&gt;</span>
+    {{ page.content }} 
+<span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+
+<span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+</code></pre>
+   <p>Success, now it works!</p>
+   <h2 id="adding-more-pages">Adding More Pages<a href="#adding-more-pages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Let's add another page: <code>about.md</code> in the <code>content/</code> folder:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># About Me</span>
+</code></pre>
+   <p>We get a similar error:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes">ba.sake.flatmark.FlatmarkException: Template 'page.html' not found in content/ or _layouts/ or theme _layouts/.
+</code></pre>
+   <p>Now we are missing the <code>page.html</code> layout.</p>
+   <p>At this point, we can copy-paste the <code>index.html</code> layout to <code>page.html</code> and it will work. But this is not a good practice. Let's rename the <code>index.html</code> layout to <code>base.html</code>, and replace the <code>&lt;main&gt;</code> tag with this:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes">
+{% block content %}
+{% endblock %} 
+
+</code></pre>
+   <p>The <code>content</code> block is like a slot where each page can insert its content.</p>
+   <hr>
+   <p>We need to update the <code>index.html</code> layout to extend the <code>base.html</code> layout:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes">
+{% extends "base.html" %}
+
+{% block content %}
+    {{ page.content }}
+{% endblock %} 
+
+
+</code></pre>
+   <hr>
+   <p>And the <code>page.html</code>:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes">
+{% extends "base.html" %}
+
+{% block content %}
+    {{ page.content }}
+
+    Custom content for the page goes here.
+{% endblock %}
+
+</code></pre>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>

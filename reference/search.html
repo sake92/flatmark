@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Reference">
-  <title> Reference | Flatmark Docs </title>
+  <meta name="description" content="Flatmark Search">
+  <title> Search | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
@@ -39,7 +39,7 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#reference">Reference</a></li>
+        <li><a href="#search">Search</a></li>
        </ul>
       </div>
      </details>
@@ -48,21 +48,23 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="reference">Reference<a href="#reference" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <ul>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/reference/configuration.html">Configuration</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/reference/files-layout.html">Files layout</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/reference/themes.html">Themes</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/reference/search.html">Search</a></p>
-    </li>
-   </ul>
+   <h1 id="search">Search<a href="#search" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>After it processes all of the content, Flatmark will create a search index file named <code>_site/search/entries.json</code>.</p>
+   <p>It looks like this:</p>
+   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
+  <span class="hljs-punctuation">{</span>
+    <span class="hljs-attr">"text"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Text of the page"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Title of the page"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"url"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/page.html"</span>
+  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
+  ...
+<span class="hljs-punctuation">]</span>
+</code></pre>
+   <hr>
+   <p>The next step is to create a search results page. You need to create a file <code>content/search/results.md</code> with the following content:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">layout: search-results.html
+</code></pre>
+   <p>The default theme will do the rest. Note that <code>search.enabled</code> must be set to <code>true</code> in the <code>_config.yaml</code> file (default is <code>true</code>).</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

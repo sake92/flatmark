@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="">
-  <title> File Layout | Flatmark Docs </title>
+  <meta name="description" content="Flatmark Files Layout">
+  <title> Files Layout | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
@@ -39,7 +39,7 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#file-layout">File Layout</a>
+        <li><a href="#files-layout">Files Layout</a>
          <ul>
           <li><a href="#content-structure">Content Structure</a></li>
           <li><a href="#other">Other</a></li>
@@ -52,7 +52,7 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="file-layout">File Layout<a href="#file-layout" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h1 id="files-layout">Files Layout<a href="#files-layout" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <h2 id="content-structure">Content Structure<a href="#content-structure" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <pre><code class="language-bash hljs" data-highlighted="yes">content/
 ├── index.md            &lt;-- index page
@@ -75,27 +75,27 @@ static/                 &lt;-- static files, copied as-is to the _site/
    <p>First level of folders in <code>content/</code> are categories.</p>
    <p>The <code>index.md</code> (or <code>index.html</code>) pages are special. They get the list of all pages in the category in the <code>paginator</code> argument, so you can list those items there. For example, the <code>content/blog/index.md</code> would receive <code>paginator</code> with all the blog posts.</p>
    <h2 id="other">Other<a href="#other" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <pre><code class="language-bash hljs" data-highlighted="yes"><span class="hljs-comment"># config</span>
-_config.yaml        &lt;-- global config
+   <pre><code class="language-bash hljs" data-highlighted="yes">_config.yaml        &lt;-- global site config
 
 _layouts/           &lt;-- templates
-    default.peb       &lt;-- default layout: <span class="hljs-keyword">for</span> index page, about page etc
-    post.peb          &lt;-- layout <span class="hljs-keyword">for</span> posts
+├── base.html         &lt;-- base layout extended by other layouts
+├── index.html        &lt;-- index.md layout
+└── page.html         &lt;-- pages layout
 
-_includes/          &lt;-- snippets/fragments/helpers
-    header.peb        &lt;-- header snippet
-    footer.peb        &lt;-- footer snippet
-    search.peb        &lt;-- search form snippet
-    pagination.peb    &lt;-- pagination snippet
+_includes/          &lt;-- snippets/fragments/helpers/
+├── header.html      &lt;-- header snippet
+├── footer.html      &lt;-- footer snippet
+├── toc.html         &lt;-- table of contents snippet
+└── pagination.html  &lt;-- pagination snippet
 
-_i18n/              &lt;-- translations <span class="hljs-keyword">for</span> the site
-    my_translations.yaml            &lt;-- default language translations
-    my_translations_de.yaml         &lt;-- german translations
+_i18n/                              &lt;-- dynamic translations <span class="hljs-keyword">for</span> the site
+├── my_translations.properties        &lt;-- default language translations
+└── my_translations_de.properties     &lt;-- german translations
 
-_themes/           &lt;-- custom, <span class="hljs-built_in">local</span> themes
-    my_theme/          &lt;-- <span class="hljs-built_in">local</span> theme folder
-        _layouts/         &lt;-- <span class="hljs-built_in">local</span> theme layouts
-        _includes/        &lt;-- <span class="hljs-built_in">local</span> theme includes
+_themes/            &lt;-- custom <span class="hljs-built_in">local</span> themes
+└── my_theme/         &lt;-- <span class="hljs-built_in">local</span> theme folder/
+    ├── _layouts/       &lt;-- <span class="hljs-built_in">local</span> theme layouts
+    └── _includes/      &lt;-- <span class="hljs-built_in">local</span> theme includes
 
 _site/              &lt;-- result of rendering, this will be deployed
 
@@ -105,8 +105,8 @@ _site/              &lt;-- result of rendering, this will be deployed
    <p>The <code>_config.yaml</code> file is the global configuration file.</p>
    <p>The <code>_layouts/</code> folder contains templates for the pages.
     <br>
-    You can override a theme layout by creating a <strong>file with the same name</strong> in the <code>_layouts/</code> folder, like <code>_layouts/page.peb</code>.</p>
-   <p>The <code>_includes/</code> folder contains reusable snippets, like header, footer, search form, etc. You can override a theme include by creating a <strong>file with the same name</strong> in the <code>_includes/</code> folder, like <code>_includes/footer.peb</code>.</p>
+    You can override a theme layout by creating a <strong>file with the same name</strong> in the <code>_layouts/</code> folder, like <code>_layouts/page.html</code>.</p>
+   <p>The <code>_includes/</code> folder contains reusable snippets, like header, footer, search form, etc. You can override a theme include by creating a <strong>file with the same name</strong> in the <code>_includes/</code> folder, like <code>_includes/footer.html</code>.</p>
    <p>The <code>_site/</code> folder is the output folder, where the rendered files will be placed.</p>
    <p>The <code>.flatmark-cache</code> folder is used to store the cache for the flatmark results.
     <br>
