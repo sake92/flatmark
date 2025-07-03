@@ -31,23 +31,23 @@ The structure of your site should look like this:
 
 ```
 my_site/
-├─ content/
-│  ├─ index.md
+└── content/
+    └── index.md
 ```
 
 ## Build and serve the site
 
 Now you can run the Flatmark CLI to generate and serve your site locally.
-Open a terminal, navigate to your `my:site` folder, and run the following command:
+Open a terminal, navigate to your `my_site` folder, and run the following command:
 
 ```shell
 user$ flatmark serve
 ```
 
-Then open your browser and go to `http://localhost:5555`.  
+Then open your browser and go to http://localhost:5555.  
 You should see your site with the content of `index.md`.
 
-> When you make changes to any file, the site will automatically rebuild and reload in the browser.
+> When you change a file, the site will automatically rebuild and browser will reload it.
 
 The generated site files will be in the `my_site/_site` folder.
 

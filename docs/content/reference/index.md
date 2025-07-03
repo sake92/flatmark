@@ -7,7 +7,7 @@ pagination:
   enabled: false
 ---
 
-# Reference
+# {{page.title}}
 
 {%
 set references = [

@@ -5,7 +5,7 @@ pagination:
   enabled: false
 ---
 
-
+# {{page.title}}
 
 {%
 set tutorials = [

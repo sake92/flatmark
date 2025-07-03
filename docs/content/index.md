@@ -5,25 +5,25 @@ pagination:
   enabled: false
 ---
 
-# Flatmark Documentation
+# Flatmark
 
-Flatmark tries to be a simple static site generator without too much configuration.  
+Flatmark strives to be the *most static* ⚡ site generator with sensible defaults.  
 
 It is based on [Jinja](https://jinja.palletsprojects.com/en/stable/templates) for templating and uses [CommonMark](https://commonmark.org/) for markdown rendering.
 
-Most of rendering is done statically: code highlighting, math, diagrams, etc.  
+Most of rendering is done statically: code highlighting, math snippets, diagrams, etc.  
 The only thing you usually need to add for those is CSS.
 
 ## Markdown
 Syntax is based on [commonmark standard](https://commonmark.org/help/) with some extensions:
-- [tables](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables#creating-a-table)
+- GitHub-style [tables](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables#creating-a-table)
 - strikethrough with double tilde: `~~text~~`
-- autolink, turns plain text links into links, no need for markdown angle brackets: `https://example.com`
+- autolink, turns plain text links into links, no need for markdown angle brackets, just write `https://example.com`
 - footnotes, use `[^1]` to create a footnote and `[1]: footnote text` to define it
 - ins, use `++text++` to mark text as inserted (underlined)
-- task-list-items, use `- [ ]` for unchecked and `- [x]` for checked items
-- image-attributes, use `{width=100%}` to set image width, `{height=50px}` for height etc.
-- heading-anchor, automatically adds ids to headings
+- task list items, use `- [ ]` for unchecked and `- [x]` for checked items
+- image attributes, use `{width=100%}` to set image width, `{height=50px}` for height etc.
+- heading anchor, automatically adds `id`s to headings (`<h1>`, `<h2>`, etc.)
 
 You can [learn markdown in 60 seconds](https://commonmark.org/help//).
 

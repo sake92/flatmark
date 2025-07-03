@@ -4,7 +4,7 @@ title: Themes
 
 # Themes
 
-By default, Flatmark uses the `default` theme, downloaded from [Flatmark repository](https://github.com/sake92/flatmark/tree/main/themes/default).  
+By default, Flatmark uses the `default` theme, downloaded from [flatmark-themes repository](https://github.com/sake92/flatmark-themes).  
 It is based on [PicoCSS](https://picocss.com/docs/conditional).
 
 You can use a different theme by setting it in the `_config.yaml` file:
@@ -14,7 +14,7 @@ theme:
   source: my_local_theme
 # or
 theme:
-  source: https://github.com/sake92/flatmark?branch=main&folder=a_folder
+  source: https://github.com/my_user/my_repo?branch=main&folder=my_folder
 ```
 
 In the first case, the theme is taken from the local `_themes/my_local_theme` folder.  

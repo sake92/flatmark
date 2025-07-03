@@ -3,7 +3,6 @@ package ba.sake.flatmark
 import java.time.LocalDateTime
 import java.util.{Locale, TimeZone}
 import scala.collection.immutable.ListMap
-import scala.util.boundary
 import org.virtuslab.yaml.*
 import YamlInstances.given
 

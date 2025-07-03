@@ -13,16 +13,24 @@ description: My Cool Blog Description   # website description
 base_url: https://mydomain.com/subpath  # URL where website will be deployed
 
 theme:
-  source: my_theme                      # website theme
+  enabled: true                         # enable theme
+  source: my_local_theme                # website theme
+
+search:
+  enabled: true                         # enable search
+code_highlight:
+  enabled: true                         # enable code highlighting
+math_highlight:
+  enabled: true                         # enable math highlighting
 
 categories:
-  blog:                 # content/blog/ folder
+  blog:                                 # content/blog/ folder
     label: Blog
-  docs:                 # content/docs/ folder
+  docs:                                 # content/docs/ folder
     label: Documentation
 
 
-lang: en                # default language
+lang: en                                # default language
 timezone: Europe/Sarajevo
 ...
 ```
@@ -35,16 +43,30 @@ Put the configuration at the top of your page file, in YAML format, like this:
 ```yaml
 ---
 title: Hello
+description: My description
+publish_date: 2025-01-01 11:11    # in timezone specified in the _config.yaml
+layout: page.html
+ext: html                         # extension of the generated file, default is html
+
+publish: yes
 tags: [scala, java]
-publish_date: 2025-01-01 11:11  # in timezone specified in the _config.yaml
-publish: yes | no | hide        # hide means published but not listed/searched/google-indexed, default is yes
+
+pagination:
+  enabled: true                   # enable pagination for this index.md page
+  per_page: 10                    # number of items per page
+  sort_by: -publish_date          # sort by publish date, descending
+
+theme_props:
+  my_theme_prop: my_value         # theme specific properties
 ---
 
-# Hello {{page.title}}
+{% raw %}
+# Hello {{ '{{' }}page.title{{ '}}' }}
+{% endraw %}
 
 This is my first post!
 ```
 
 The page configuration section is optional.  
-The file needs to start with `---` and the config ends with another `---`.  
+If used, the file needs to start with `---`, the config ends with another `---`.  
 This type of config is called "YAML front matter".
