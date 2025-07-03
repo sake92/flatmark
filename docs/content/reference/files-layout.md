@@ -8,23 +8,22 @@ title: File Layout
 
 ```bash
 content/
-    index.md            <-- index page
-    blog                  <-- the blog category
-        index.md            <-- index page for blog posts
-        mypost.md           <-- one blog post
-    docs                <-- the docs category
-        index.md          <-- index page for docs
-        mypost.md         <-- one doc page
-    404.md              <-- 404 not found page
-    bs/                 <-- translations live in lang-code/ named folders
-        index.md
-        blog/mypost.md    <-- translated post
+├── index.md            <-- index page
+├── blog                  <-- the blog category/
+│   ├── index.md            <-- index page for blog posts
+│   └── mypost.md           <-- one blog post
+├── docs                <-- the docs category/
+│   ├── index.md          <-- index page for docs
+│   └── mypost.md         <-- one doc page
+├── 404.md              <-- 404 not found page
+└── bs/                 <-- translations live in lang-code/ named folders/
+    ├── index.md
+    └── blog/mypost.md    <-- translated post
 
-static/                 <-- static files, copied as-is to the output
-    images/favicon.ico
-    styles/main.css
-    scripts/main.js
-
+static/                 <-- static files, copied as-is to the _site/
+├── images/favicon.ico
+├── styles/main.css
+└── scripts/main.js
 ```
 
 First level of folders in `content/` are categories.

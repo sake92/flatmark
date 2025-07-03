@@ -35,6 +35,10 @@ my_site/
     └── index.md
 ```
 
+You can take a look at 
+[the example](https://github.com/sake92/flatmark/tree/main/examples/minimal)
+in GitHub for reference.
+
 ## Build and serve the site
 
 Now you can run the Flatmark CLI to generate and serve your site locally.
@@ -50,4 +54,6 @@ You should see your site with the content of `index.md`.
 > When you change a file, the site will automatically rebuild and browser will reload it.
 
 The generated site files will be in the `my_site/_site` folder.
+
+
 

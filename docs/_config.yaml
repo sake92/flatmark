@@ -1,6 +1,7 @@
 
 name: Flatmark Docs
 timezone: Europe/Sarajevo
+lang: en
 
 categories:
   tutorials:
@@ -9,3 +10,4 @@ categories:
     label: How Tos
   reference:
     label: Reference
+
