@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="">
+  <title> Multilingual Site | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#multilingual-site">Multilingual Site</a></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="multilingual-site">Multilingual Site<a href="#multilingual-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>This tutorial builds on the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> tutorial and shows how to create a multilingual site with Flatmark.</p>
+   <p>We need to add a bit of configuration to our site. Create a file named <code>_config.yml</code> in the root of your site folder (<code>my_site/</code>) with the following content:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+</code></pre>
+   <p>This sets the default language of your site to English. You can set it to any language code you prefer, such as <code>fr</code> for French or <code>de</code> for German. For full reference of language codes and subcodes, see <a href="https://www.w3.org/International/articles/language-tags/">https://www.w3.org/International/articles/language-tags/</a></p>
+   <p>The <code>content/</code> root folder contains the pages for your default language.</p>
+   <p>To add another language, create a subfolder named <code>bs/</code> (or any other name for your second language) inside the <code>content/</code> folder. The files structure is mirrored, so the files should be called the same in both languages.</p>
+   <p>This is how it should look like this:</p>
+   <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
+└── content<span class="hljs-symbol">/</span>
+    ├── index.md
+    ├── about<span class="hljs-symbol">/</span>
+    │   └── index.md
+    └── bs<span class="hljs-symbol">/</span>
+        ├── index.md
+        └── about<span class="hljs-symbol">/</span>
+            └── index.md
+</code></pre>
+   <p>The <code>bs/</code> files will be served at <code>http://localhost:5555/bs/</code> URL.</p>
+   <p>When you <code>flatmark serve</code> the site and open it, you should see a language switcher in the header on the top right.</p>
+   <p>You can take a look at <a href="https://github.com/sake92/flatmark/tree/main/examples/multilang">the example</a> in GitHub for reference.</p>
+   <blockquote>
+    <p>Example site: <a href="https://sake.ba/">https://sake.ba/</a></p>
+   </blockquote>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
