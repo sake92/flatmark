@@ -16,14 +16,14 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 24
       - name: Build
         run: |
             ./mill -i cli.jvm.assembly
             cp out/cli/jvm/assembly.dest/out.jar ./flatmark
             chmod +x ./flatmark
             export FLATMARK_BASE_URL=https://sake92.github.io/flatmark
-            ./flatmark build -i docs --no-cache
+            ./flatmark build -i docs
       - name: Deploy to GH Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
