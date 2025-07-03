@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Flatmark Data Files tutorial">
+  <title> Data Files | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#data-files">Data Files</a>
+         <ul>
+          <li><a href="#setting-up-data-files">Setting up data files</a></li>
+          <li><a href="#using-data-files-in-pages">Using data files in pages</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="data-files">Data Files<a href="#data-files" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>Data files are normal YAML files that you can use to store structured data for your site. You can use them in your pages and layouts to generate dynamic content.</p>
+   <h2 id="setting-up-data-files">Setting up data files<a href="#setting-up-data-files" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Data files are stored in the <code>_data</code> folder inside your site folder. Create a file <code>authors.yaml</code> in the <code>_data</code> folder with the following content:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Sakib</span>
+  <span class="hljs-attr">skills:</span> [<span class="hljs-string">scala</span>, <span class="hljs-string">java</span>, <span class="hljs-string">python</span>]
+<span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Senjin</span>
+  <span class="hljs-attr">skills:</span> [<span class="hljs-string">scala</span>, <span class="hljs-string">java</span>, <span class="hljs-string">javascript</span>]
+</code></pre>
+   <h2 id="using-data-files-in-pages">Using data files in pages<a href="#using-data-files-in-pages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>You can use data files in your pages by using the <code>site.data</code> variable.</p>
+   <p>For example, you can create a file <code>content/authors.md</code> with the following content:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">
+{% for author in site.data.authors %}
+<span class="hljs-bullet">-</span> {{ author.name }}, skills: {{ author.skills|join(', ') }}
+{% endfor %}
+
+</code></pre>
+   <p>This <code>for</code> loop goes through the array defined in <code>authors.yaml</code> and generates a list of authors. It is the same as if you wrote:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-bullet">-</span> Sakib, skills: scala, java, python
+<span class="hljs-bullet">-</span> Senjin, skills: scala, java, javascript
+</code></pre>
+   <p>You can take a look at <a href="https://github.com/sake92/flatmark/tree/main/examples/data-file">the example</a> in GitHub for reference.</p>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>
