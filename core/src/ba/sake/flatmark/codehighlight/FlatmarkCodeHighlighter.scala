@@ -31,6 +31,10 @@ class FlatmarkCodeHighlighter(ssrServerUrl: String, webDriverHolder: WebDriverHo
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
           logger.error(s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
           codeStr
+        case e: org.openqa.selenium.JavascriptException =>
+          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.error(s"Errors during code highlighting: ${logs.asScala.mkString("\n")}", e)
+          codeStr
       }
     }
 

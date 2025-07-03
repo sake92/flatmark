@@ -29,6 +29,10 @@ class FlatmarkMermaidRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHo
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
           logger.error(s"Errors during mermaid rendering: ${logs.asScala.mkString("\n")}", e)
           source
+        case e: org.openqa.selenium.JavascriptException =>
+          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.error(s"Errors during mermaid rendering: ${logs.asScala.mkString("\n")}", e)
+          source
       }
     }
 

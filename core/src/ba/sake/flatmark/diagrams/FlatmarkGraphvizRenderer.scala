@@ -30,6 +30,10 @@ class FlatmarkGraphvizRenderer(ssrServerUrl: String, webDriverHolder: WebDriverH
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
           logger.error(s"Errors during graphviz rendering: ${logs.asScala.mkString("\n")}", e)
           dotStr
+        case e: org.openqa.selenium.JavascriptException =>
+          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.error(s"Errors during graphviz rendering: ${logs.asScala.mkString("\n")}", e)
+          dotStr
       }
     }
 

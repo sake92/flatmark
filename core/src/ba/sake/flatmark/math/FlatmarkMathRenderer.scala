@@ -11,7 +11,7 @@ import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
 
 class FlatmarkMathRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
-  
+
   private val logger = LoggerFactory.getLogger(getClass.getName)
 
   def render(mathStr: String): String =
@@ -26,6 +26,10 @@ class FlatmarkMathRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHolde
         webDriverHolder.driver.findElement(By.id("result")).getDomProperty("innerHTML")
       } catch {
         case e: org.openqa.selenium.WebDriverException =>
+          val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
+          logger.error(s"Errors during math rendering: ${logs.asScala.mkString("\n")}", e)
+          mathStr
+        case e: org.openqa.selenium.JavascriptException =>
           val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
           logger.error(s"Errors during math rendering: ${logs.asScala.mkString("\n")}", e)
           mathStr
