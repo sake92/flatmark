@@ -79,7 +79,6 @@ val routes = Routes {
             mermaid.run({
               querySelector: '.mermaid',
               postRenderCallback: (id) => {
-                console.log(id);
                 window.renderFinished = true;
               }
             });
