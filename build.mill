@@ -126,6 +126,13 @@ object ssr extends ScalaModule {
     ivy"org.seleniumhq.selenium:selenium-support:4.33.0",
     ivy"org.slf4j:slf4j-api:2.0.17"
   )
+  object test extends ScalaTests with TestModule.Munit {
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::1.1.0",
+      ivy"org.jsoup:jsoup:1.21.1",
+      ivy"org.slf4j:slf4j-simple:2.0.17"
+    )
+  }
 }
 
 trait CustomJpackageModule extends JpackageModule {

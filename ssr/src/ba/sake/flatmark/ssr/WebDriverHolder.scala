@@ -19,6 +19,7 @@ class WebDriverHolder {
     driverLogPrefs.enable(LogType.BROWSER, Level.ALL)
     chromeOptions.setCapability("goog:loggingPrefs", driverLogPrefs)
     chromeOptions.addArguments("--headless=new")
+    chromeOptions.setBrowserVersion("138")
     val webDriver = new ChromeDriver(chromeOptions)
     initialized = true
     logger.debug("WebDriver started")
