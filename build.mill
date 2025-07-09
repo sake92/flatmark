@@ -108,7 +108,7 @@ object core extends ScalaModule {
 object swebserver extends ScalaModule {
   def scalaVersion = "3.7.0"
   def ivyDeps = Agg(
-    ivy"ba.sake::sharaf-undertow:0.10.0",
+    ivy"ba.sake::sharaf-undertow:0.13.0",
     // https://github.com/wildfly/wildfly-common/issues/74
     ivy"org.wildfly.common:wildfly-common:1.7.0.Final",
     ivy"com.lihaoyi::mainargs:0.7.6",
@@ -120,7 +120,7 @@ object swebserver extends ScalaModule {
 object ssr extends ScalaModule {
   def scalaVersion = "3.7.0"
   def ivyDeps = Agg(
-    ivy"ba.sake::sharaf-undertow:0.10.0",
+    ivy"ba.sake::sharaf-undertow:0.13.0",
     // https://github.com/wildfly/wildfly-common/issues/74
     ivy"org.wildfly.common:wildfly-common:1.7.0.Final"
   )

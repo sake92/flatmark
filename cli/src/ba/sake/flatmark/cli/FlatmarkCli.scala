@@ -7,14 +7,14 @@ import io.undertow.Handlers
 import ba.sake.flatmark.FlatmarkGenerator
 import ba.sake.flatmark.selenium.WebDriverHolder
 import ba.sake.sharaf.*
-import ba.sake.sharaf.undertow.UndertowSharafServer
-import ba.sake.sharaf.undertow.handlers.SharafHandler
+import ba.sake.sharaf.undertow.*
 import ba.sake.sharaf.utils.NetworkUtils
 import ba.sake.swebserver.SwebserverFileHandler
 import ba.sake.swebserver.SwebserverWebSocketConnectionCallback
 
 import java.time.Instant
 import java.util.concurrent.atomic.AtomicReference
+import io.undertow.server.handlers.BlockingHandler
 
 class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Boolean, updateTheme: Boolean) {
   private val logger = LoggerFactory.getLogger(getClass.getName)
@@ -74,15 +74,17 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     logger.debug("Flatmark server starting...")
     val generatedSiteFolder = siteRootFolder / "_site"
     if !os.exists(generatedSiteFolder) then os.makeDir(generatedSiteFolder)
-    val notFoundHandler = SharafHandler(Routes { case GET -> notFoundPath =>
+    val notFoundHandler = SharafUndertowHandler(SharafHandler.routes(Routes { case GET -> notFoundPath =>
       // TODO use 404.html from _site if exists
       Response
         .withBody(s"404 Not Found: ${notFoundPath.segments.mkString("/")}")
         .withStatus(sttp.model.StatusCode.NotFound)
         .settingHeader("content-type", "text/html")
-    })
+    }))
     val resourceManager = PathResourceManager(generatedSiteFolder.wrapped)
-    val fallbackResourceHandler = ResourceHandler(resourceManager, notFoundHandler).setDirectoryListingEnabled(true)
+    val fallbackResourceHandler =
+      ResourceHandler(resourceManager, new BlockingHandler(notFoundHandler))
+        .setDirectoryListingEnabled(true)
     val fileHandler = SwebserverFileHandler(generatedSiteFolder, host, port, fallbackResourceHandler)
     val lastChangeAt = new AtomicReference(Instant.now())
     val websocketHandler = Handlers.websocket(SwebserverWebSocketConnectionCallback(lastChangeAt))
@@ -109,7 +111,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     logger.debug("Flatmark SSR server starting...")
     val server = UndertowSharafServer("localhost", port, ba.sake.flatmark.ssr.routes)
     server.start()
-    logger.debug(s"Flatmark SSR server started at http://localhost:${port}")
+    logger.info(s"Flatmark SSR server started at http://localhost:${port}")
     server
   }
 }

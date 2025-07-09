@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import ba.sake.flatmark.FileCache
 import ba.sake.flatmark.selenium.WebDriverHolder
 
+// TODO move to SSR project and write tests for it
 // driver is lazy because of performance reasons, it is created only when needed
 class FlatmarkCodeHighlighter(ssrServerUrl: String, webDriverHolder: WebDriverHolder, fileCache: FileCache) {
 
