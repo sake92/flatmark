@@ -5,7 +5,7 @@ import io.undertow.Undertow
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
 import io.undertow.Handlers
 import ba.sake.flatmark.FlatmarkGenerator
-import ba.sake.flatmark.selenium.WebDriverHolder
+import ba.sake.flatmark.ssr.WebDriverHolder
 import ba.sake.sharaf.*
 import ba.sake.sharaf.undertow.*
 import ba.sake.sharaf.utils.NetworkUtils

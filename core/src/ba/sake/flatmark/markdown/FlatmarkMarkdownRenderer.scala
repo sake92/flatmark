@@ -1,10 +1,6 @@
 package ba.sake.flatmark.markdown
 
 import java.util as ju
-import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
-import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
-import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
-import ba.sake.flatmark.math.FlatmarkMathRenderer
 import org.commonmark.ext.autolink.AutolinkExtension
 import org.commonmark.ext.footnotes.FootnotesExtension
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension
@@ -18,13 +14,9 @@ import org.commonmark.parser.Parser
 import org.commonmark.renderer.NodeRenderer
 import org.commonmark.renderer.html.HtmlRenderer.HtmlRendererExtension
 import org.commonmark.renderer.html.{HtmlNodeRendererContext, HtmlNodeRendererFactory, HtmlRenderer}
+import ba.sake.flatmark.CachingFlatmarkSsr
 
-class FlatmarkMarkdownRenderer(
-    codeHighlighter: FlatmarkCodeHighlighter,
-    graphvizRenderer: FlatmarkGraphvizRenderer,
-    mermaidRenderer: FlatmarkMermaidRenderer,
-    mathRenderer: FlatmarkMathRenderer
-) {
+class FlatmarkMarkdownRenderer(ssr: CachingFlatmarkSsr) {
 
   private val extensions = ju.Arrays.asList(
     TablesExtension.create(),
@@ -35,8 +27,8 @@ class FlatmarkMarkdownRenderer(
     InsExtension.create(),
     ImageAttributesExtension.create(),
     TaskListItemsExtension.create(),
-    FlatmarkStaticCodeRendererExtension(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer),
-    InlineMathExtension.create(mathRenderer)
+    FlatmarkStaticCodeRendererExtension(ssr),
+    InlineMathExtension.create(ssr)
   )
   private val parser = Parser.builder.extensions(extensions).build
   private val renderer = HtmlRenderer.builder.extensions(extensions).build
@@ -46,28 +38,17 @@ class FlatmarkMarkdownRenderer(
     renderer.render(document)
 }
 
-class FlatmarkStaticCodeRendererExtension(
-    codeHighlighter: FlatmarkCodeHighlighter,
-    graphvizRenderer: FlatmarkGraphvizRenderer,
-    mermaidRenderer: FlatmarkMermaidRenderer,
-    mathRenderer: FlatmarkMathRenderer
-) extends HtmlRendererExtension {
+class FlatmarkStaticCodeRendererExtension(ssr: CachingFlatmarkSsr) extends HtmlRendererExtension {
 
   override def extend(htmlRendererBuilder: HtmlRenderer.Builder): Unit =
     htmlRendererBuilder.nodeRendererFactory(new HtmlNodeRendererFactory() {
       def create(context: HtmlNodeRendererContext) =
-        new FlatmarkStaticCodeNodeRenderer(context, codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
+        new FlatmarkStaticCodeNodeRenderer(context, ssr)
     })
 
 }
 
-class FlatmarkStaticCodeNodeRenderer(
-    context: HtmlNodeRendererContext,
-    codeHighlighter: FlatmarkCodeHighlighter,
-    graphvizRenderer: FlatmarkGraphvizRenderer,
-    mermaidRenderer: FlatmarkMermaidRenderer,
-    mathRenderer: FlatmarkMathRenderer
-) extends NodeRenderer {
+class FlatmarkStaticCodeNodeRenderer(context: HtmlNodeRendererContext, ssr: CachingFlatmarkSsr) extends NodeRenderer {
 
   override def getNodeTypes: ju.Set[Class[? <: Node]] = ju.Set.of(classOf[FencedCodeBlock])
 
@@ -77,10 +58,10 @@ class FlatmarkStaticCodeNodeRenderer(
     val codeBlockLiteral = codeBlock.getLiteral
     val codeLang = codeBlock.getInfo
     val res =
-      if codeLang == "math" then mathRenderer.render(codeBlockLiteral)
-      else if codeLang == "diagram:graphviz" then graphvizRenderer.render(codeBlockLiteral)
-      else if codeLang == "diagram:mermaid" then mermaidRenderer.render(codeBlockLiteral)
-      else codeHighlighter.highlight(codeBlockLiteral, Some(codeLang))
+      if codeLang == "math" then ssr.renderMath(codeBlockLiteral)
+      else if codeLang == "diagram:graphviz" then ssr.renderGraphviz(codeBlockLiteral)
+      else if codeLang == "diagram:mermaid" then ssr.renderMermaid(codeBlockLiteral)
+      else ssr.highlight(codeBlockLiteral, Some(codeLang))
     html.raw(res)
   }
 }

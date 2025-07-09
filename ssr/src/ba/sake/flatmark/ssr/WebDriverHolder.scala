@@ -1,4 +1,4 @@
-package ba.sake.flatmark.selenium
+package ba.sake.flatmark.ssr
 
 import java.util.logging.{Level, Logger}
 import org.slf4j.LoggerFactory

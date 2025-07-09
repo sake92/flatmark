@@ -7,12 +7,9 @@ import scala.util.control.NonFatal
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.virtuslab.yaml.*
-import ba.sake.flatmark.selenium.WebDriverHolder
+import ba.sake.flatmark.ssr.WebDriverHolder
+import ba.sake.flatmark.ssr.FlatmarkSsr
 import ba.sake.flatmark.markdown.FlatmarkMarkdownRenderer
-import ba.sake.flatmark.codehighlight.FlatmarkCodeHighlighter
-import ba.sake.flatmark.diagrams.FlatmarkGraphvizRenderer
-import ba.sake.flatmark.diagrams.FlatmarkMermaidRenderer
-import ba.sake.flatmark.math.FlatmarkMathRenderer
 import ba.sake.flatmark.search.SearchEntry
 import ba.sake.flatmark.templates.FlatmarkTemplateHandler
 import ba.sake.tupson.{JsonRW, toJson}
@@ -102,11 +99,8 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       ThemeResolver.resolve(siteConfig.theme.source, localThemesFolder, themesCacheFolder, updateTheme)
     )
     val fileCache = FileCache(cacheFolder, useCache)
-    val codeHighlighter = FlatmarkCodeHighlighter(ssrServerUrl, webDriverHolder, fileCache)
-    val graphvizRenderer = FlatmarkGraphvizRenderer(ssrServerUrl, webDriverHolder, fileCache)
-    val mermaidRenderer = FlatmarkMermaidRenderer(ssrServerUrl, webDriverHolder, fileCache)
-    val mathRenderer = FlatmarkMathRenderer(ssrServerUrl, webDriverHolder, fileCache)
-    val markdownRenderer = FlatmarkMarkdownRenderer(codeHighlighter, graphvizRenderer, mermaidRenderer, mathRenderer)
+    val cachingSsr = CachingFlatmarkSsr(FlatmarkSsr(ssrServerUrl, webDriverHolder), fileCache)
+    val markdownRenderer = FlatmarkMarkdownRenderer(cachingSsr)
     val customClassloader = new java.net.URLClassLoader(
       (Array(siteRootFolder / "_i18n") ++ themeFolder.map(_ / "_i18n").toArray).map(_.toIO.toURI.toURL),
       Thread.currentThread.getContextClassLoader

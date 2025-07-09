@@ -1,7 +1,6 @@
 package ba.sake.flatmark.markdown
 
-import ba.sake.flatmark.math.FlatmarkMathRenderer
-
+import java.util
 import scala.jdk.CollectionConverters.*
 import org.commonmark.node.{CustomNode, Delimited}
 import org.commonmark.ext.ins.Ins
@@ -19,19 +18,21 @@ import org.commonmark.renderer.text.TextContentRenderer
 import org.commonmark.node.Node
 import org.commonmark.renderer.html.HtmlNodeRendererContext
 import org.commonmark.renderer.html.HtmlWriter
+import ba.sake.flatmark.CachingFlatmarkSsr
 
-import java.util
 
 object InlineMathExtension {
-  def create(mathRenderer: FlatmarkMathRenderer): InlineMathExtension = new InlineMathExtension(mathRenderer)
+  def create(ssr: CachingFlatmarkSsr): InlineMathExtension = 
+    new InlineMathExtension(ssr)
 }
 
-class InlineMathExtension(mathRenderer: FlatmarkMathRenderer) extends Parser.ParserExtension, HtmlRenderer.HtmlRendererExtension {
+class InlineMathExtension(ssr: CachingFlatmarkSsr) extends Parser.ParserExtension, HtmlRenderer.HtmlRendererExtension {
   override def extend(parserBuilder: Parser.Builder): Unit =
     parserBuilder.customDelimiterProcessor(new InlineMathDelimiterProcessor())
 
   override def extend(rendererBuilder: HtmlRenderer.Builder): Unit =
-    rendererBuilder.nodeRendererFactory((context: HtmlNodeRendererContext) => new InlineMathHtmlNodeRenderer(context, mathRenderer))
+    rendererBuilder.nodeRendererFactory((context: HtmlNodeRendererContext) => 
+        new InlineMathHtmlNodeRenderer(context, ssr))
 }
 
 class InlineMathNode extends CustomNode with Delimited {
@@ -68,14 +69,14 @@ class InlineMathDelimiterProcessor extends DelimiterProcessor {
 }
 
 
-class InlineMathHtmlNodeRenderer(context: HtmlNodeRendererContext, mathRenderer: FlatmarkMathRenderer) extends NodeRenderer {
+class InlineMathHtmlNodeRenderer(context: HtmlNodeRendererContext, ssr: CachingFlatmarkSsr) extends NodeRenderer {
   private val html = context.getWriter
 
   override def getNodeTypes: util.Set[Class[? <: Node]] = util.Set.of(classOf[InlineMathNode])
 
   override def render(node: Node): Unit = {
     val literalText = getLiteralText(node)
-    val ssrRendered = mathRenderer.render(literalText)
+    val ssrRendered = ssr.renderMath(literalText)
     html.raw(ssrRendered)
   }
 
