@@ -51,7 +51,7 @@
    <h1 id="search">Search<a href="#search" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <p>After it processes all of the content, Flatmark will create a search index file named <code>_site/search/entries.json</code>.</p>
    <p>It looks like this:</p>
-   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
+   <pre>            <code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
   <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">"text"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Text of the page"</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Title of the page"</span><span class="hljs-punctuation">,</span>
@@ -59,11 +59,13 @@
   <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
   ...
 <span class="hljs-punctuation">]</span>
-</code></pre>
+</code>
+          </pre>
    <hr>
    <p>The next step is to create a search results page. You need to create a file <code>content/search/results.md</code> with the following content:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">layout: search-results.html
-</code></pre>
+   <pre>            <code class="language-markdown hljs" data-highlighted="yes">layout: search-results.html
+</code>
+          </pre>
    <p>The default theme will do the rest. Note that <code>search.enabled</code> must be set to <code>true</code> in the <code>_config.yaml</code> file (default is <code>true</code>).</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>

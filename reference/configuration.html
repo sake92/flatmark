@@ -55,7 +55,7 @@
    <h1 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <h2 id="site-configuration">Site Configuration<a href="#site-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>For global site config you edit the <code>_config.yaml</code> in the root folder:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>                      <span class="hljs-comment"># website name</span>
+   <pre>            <code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span>                      <span class="hljs-comment"># website name</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">Cool</span> <span class="hljs-string">Blog</span> <span class="hljs-string">Description</span>   <span class="hljs-comment"># website description</span>
 <span class="hljs-attr">base_url:</span> <span class="hljs-string">https://mydomain.com/subpath</span>  <span class="hljs-comment"># URL where website will be deployed</span>
 
@@ -80,11 +80,12 @@
 <span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>                                <span class="hljs-comment"># default language</span>
 <span class="hljs-attr">timezone:</span> <span class="hljs-string">Europe/Sarajevo</span>
 <span class="hljs-string">...</span>
-</code></pre>
+</code>
+          </pre>
    <p>The <code>base_url</code> can also be specified as an environment variable <code>FLATMARK_BASE_URL</code>.</p>
    <h2 id="page-configuration">Page Configuration<a href="#page-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Put the configuration at the top of your page file, in YAML format, like this:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
+   <pre>            <code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
 <span class="hljs-attr">title:</span> <span class="hljs-string">Hello</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">My</span> <span class="hljs-string">description</span>
 <span class="hljs-attr">publish_date:</span> <span class="hljs-number">2025-01-01 </span><span class="hljs-number">11</span><span class="hljs-string">:11</span>    <span class="hljs-comment"># in timezone specified in the _config.yaml</span>
@@ -108,7 +109,8 @@
 
 
 <span class="hljs-string">This</span> <span class="hljs-string">is</span> <span class="hljs-string">my</span> <span class="hljs-string">first</span> <span class="hljs-string">post!</span>
-</code></pre>
+</code>
+          </pre>
    <p>The page configuration section is optional.
     <br>
     If used, the file needs to start with <code>---</code>, the config ends with another <code>---</code>.

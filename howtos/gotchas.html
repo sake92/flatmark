@@ -55,7 +55,7 @@
    <h1 id="gotchas">Gotchas<a href="#gotchas" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
    <h2 id="cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template<a href="#cant-add-content-to-a-template-that-extends-another-template" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>When you extend a template:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">
+   <pre>            <code class="language-markdown hljs" data-highlighted="yes">
 {% extends "base.html" %}
 
 {% block title %}
@@ -69,7 +69,8 @@ cant add this!!!
 <span class="hljs-code">    cant add this either!!!
 {% endblock %}
 </span>
-</code></pre>
+</code>
+          </pre>
    <p>note that <strong>you can only override blocks that are defined in the base template</strong>,
     <br>
     you cannot create new blocks or add content.</p>
