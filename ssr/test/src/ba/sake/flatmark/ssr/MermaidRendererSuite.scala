@@ -16,7 +16,7 @@ class MermaidRendererSuite extends munit.FunSuite {
 
   override def afterAll(): Unit =
     server.stop()
-    webDriverHolder.close()
+    webDriverHolder.quit()
 
   test("render mermaid flowchart diagram to HTML") {
     val ssr = FlatmarkSsr(s"http://localhost:${port}", webDriverHolder)

@@ -16,7 +16,7 @@ class MathRendererSuite extends munit.FunSuite {
 
   override def afterAll(): Unit =
     server.stop()
-    webDriverHolder.close()
+    webDriverHolder.quit()
 
   test("highlight math expression") {
     val ssr = FlatmarkSsr(s"http://localhost:${port}", webDriverHolder)

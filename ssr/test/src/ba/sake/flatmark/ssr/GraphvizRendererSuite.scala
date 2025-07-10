@@ -16,7 +16,7 @@ class GraphvizRendererSuite extends munit.FunSuite {
 
   override def afterAll(): Unit =
     server.stop()
-    webDriverHolder.close()
+    webDriverHolder.quit()
 
   test("render graphviz graph to SVG") {
     val ssr = FlatmarkSsr(s"http://localhost:${port}", webDriverHolder)

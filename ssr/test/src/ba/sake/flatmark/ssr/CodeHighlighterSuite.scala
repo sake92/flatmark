@@ -17,7 +17,7 @@ class CodeHighlighterSuite extends munit.FunSuite {
 
   override def afterAll(): Unit =
     server.stop()
-    webDriverHolder.close()
+    webDriverHolder.quit()
 
   test("highlight scala code") {
     val ssr = FlatmarkSsr(s"http://localhost:${port}", webDriverHolder)
