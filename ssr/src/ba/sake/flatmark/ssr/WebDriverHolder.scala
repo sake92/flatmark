@@ -26,14 +26,14 @@ class WebDriverHolder {
     webDriver
   }
 
-  def close(): Unit = {
+  def quit(): Unit = {
     if initialized then {
-      logger.debug("Closing WebDriver...")
+      logger.debug("Quitting WebDriver...")
       driver.quit()
       initialized = false
-      logger.debug("WebDriver closed")
+      logger.debug("WebDriver quitted")
     } else {
-      logger.debug("WebDriver was not initialized, nothing to close.")
+      logger.debug("WebDriver was not initialized, nothing to quit.")
     }
   }
 }

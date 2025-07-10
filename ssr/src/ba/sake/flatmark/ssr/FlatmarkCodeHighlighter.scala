@@ -19,6 +19,7 @@ class FlatmarkCodeHighlighter(ssrServerUrl: String, webDriverHolder: WebDriverHo
       val encodedCodeStr = URLEncoder.encode(codeStr, "utf-8")
       val encodedCodeLang = codeLang.map(lang => URLEncoder.encode(lang, "utf-8")).getOrElse("plaintext")
       val url = s"${ssrServerUrl}/ssr/highlightjs?code=${encodedCodeStr}&lang=${encodedCodeLang}"
+      webDriverHolder.driver.manage().deleteAllCookies()
       webDriverHolder.driver.get(url)
       val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
       waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

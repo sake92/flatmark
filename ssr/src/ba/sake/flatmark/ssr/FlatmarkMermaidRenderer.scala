@@ -17,6 +17,7 @@ class FlatmarkMermaidRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHo
       logger.debug("Render mermaid start")
       val encodedSource = URLEncoder.encode(source, "utf-8")
       val url = s"${ssrServerUrl}/ssr/mermaid?source=${encodedSource}"
+      webDriverHolder.driver.manage().deleteAllCookies()
       webDriverHolder.driver.get(url)
       val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
       waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

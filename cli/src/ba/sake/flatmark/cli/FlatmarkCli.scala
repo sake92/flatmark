@@ -1,5 +1,6 @@
 package ba.sake.flatmark.cli
 
+import scala.util.Try
 import org.slf4j.LoggerFactory
 import io.undertow.Undertow
 import io.undertow.server.handlers.resource.{PathResourceManager, ResourceHandler}
@@ -31,7 +32,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
       try generator.generate(siteRootFolder, useCache)
       finally
         flatmarkSsrServer.stop()
-        webDriverHolder.close()
+        webDriverHolder.quit()
     val finishAtMillis = System.currentTimeMillis()
     val totalSeconds = (finishAtMillis - startAtMillis).toDouble / 1000
     if success then logger.info(s"Flatmark build finished successfully in ${totalSeconds} s")
@@ -41,16 +42,22 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     }
   }
 
-  // TODO handle generation errors, and exit code accordingly
   def serve(): Unit = {
     logger.info("Flatmark serve started")
-    val webDriverHolder = WebDriverHolder()
+    // we reuse the servers, but NOT the webdriver, because it can accidentally keep the browser open
     val flatmarkServer = startFlatmarkServer()
     val ssrServerPort = NetworkUtils.getFreePort()
     val ssrServerUrl = s"http://localhost:${ssrServerPort}"
     val flatmarkSsrServer = startFlatmarkSsrServer(ssrServerPort)
-    val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
-    generator.generate(siteRootFolder, useCache)
+
+    // initial generation
+    locally {
+      val webDriverHolder = WebDriverHolder()
+      val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
+      try generator.generate(siteRootFolder, useCache)
+      finally webDriverHolder.quit()
+    }
+
     os.watch.watch(
       Seq(siteRootFolder),
       changed => {
@@ -59,14 +66,17 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
         )
         if relevantFiles.nonEmpty then {
           logger.info(s"Detected changes, regenerating...")
-          generator.generate(siteRootFolder, useCache)
+          val webDriverHolder = WebDriverHolder()
+          val generator = FlatmarkGenerator(ssrServerUrl, webDriverHolder, updateTheme)
+          try generator.generate(siteRootFolder, useCache)
+          finally webDriverHolder.quit()
         }
       }
     )
     Runtime.getRuntime.addShutdownHook(new Thread(() => {
-      flatmarkSsrServer.stop()
-      flatmarkServer.stop()
-      webDriverHolder.close()
+      Try(flatmarkSsrServer.stop()) // just in case smh fails..
+      Try(flatmarkServer.stop())
+      ()
     }))
   }
 
@@ -111,7 +121,7 @@ class FlatmarkCli(siteRootFolder: os.Path, host: String, port: Int, useCache: Bo
     logger.debug("Flatmark SSR server starting...")
     val server = UndertowSharafServer("localhost", port, ba.sake.flatmark.ssr.routes)
     server.start()
-    logger.info(s"Flatmark SSR server started at http://localhost:${port}")
+    logger.debug(s"Flatmark SSR server started at http://localhost:${port}")
     server
   }
 }

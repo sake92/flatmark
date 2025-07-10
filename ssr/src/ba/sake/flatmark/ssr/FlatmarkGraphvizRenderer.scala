@@ -18,6 +18,7 @@ class FlatmarkGraphvizRenderer(ssrServerUrl: String, webDriverHolder: WebDriverH
       val encodedDotStr = URLEncoder.encode(dotStr, "utf-8")
       val encodedEngine = URLEncoder.encode(engine, "utf-8")
       val url = s"${ssrServerUrl}/ssr/graphviz?source=${encodedDotStr}&engine=${encodedEngine}"
+      webDriverHolder.driver.manage().deleteAllCookies()
       webDriverHolder.driver.get(url)
       val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
       waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)
@@ -31,7 +32,6 @@ class FlatmarkGraphvizRenderer(ssrServerUrl: String, webDriverHolder: WebDriverH
         val logs = webDriverHolder.driver.manage().logs().get(LogType.BROWSER).getAll
         logger.error(s"Errors during graphviz rendering: ${logs.asScala.mkString("\n")}", e)
         dotStr
-
     }
 
 }

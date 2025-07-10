@@ -22,3 +22,10 @@ Test html highlighting:
 </body>
 </html>
 ```
+
+
+```scala
+def x = "bla"
+```
+
+
