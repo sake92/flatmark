@@ -124,7 +124,6 @@ object ssr extends ScalaModule {
     ivy"org.wildfly.common:wildfly-common:1.7.0.Final",
     ivy"org.seleniumhq.selenium:selenium-chrome-driver:4.34.0",
     ivy"org.seleniumhq.selenium:selenium-support:4.34.0",
-    ivy"org.seleniumhq.selenium:selenium-devtools-v138:4.34.0",
     ivy"org.slf4j:slf4j-api:2.0.17"
   )
   object test extends ScalaTests with TestModule.Munit {
