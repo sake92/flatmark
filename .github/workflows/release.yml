@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             mill-module: ubuntu
             installer-name: flatmark_${{ github.event.inputs.version }}_amd64.deb
             artifact-name: flatmark-installer-deb-x64
