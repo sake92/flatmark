@@ -419,8 +419,9 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
         // TODO handle srcset
         // Combine all attribute selectors into a single query for better performance
         val selector = """[href^="/"],[src^="/"],[cite^="/"],[action^="/"],[formaction^="/"],[data^="/"],[poster^="/"],[manifest^="/"]"""
+        val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
         document.select(selector).forEach { elem =>
-          val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
+          // Each element matches on at least one attribute, check which ones need updating
           urlAttrs.foreach { attrName =>
             if (elem.hasAttr(attrName)) {
               val attrValue = elem.attr(attrName)
