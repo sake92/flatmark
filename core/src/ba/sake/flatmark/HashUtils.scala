@@ -10,6 +10,20 @@ object HashUtils {
     val md = MessageDigest.getInstance("MD5")
     val theMD5digest = md.digest(bytesOfMessage)
     val b64 = Base64.getEncoder.encode(theMD5digest)
-    new String(b64, "UTF-8").replace('/', '-').replace('=', '_').replace('+', '$')
+    val encoded = new String(b64, "UTF-8")
+    
+    // Use StringBuilder for efficient string manipulation
+    val result = new StringBuilder(encoded.length)
+    var i = 0
+    while (i < encoded.length) {
+      encoded.charAt(i) match {
+        case '/' => result.append('-')
+        case '=' => result.append('_')
+        case '+' => result.append('$')
+        case c => result.append(c)
+      }
+      i += 1
+    }
+    result.toString
   }
 }

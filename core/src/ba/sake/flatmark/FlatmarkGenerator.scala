@@ -417,11 +417,17 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       // prepend base URL to all relative URLs
       layoutContext.site.baseUrl.foreach { baseUrl =>
         // TODO handle srcset
-        val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
-        urlAttrs.foreach { attrName =>
-          document.select(s"""[${attrName}^="/"]""").forEach { elem =>
-            val attrValue = elem.attr(attrName)
-            elem.attr(attrName, baseUrl + attrValue)
+        // Combine all attribute selectors into a single query for better performance
+        val selector = """[href^="/"],[src^="/"],[cite^="/"],[action^="/"],[formaction^="/"],[data^="/"],[poster^="/"],[manifest^="/"]"""
+        document.select(selector).forEach { elem =>
+          val urlAttrs = List("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
+          urlAttrs.foreach { attrName =>
+            if (elem.hasAttr(attrName)) {
+              val attrValue = elem.attr(attrName)
+              if (attrValue.startsWith("/")) {
+                elem.attr(attrName, baseUrl + attrValue)
+              }
+            }
           }
         }
       }

@@ -17,7 +17,6 @@ class FlatmarkMathRenderer(ssrServerUrl: String, webDriverHolder: WebDriverHolde
       logger.debug("Render math start")
       val encodedMathStr = URLEncoder.encode(mathStr, "utf-8")
       val url = s"${ssrServerUrl}/ssr/katex?source=${encodedMathStr}"
-      webDriverHolder.driver.manage().deleteAllCookies()
       webDriverHolder.driver.get(url)
       val waitCondition = new WebDriverWait(webDriverHolder.driver, Duration.ofSeconds(5))
       waitCondition.until(_ => webDriverHolder.driver.executeScript("return renderFinished;") == true)

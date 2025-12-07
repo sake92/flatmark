@@ -12,13 +12,15 @@ object FrontMatterUtils {
     var hasYamlFrontMatter = false
     var firstTripleDashIndex = -1
     var secondTripleDashIndex = -1
+    
+    // Single pass through the lines
+    val lines = templateRaw.split('\n')
+    var i = 0
     boundary {
-      val iter = templateRaw.linesIterator
-      var i = 0
-      while iter.hasNext do {
-        val line = iter.next().trim
-        if line.nonEmpty then {
-          if line == "---" then {
+      while (i < lines.length) {
+        val line = lines(i).trim
+        if (line.nonEmpty) {
+          if (line == "---") {
             if (firstTripleDashIndex == -1) firstTripleDashIndex = i
             else if (secondTripleDashIndex == -1) {
               secondTripleDashIndex = i
@@ -32,14 +34,10 @@ object FrontMatterUtils {
         i += 1
       }
     }
-    if hasYamlFrontMatter then {
-      val yaml = templateRaw.linesIterator
-        .slice(firstTripleDashIndex + 1, firstTripleDashIndex + 1 + secondTripleDashIndex - firstTripleDashIndex - 1)
-        .mkString("\n")
-      val content = templateRaw.linesIterator
-        .drop(secondTripleDashIndex + 1)
-        .mkString("\n")
-        .trim
+    
+    if (hasYamlFrontMatter) {
+      val yaml = lines.slice(firstTripleDashIndex + 1, secondTripleDashIndex).mkString("\n")
+      val content = lines.drop(secondTripleDashIndex + 1).mkString("\n").trim
       (yaml, content)
     } else ("", templateRaw)
   }

@@ -23,52 +23,55 @@ object HeadingHierarchyExtractor {
 
     // This will hold the current "parent" for each heading level.
     // Index 0 for H1, index 1 for H2, etc. Max level is 6, so size 6.
-    val currentParents: Array[Option[Heading]] = Array.fill(6)(None)
+    // Using Array[Heading | Null] for better performance
+    val currentParents: Array[Heading | Null] = new Array[Heading | Null](6)
 
     // Select all heading tags in document order
     val allHeadings = doc.select("h1, h2, h3, h4, h5, h6").asScala // Convert Java Elements to Scala Seq
 
     for (headingElement <- allHeadings) {
       val tagName = headingElement.tagName() // e.g., "h1", "h2"
-      val level = tagName.substring(1).toInt // Extract level (1-6)
+      val level = tagName.charAt(1) - '0' // Extract level (1-6) more efficiently
 
       val newHeading = Heading(level, headingElement.text(), headingElement.attr("id").trim)
 
       if (level == 1) {
         // H1 is always a top-level heading
         topLevelHeadings += newHeading
-        currentParents(0) = Some(newHeading) // Set H1 as the current parent for H1s
+        currentParents(0) = newHeading // Set H1 as the current parent for H1s
         // Reset parents for lower levels
-        for (i <- 1 until 6) {
-          currentParents(i) = None
+        var i = 1
+        while (i < 6) {
+          currentParents(i) = null
+          i += 1
         }
       } else {
         // Find the appropriate parent for this heading
         // Iterate upwards from the previous level
-        var parentFound: Option[Heading] = None
-        boundary {
-          for (i <- (level - 2) to 0 by -1) { // level - 2 because array is 0-indexed and we need the *next* higher level
-            if (currentParents(i).isDefined) {
-              parentFound = currentParents(i)
-              boundary.break() // Break out of the loop once a parent is found
-            }
+        var parentFound: Heading | Null = null
+        var i = level - 2
+        while (i >= 0 && parentFound == null) {
+          if (currentParents(i) != null) {
+            parentFound = currentParents(i)
           }
+          i -= 1
         }
 
-        parentFound match {
-          case Some(parent) =>
-            parent.children += newHeading
-          case None =>
-            // If no higher-level parent is found, it's a top-level heading
-            // (e.g., an H2 without a preceding H1)
-            topLevelHeadings += newHeading
+        if (parentFound != null) {
+          parentFound.children += newHeading
+        } else {
+          // If no higher-level parent is found, it's a top-level heading
+          // (e.g., an H2 without a preceding H1)
+          topLevelHeadings += newHeading
         }
 
         // Set this heading as the current parent for its own level
-        currentParents(level - 1) = Some(newHeading)
+        currentParents(level - 1) = newHeading
         // Reset parents for lower levels (any subsequent Hx that are children of this one)
-        for (i <- level until 6) {
-          currentParents(i) = None
+        var j = level
+        while (j < 6) {
+          currentParents(j) = null
+          j += 1
         }
       }
     }
