@@ -31,12 +31,11 @@ class CodeHighlighterSuite extends munit.FunSuite {
     )
     val resHtml = Jsoup.parse(res)
     val expectedHtml = Jsoup.parse(
-      """<pre>            <code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">HelloWorld</span> </span>{
+      """<pre><code class="language-scala hljs" data-highlighted="yes"><span class="hljs-class"><span class="hljs-keyword">object</span> <span class="hljs-title">HelloWorld</span> </span>{
   <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">main</span></span>(args: <span class="hljs-type">Array</span>[<span class="hljs-type">String</span>]): <span class="hljs-type">Unit</span> = {
     println(<span class="hljs-string">"Hello, world!"</span>)
   }
-}</code>
-          </pre>"""
+}</code></pre>"""
     )
     assertEquals(resHtml.html, expectedHtml.html)
   }
@@ -62,7 +61,7 @@ class CodeHighlighterSuite extends munit.FunSuite {
     )
     val resHtml = Jsoup.parse(res)
     val expectedHtml = Jsoup.parse(
-      """<pre>            <code class="language-html hljs language-xml" data-highlighted="yes"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
+      """<pre><code class="language-html hljs language-xml" data-highlighted="yes"><span class="hljs-meta">&lt;!DOCTYPE <span class="hljs-keyword">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span>
 <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Page Title<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span>
@@ -74,8 +73,7 @@ class CodeHighlighterSuite extends munit.FunSuite {
 
 <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span>
 <span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
-</code>
-          </pre>"""
+</code></pre>"""
     )
     assertEquals(resHtml.html, expectedHtml.html)
   }
