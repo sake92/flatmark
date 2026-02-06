@@ -12,9 +12,7 @@ val routes = Routes {
       htmlPage(
         html"""
         <div id="result">
-          <pre>
-            <code class="language-${HtmlFormat.raw(qp.lang)}">${qp.code}</code>
-          </pre>
+          <pre><code class="language-${HtmlFormat.raw(qp.lang)}">${qp.code}</code></pre>
         </div>
         <script type="module">
             import { hljs } from '/highlightjs.js';
