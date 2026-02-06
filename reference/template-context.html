@@ -64,7 +64,7 @@
    <h2 id="site-context">Site Context<a href="#site-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Most of these are just propagated from the <code>_config.yaml</code> file.</p>
    <p>They are available through the <code>site</code> context in templates. For example, you can access the site name with <code>{{ site.name }}</code>.</p>
-   <pre>            <code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">"My Site"</span>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">"My Site"</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">"My site description"</span>
 <span class="hljs-attr">base_url:</span> <span class="hljs-string">https://example.com</span>
 
@@ -94,12 +94,11 @@
 <span class="hljs-attr">data:</span>
   <span class="hljs-attr">my_data_file:</span> <span class="hljs-string">"My data value"</span>
 
-</code>
-          </pre>
+</code></pre>
    <p>The <code>langs</code>, <code>categories</code> and <code>data</code> are dynamic.</p>
    <h2 id="page-context">Page Context<a href="#page-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>These are available through the <code>page</code> context in templates. For example, you can access the page title with <code>{{ page.title }}</code>.</p>
-   <pre>            <code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">title:</span> <span class="hljs-string">..</span>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">title:</span> <span class="hljs-string">..</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">..</span>
 <span class="hljs-attr">content:</span> <span class="hljs-string">..</span>                     <span class="hljs-comment"># not empty only in _layouts/ and _includes/ </span>
 <span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
@@ -119,12 +118,11 @@
   
 <span class="hljs-attr">theme_props:</span>
     <span class="hljs-attr">my_theme_prop:</span> <span class="hljs-string">my_value</span>     <span class="hljs-comment"># theme specific properties</span>
-</code>
-          </pre>
+</code></pre>
    <h2 id="paginator-context">Paginator Context<a href="#paginator-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>This context is available only on <code>index.md</code> pages, and it provides information about pagination.</p>
    <p>They are available through the <code>paginator</code> context in templates. For example, you can access the site name with <code>{{ paginator.per_page }}</code> .</p>
-   <pre>            <code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>       <span class="hljs-comment"># if pagination is enabled in page config front matter</span>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>       <span class="hljs-comment"># if pagination is enabled in page config front matter</span>
 <span class="hljs-attr">items:</span>              <span class="hljs-comment"># list of page contexts</span>
   <span class="hljs-bullet">-</span> <span class="hljs-attr">title:</span> <span class="hljs-string">Post</span> <span class="hljs-number">1</span><span class="hljs-string">,</span>
     <span class="hljs-attr">url:</span> <span class="hljs-string">/blog/post-1.html</span>
@@ -139,8 +137,7 @@
 <span class="hljs-attr">has_next:</span> <span class="hljs-literal">true</span>
 <span class="hljs-attr">prev_url:</span> <span class="hljs-string">/blog/index-1.html</span>
 <span class="hljs-attr">next_url:</span> <span class="hljs-string">/blog/index-3.html</span>
-</code>
-          </pre>
+</code></pre>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

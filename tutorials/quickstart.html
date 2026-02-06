@@ -61,27 +61,23 @@
     <p>There are no dependencies you need to install. It works on macOS, Linux and Windows.</p>
    </blockquote>
    <p>When you type <code>flatmark --version</code> it should print the version of Flatmark:</p>
-   <pre>            <code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark --version</span>
+   <pre><code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark --version</span>
 Flatmark CLI 1.2.3
-</code>
-          </pre>
+</code></pre>
    <h2 id="create-a-new-site">Create a new site<a href="#create-a-new-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Make a new folder for your site, e.g. <code>my_site</code>. Then create a new folder in it, called <code>content</code>. Finally, inside <code>content</code>, create a new file called <code>index.md</code> with the following content:</p>
-   <pre>            <code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># Welcome to Flatmark!</span>
-</code>
-          </pre>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># Welcome to Flatmark!</span>
+</code></pre>
    <p>The structure of your site should look like this:</p>
-   <pre>            <code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
+   <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
 └── content<span class="hljs-symbol">/</span>
     └── index.md
-</code>
-          </pre>
+</code></pre>
    <p>You can take a look at <a href="https://github.com/sake92/flatmark/tree/main/examples/minimal">the example</a> in GitHub for reference.</p>
    <h2 id="build-and-serve-the-site">Build and serve the site<a href="#build-and-serve-the-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>Now you can run the Flatmark CLI to generate and serve your site locally. Open a terminal, navigate to your <code>my_site</code> folder, and run the following command:</p>
-   <pre>            <code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark serve</span>
-</code>
-          </pre>
+   <pre><code class="language-shell hljs" data-highlighted="yes"><span class="hljs-meta prompt_">user$ </span><span class="language-bash">flatmark serve</span>
+</code></pre>
    <p>Then open your browser and go to <a href="http://localhost:5555">http://localhost:5555</a>.
     <br>
     You should see your site with the content of <code>index.md</code>.</p>
