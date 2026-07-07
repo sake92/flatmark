@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@apple/highlightjs-pkl": "^1.0.1",
     "highlight.js": "^11.11.1"
   }
 }

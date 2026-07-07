@@ -3,15 +3,29 @@ var __getProtoOf = Object.getPrototypeOf;
 var __defProp = Object.defineProperty;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+function __accessProp(key) {
+  return this[key];
+}
+var __toESMCache_node;
+var __toESMCache_esm;
 var __toESM = (mod, isNodeMode, target) => {
+  var canCache = mod != null && typeof mod === "object";
+  if (canCache) {
+    var cache = isNodeMode ? __toESMCache_node ??= new WeakMap : __toESMCache_esm ??= new WeakMap;
+    var cached = cache.get(mod);
+    if (cached)
+      return cached;
+  }
   target = mod != null ? __create(__getProtoOf(mod)) : {};
   const to = isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target;
   for (let key of __getOwnPropNames(mod))
     if (!__hasOwnProp.call(to, key))
       __defProp(to, key, {
-        get: () => mod[key],
+        get: __accessProp.bind(mod, key),
         enumerable: true
       });
+  if (canCache)
+    cache.set(mod, to);
   return to;
 };
 var __commonJS = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
@@ -4118,7 +4132,7 @@ var require_asciidoc = __commonJS((exports, module) => {
           className: "section",
           relevance: 10,
           variants: [
-            { begin: "^(={1,6})[ 	].+?([ 	]\\1)?$" },
+            { begin: "^(={1,6})[ \t].+?([ \t]\\1)?$" },
             { begin: "^[^\\[\\]\\n]+?\\n[=\\-~\\^\\+]{2,}$" }
           ]
         },
@@ -9752,7 +9766,7 @@ var require_markdown = __commonJS((exports, module) => {
     };
     const LIST = {
       className: "bullet",
-      begin: "^[ 	]*([*+-]|(\\d+\\.))(?=\\s+)",
+      begin: "^[ \t]*([*+-]|(\\d+\\.))(?=\\s+)",
       end: "\\s+",
       excludeEnd: true
     };
@@ -18090,7 +18104,7 @@ var require_groovy = __commonJS((exports, module) => {
         },
         {
           className: "attr",
-          begin: IDENT_RE + "[ 	]*:",
+          begin: IDENT_RE + "[ \t]*:",
           relevance: 0
         },
         {
@@ -18107,7 +18121,7 @@ var require_groovy = __commonJS((exports, module) => {
         },
         {
           className: "symbol",
-          begin: "^[ 	]*" + regex.lookahead(IDENT_RE + ":"),
+          begin: "^[ \t]*" + regex.lookahead(IDENT_RE + ":"),
           excludeBegin: true,
           end: IDENT_RE + ":",
           relevance: 0
@@ -21319,7 +21333,7 @@ var require_latex = __commonJS((exports, module) => {
     };
     const BEGIN_ENV = function(envname, starts_mode) {
       return hljs.inherit({
-        begin: "\\\\begin(?=[ 	]*(\\r?\\n[ 	]*)?\\{" + envname + "\\})",
+        begin: "\\\\begin(?=[ \t]*(\\r?\\n[ \t]*)?\\{" + envname + "\\})",
         keywords: {
           $pattern: /\\[a-zA-Z]+/,
           keyword: "\\begin"
@@ -43276,7 +43290,7 @@ var require_stata = __commonJS((exports, module) => {
           className: "built_in",
           variants: [{ begin: "\\b(abs|acos|asin|atan|atan2|atanh|ceil|cloglog|comb|cos|digamma|exp|floor|invcloglog|invlogit|ln|lnfact|lnfactorial|lngamma|log|log10|max|min|mod|reldif|round|sign|sin|sqrt|sum|tan|tanh|trigamma|trunc|betaden|Binomial|binorm|binormal|chi2|chi2tail|dgammapda|dgammapdada|dgammapdadx|dgammapdx|dgammapdxdx|F|Fden|Ftail|gammaden|gammap|ibeta|invbinomial|invchi2|invchi2tail|invF|invFtail|invgammap|invibeta|invnchi2|invnFtail|invnibeta|invnorm|invnormal|invttail|nbetaden|nchi2|nFden|nFtail|nibeta|norm|normal|normalden|normd|npnchi2|tden|ttail|uniform|abbrev|char|index|indexnot|length|lower|ltrim|match|plural|proper|real|regexm|regexr|regexs|reverse|rtrim|string|strlen|strlower|strltrim|strmatch|strofreal|strpos|strproper|strreverse|strrtrim|strtrim|strupper|subinstr|subinword|substr|trim|upper|word|wordcount|_caller|autocode|byteorder|chop|clip|cond|e|epsdouble|epsfloat|group|inlist|inrange|irecode|matrix|maxbyte|maxdouble|maxfloat|maxint|maxlong|mi|minbyte|mindouble|minfloat|minint|minlong|missing|r|recode|replay|return|s|scalar|d|date|day|dow|doy|halfyear|mdy|month|quarter|week|year|d|daily|dofd|dofh|dofm|dofq|dofw|dofy|h|halfyearly|hofd|m|mofd|monthly|q|qofd|quarterly|tin|twithin|w|weekly|wofd|y|yearly|yh|ym|yofd|yq|yw|cholesky|colnumb|colsof|corr|det|diag|diag0cnt|el|get|hadamard|I|inv|invsym|issym|issymmetric|J|matmissing|matuniform|mreldif|nullmat|rownumb|rowsof|sweep|syminv|trace|vec|vecdiag)(?=\\()" }]
         },
-        hljs.COMMENT("^[ 	]*\\*.*$", false),
+        hljs.COMMENT("^[ \t]*\\*.*$", false),
         hljs.C_LINE_COMMENT_MODE,
         hljs.C_BLOCK_COMMENT_MODE
       ]
@@ -49158,6 +49172,295 @@ var require_lib = __commonJS((exports, module) => {
 // node_modules/highlight.js/es/index.js
 var import_lib = __toESM(require_lib(), 1);
 var es_default = import_lib.default;
+
+// node_modules/@apple/highlightjs-pkl/src/languages/pkl.js
+function source(re) {
+  if (!re)
+    return null;
+  if (typeof re === "string")
+    return re;
+  return re.source;
+}
+function concat(...args) {
+  return args.map((x) => source(x)).join("");
+}
+function pkl_default(hljs) {
+  const KEYWORDS = {
+    keyword: [
+      "abstract",
+      "amends",
+      "as",
+      "case",
+      "class",
+      "const",
+      "delete",
+      "else",
+      "extends",
+      "external",
+      "fixed",
+      "for",
+      "function",
+      "hidden",
+      "if",
+      "import",
+      "import*",
+      "in",
+      "is",
+      "let",
+      "local",
+      "module",
+      "new",
+      "open",
+      "out",
+      "outer",
+      "override",
+      "protected",
+      "read",
+      "read*",
+      "read?",
+      "record",
+      "super",
+      "switch",
+      "this",
+      "throw",
+      "trace",
+      "typealias",
+      "unknown",
+      "vararg",
+      "when"
+    ],
+    literal: ["true", "false", "null", "nothing"]
+  };
+  const IDENTIFIER_RE = "[a-zA-Z_][a-zA-Z0-9_]*";
+  const QUOTED_IDENTIFIER_RE = /`[^`]+`/;
+  const NORMAL_IDENTIFIER = {
+    className: "title",
+    begin: IDENTIFIER_RE
+  };
+  const QUOTED_IDENTIFIER = {
+    className: "title",
+    begin: QUOTED_IDENTIFIER_RE
+  };
+  const IDENTIFIER = {
+    className: "title",
+    variants: [NORMAL_IDENTIFIER, QUOTED_IDENTIFIER]
+  };
+  const decimalDigits = "([0-9]_*)+";
+  const hexDigits = "([0-9a-fA-F]_*)+";
+  const NUMBER = {
+    className: "number",
+    relevance: 0,
+    variants: [
+      {
+        match: `\\b(${decimalDigits})(\\.(${decimalDigits}))?` + `([eE][+-]?(${decimalDigits}))?\\b`
+      },
+      {
+        match: `\\b0x(${hexDigits})(\\.(${hexDigits}))?` + `([pP][+-]?(${decimalDigits}))?\\b`
+      },
+      { match: /\b0o([0-7]_*)+\b/ },
+      { match: /\b0b([01]_*)+\b/ }
+    ]
+  };
+  const stringEscape = (rawDelimiter = "") => ({
+    className: "subst",
+    variants: [
+      { match: concat(/\\/, rawDelimiter, /[0\\tnr"']/) },
+      { match: concat(/\\/, rawDelimiter, /u\{[0-9a-fA-F]{1,8}}/) }
+    ]
+  });
+  const interpolation = (rawDelimiter = "") => ({
+    className: "subst",
+    label: "interpol",
+    begin: concat(/\\/, rawDelimiter, /\(/),
+    end: /\)/
+  });
+  const multilineString = (rawDelimiter = "") => ({
+    begin: concat(rawDelimiter, /"""/),
+    end: concat(/"""/, rawDelimiter),
+    contains: [stringEscape(rawDelimiter), interpolation(rawDelimiter)]
+  });
+  const singleLineString = (rawDelimiter = "") => ({
+    begin: concat(rawDelimiter, /"/),
+    end: concat(/"/, rawDelimiter),
+    contains: [stringEscape(rawDelimiter), interpolation(rawDelimiter)]
+  });
+  const stringConstantVariant = (delimiter = "") => ({
+    begin: concat(delimiter, /"/),
+    end: concat(/"/, delimiter),
+    contains: [stringEscape(delimiter)]
+  });
+  const STRING = {
+    className: "string",
+    variants: [
+      multilineString(),
+      multilineString("#"),
+      multilineString("##"),
+      multilineString("###"),
+      singleLineString(),
+      singleLineString("#"),
+      singleLineString("##"),
+      singleLineString("###")
+    ]
+  };
+  const STRING_CONSTANT = {
+    className: "string",
+    variants: [
+      stringConstantVariant(),
+      stringConstantVariant("#"),
+      stringConstantVariant("##"),
+      stringConstantVariant("##")
+    ]
+  };
+  const DOC_COMMENT = hljs.COMMENT("///", "$", {
+    className: "doctag",
+    relevance: 10
+  });
+  const ANNOTATION = {
+    className: "meta",
+    begin: /@[a-zA-Z_][a-zA-Z0-9_]*/,
+    relevance: 5
+  };
+  const FUNCTION_DEF = {
+    className: "function",
+    beginKeywords: "function",
+    end: /[={]/,
+    excludeEnd: true,
+    contains: [
+      IDENTIFIER,
+      {
+        className: "params",
+        begin: /\(/,
+        end: /\)/,
+        contains: [
+          hljs.C_LINE_COMMENT_MODE,
+          hljs.C_BLOCK_COMMENT_MODE,
+          IDENTIFIER
+        ]
+      }
+    ]
+  };
+  const CLASS_DEF = {
+    className: "class",
+    beginKeywords: "class",
+    end: /[{]|$/,
+    excludeEnd: true,
+    contains: [
+      IDENTIFIER,
+      { beginKeywords: "extends" },
+      {
+        begin: /</,
+        end: />/,
+        contains: ["self"]
+      }
+    ]
+  };
+  const TYPEALIAS_DEF = {
+    className: "type",
+    beginKeywords: "typealias",
+    end: /$/,
+    contains: [
+      IDENTIFIER,
+      {
+        begin: /=\s*/,
+        returnBegin: true,
+        contains: []
+      }
+    ]
+  };
+  const MODULE_DECLARATION = {
+    className: "meta",
+    variants: [
+      {
+        begin: /^\s*(module|amends|extends)\s+/,
+        end: /$/,
+        contains: [
+          {
+            className: "keyword",
+            begin: /(module|amends|extends)/
+          },
+          STRING_CONSTANT
+        ]
+      }
+    ]
+  };
+  const IMPORT_DECLARATION = {
+    className: "meta",
+    begin: /\b(import|import\*)\s+/,
+    end: /$/,
+    keywords: { keyword: ["import", "import*", "as"] },
+    contains: [STRING_CONSTANT]
+  };
+  const TYPE_REFERENCE = {
+    className: "type",
+    begin: /:\s*/,
+    end: /(?=[=,)\]}]|$)/,
+    excludeBegin: true,
+    contains: [
+      {
+        className: "type",
+        begin: IDENTIFIER_RE
+      },
+      hljs.C_LINE_COMMENT_MODE,
+      hljs.C_BLOCK_COMMENT_MODE
+    ]
+  };
+  const PROPERTY_ACCESS = {
+    variants: [
+      {
+        match: [/\.|\?\./, /\s*/, QUOTED_IDENTIFIER_RE],
+        scope: {
+          3: "property"
+        }
+      },
+      {
+        match: [/\.|\?\./, /\s*/, IDENTIFIER_RE],
+        scope: {
+          3: "property"
+        }
+      }
+    ]
+  };
+  const OBJECT_PROPERTY = {
+    variants: [
+      {
+        match: [QUOTED_IDENTIFIER_RE, /\s*/, /(?=[=:{])/],
+        scope: {
+          1: "property"
+        }
+      },
+      {
+        match: [IDENTIFIER_RE, /\s*/, /(?=[=:{])/],
+        scope: {
+          1: "property"
+        }
+      }
+    ]
+  };
+  return {
+    name: "Pkl",
+    aliases: ["pkl"],
+    keywords: KEYWORDS,
+    contains: [
+      DOC_COMMENT,
+      hljs.C_LINE_COMMENT_MODE,
+      hljs.C_BLOCK_COMMENT_MODE,
+      MODULE_DECLARATION,
+      IMPORT_DECLARATION,
+      ANNOTATION,
+      CLASS_DEF,
+      FUNCTION_DEF,
+      TYPEALIAS_DEF,
+      PROPERTY_ACCESS,
+      TYPE_REFERENCE,
+      OBJECT_PROPERTY,
+      STRING,
+      NUMBER
+    ]
+  };
+}
+
+// index.mjs
+es_default.registerLanguage("pkl", pkl_default);
 export {
   es_default as hljs
 };
