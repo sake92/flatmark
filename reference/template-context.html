@@ -75,8 +75,11 @@
 <span class="hljs-attr">math_highlight:</span>
     <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
 
-<span class="hljs-comment"># languages used in the site</span>
-<span class="hljs-attr">langs:</span> [<span class="hljs-string">en</span>, <span class="hljs-string">bs</span> <span class="hljs-string">...</span>] 
+<span class="hljs-comment"># site languages, including the current language</span>
+<span class="hljs-attr">langs:</span>
+  <span class="hljs-bullet">-</span> <span class="hljs-attr">code:</span> <span class="hljs-string">en</span>
+    <span class="hljs-attr">label:</span> <span class="hljs-string">English</span>
+    <span class="hljs-attr">url:</span> <span class="hljs-string">/current-page.html</span>
 
 <span class="hljs-comment"># categories, folders in content/</span>
 <span class="hljs-attr">categories:</span> 
@@ -95,7 +98,7 @@
   <span class="hljs-attr">my_data_file:</span> <span class="hljs-string">"My data value"</span>
 
 </code></pre>
-   <p>The <code>langs</code>, <code>categories</code> and <code>data</code> are dynamic.</p>
+   <p>The <code>langs</code>, <code>categories</code> and <code>data</code> are dynamic. Each language URL points to the file at the same relative content path, or to that language's home page when the translation does not exist. <code>categories</code> contains only categories whose index page exists in the current language.</p>
    <h2 id="page-context">Page Context<a href="#page-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
    <p>These are available through the <code>page</code> context in templates. For example, you can access the page title with <code>{{ page.title }}</code>.</p>
    <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">title:</span> <span class="hljs-string">..</span>
