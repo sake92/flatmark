@@ -149,28 +149,67 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       else templatedContentFiles += file
     }
 
-    // TODO pokupit sve pathove za content files
-    // i proslijedit pebbleu za custom translation_url
-
-    // generate content first to get their snippets for index pages
     val allUsedLanguages =
       translationsLangCodes.prepend(siteConfig.lang.toLanguageTag).distinct.sorted.map(Locale.forLanguageTag).toSeq
+
+    val pageConfigs = processFiles.map { file =>
+      file -> parseConfig(file, os.read(file))
+    }.toMap
+    val contentRoutes = processFiles.map { file =>
+      contentRoute(contentFolder, file, pageConfigs(file), siteConfig.lang)
+    }.toSeq
+    val duplicateRoutes = contentRoutes
+      .groupBy(route => route.language.toLanguageTag -> route.logicalPath)
+      .values
+      .filter(_.sizeIs > 1)
+    if duplicateRoutes.nonEmpty then {
+      val duplicateFiles = duplicateRoutes.flatten.map(_.file).mkString(", ")
+      throw FlatmarkException(s"Multiple content files define the same language and route: ${duplicateFiles}")
+    }
+    val routesByFile = contentRoutes.map(route => route.file -> route).toMap
+    val routesByLanguageAndLogicalPath = contentRoutes.map { route =>
+      (route.language.toLanguageTag -> route.logicalPath) -> route
+    }.toMap
+
+    def languageRoutes(file: os.Path): Seq[(Locale, String)] = {
+      val currentRoute = routesByFile(file)
+      allUsedLanguages.map { language =>
+        val url = routesByLanguageAndLogicalPath
+          .get(language.toLanguageTag -> currentRoute.logicalPath)
+          .map(_.url)
+          .getOrElse(languageHomeUrl(siteConfig.lang, language))
+        language -> url
+      }
+    }
+
+    def categoryContexts(
+        language: Locale,
+        contentByCategory: Map[String, Seq[PageContext]] = Map.empty
+    ): ListMap[String, CategoryContext] =
+      siteConfig.categories.flatMap { case (catKey, catValue) =>
+        Option.when(routesByLanguageAndLogicalPath.contains(language.toLanguageTag -> s"${catKey}/index")) {
+          catKey -> CategoryContext(
+            catValue.label,
+            catValue.description,
+            contentByCategory.getOrElse(catKey, Seq.empty)
+          )
+        }
+      }
+
+    // generate content first to get their snippets for index pages
     val contentResults = templatedContentFiles.flatMap { file =>
-      val contentTemplateRaw = os.read(file)
-      val pageConfig = parseConfig(file, contentTemplateRaw)
+      val route = routesByFile(file)
       renderTemplatedFile(
         siteConfig,
-        pageConfig,
-        allUsedLanguages,
+        pageConfigs(file),
+        languageRoutes(file),
         contentFolder = contentFolder,
         file = file,
         outputFolder = outputFolder,
         markdownRenderer,
         templateHandler,
         paginateItems = None,
-        categoryContexts = siteConfig.categories.map { case (catKey, catValue) =>
-          catKey -> CategoryContext(catValue.label, catValue.description, Seq.empty)
-        },
+        categoryContexts = categoryContexts(route.language),
         dataYamls = dataYamls
       )
     }.toSeq
@@ -197,24 +236,18 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
 
     // render index files with pagination
     val categoryContextsPerLang = allUsedLanguages.map { lang =>
-      val categoryContexts = siteConfig.categories.map { case (catKey, catValue) =>
-        val categoryItems = contentByLangAndCategory
-          .getOrElse((lang.toLanguageTag, catKey), Seq.empty)
-        catKey -> CategoryContext(catValue.label, catValue.description, categoryItems)
-      }
-      lang.toLanguageTag -> categoryContexts
+      val contentByCategory = siteConfig.categories.keys.map { catKey =>
+        catKey -> contentByLangAndCategory.getOrElse((lang.toLanguageTag, catKey), Seq.empty)
+      }.toMap
+      lang.toLanguageTag -> categoryContexts(lang, contentByCategory)
     }.toMap
 
     val indexResults = templatedIndexFiles.flatMap { file =>
-      val segments = file.relativeTo(contentFolder).segments
-      val firstSegment = segments.head
-      val key =
-        if translationsLangCodes.contains(firstSegment)
-        then (firstSegment, segments(1)) // (lang, category)
-        else (siteConfig.lang.toLanguageTag, firstSegment) // (default lang, category)
+      val route = routesByFile(file)
+      val categoryKey = route.logicalPath.split('/').head
+      val key = route.language.toLanguageTag -> categoryKey
 
-      val contentTemplateRaw = os.read(file)
-      val pageConfig = parseConfig(file, contentTemplateRaw)
+      val pageConfig = pageConfigs(file)
       val sortOrder: Ordering[PageContext] = pageConfig.pagination.sort_by match {
         case "publish_date" => Ordering.by(_.publishDate.getOrElse(ZonedDateTime.now().minusYears(1000)))
         case "-publish_date" =>
@@ -235,7 +268,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       renderTemplatedFile(
         siteConfig,
         pageConfig,
-        allUsedLanguages,
+        languageRoutes(file),
         contentFolder = contentFolder,
         file = file,
         outputFolder = outputFolder,
@@ -287,7 +320,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
   private def renderTemplatedFile(
       siteConfig: SiteConfig,
       pageConfig: PageConfig,
-      languages: Seq[Locale],
+      languageRoutes: Seq[(Locale, String)],
       contentFolder: os.Path,
       file: os.Path,
       outputFolder: os.Path,
@@ -317,7 +350,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
             else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}${pageNumSuffix}.${fileExtension}"
           }
           val contentContext = templateContext(
-            languages,
+            languageRoutes,
             locale,
             templateConfig,
             defaultLayout = "index.html",
@@ -346,7 +379,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
           else s"${fileRelPath.segments.init.mkString("/")}/${file.baseName}.${fileExtension}"
         val defaultLayout = if paginateItems.isDefined then "index.html" else "page.html"
         val contentContext = templateContext(
-          languages,
+          languageRoutes,
           locale,
           templateConfig,
           defaultLayout = defaultLayout,
@@ -443,7 +476,7 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
   }
 
   private def templateContext(
-      languages: Seq[Locale],
+      languageRoutes: Seq[(Locale, String)],
       lang: Locale,
       templateConfig: TemplateConfig,
       defaultLayout: String,
@@ -458,17 +491,16 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
   ): TemplateContext = {
     val (langContexts, langContext) = locally {
       val originalLocale = Locale.getDefault(Locale.Category.DISPLAY)
-      val res1 = languages.map { l =>
+      val res1 = languageRoutes.map { case (l, url) =>
         // set locale for rendering language names in respective language
         Locale.setDefault(Locale.Category.DISPLAY, l)
-        val url = if templateConfig.site.lang == l then "/" else s"/${l.toLanguageTag}"
         LanguageContext(l.toLanguageTag, l.getDisplayLanguage, url)
       }
       Locale.setDefault(Locale.Category.DISPLAY, originalLocale) // restore original locale
       val res2 = LanguageContext(
         lang.toLanguageTag,
         lang.getDisplayLanguage,
-        if templateConfig.site.lang == lang then "/" else s"/${lang.toLanguageTag}"
+        languageHomeUrl(templateConfig.site.lang, lang)
       )
       (res1, res2)
     }
@@ -527,6 +559,34 @@ class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHolder, 
       mn.mappings.map { case (key, value) => nodetoJavaContext(key) -> nodetoJavaContext(value) }.asJava
     case sn: Node.SequenceNode => sn.nodes.map(nodetoJavaContext).asJava
   }
+
+  private def contentRoute(
+      contentFolder: os.Path,
+      file: os.Path,
+      pageConfig: PageConfig,
+      defaultLanguage: Locale
+  ): ContentRoute = {
+    val fileRelPath = file.relativeTo(contentFolder)
+    val isTranslation = fileRelPath.segments.length > 1 && Iso2LanguageCodes(fileRelPath.segments.head)
+    val language =
+      if isTranslation then Locale.forLanguageTag(fileRelPath.segments.head)
+      else defaultLanguage
+    val logicalSegments =
+      (if isTranslation then fileRelPath.segments.tail else fileRelPath.segments).init :+ file.baseName
+    val outputExtension = pageConfig.ext.getOrElse("html")
+    val outputSegments = fileRelPath.segments.init :+ s"${file.baseName}.${outputExtension}"
+    val url =
+      if file.baseName == "index" && outputExtension == "html" then {
+        val folderUrl = outputSegments.init.mkString("/")
+        if folderUrl.isEmpty then "/" else s"/${folderUrl}"
+      } else s"/${outputSegments.mkString("/")}"
+    ContentRoute(file, language, logicalSegments.mkString("/"), url)
+  }
+
+  private case class ContentRoute(file: os.Path, language: Locale, logicalPath: String, url: String)
+
+  private def languageHomeUrl(defaultLanguage: Locale, language: Locale): String =
+    if defaultLanguage == language then "/" else s"/${language.toLanguageTag}"
 }
 
 class FlatmarkException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)

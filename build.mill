@@ -98,6 +98,11 @@ object core extends ScalaModule {
     ivy"org.jsoup:jsoup:1.21.1",
     ivy"org.slf4j:slf4j-jdk14:2.0.17"
   )
+  object test extends ScalaTests with TestModule.Munit {
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::1.1.0"
+    )
+  }
   /* def repositoriesTask = Task.Anon {
     super.repositoriesTask() ++ Seq(coursier.MavenRepository("https://jitpack.io"))
   }*/

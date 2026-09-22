@@ -3,8 +3,11 @@
     <nav>
         <a href="{{ page.lang.url }}">Home</a>
         {% for cat in site.categories %}
-            | <a href="/{{ cat.key }}">{{ cat.value.label }}</a>
+            {% if page.lang.url == "/" %}
+                | <a href="/{{ cat.key }}">{{ cat.value.label }}</a>
+            {% else %}
+                | <a href="{{ page.lang.url }}/{{ cat.key }}">{{ cat.value.label }}</a>
+            {% endif %}
         {% endfor %}
     </nav>
 </header>
-    

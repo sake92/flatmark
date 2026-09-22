@@ -1,5 +1,4 @@
-    
-{% if page.toc is not empty %}
+{% if page.toc %}
 <details>
 <summary>Table of Contents</summary>
 <div>
@@ -7,7 +6,7 @@
     {% for h1 in page.toc %}
         <li>
             <a href="{{ h1.url }}">{{ h1.title }}</a>
-            {% if h1.children is not empty %}
+            {% if h1.children %}
                 <ul>
                     {% for h2 in h1.children %}
                         <li>
@@ -22,5 +21,3 @@
 </div>
 </details>
 {% endif %}
-
-    

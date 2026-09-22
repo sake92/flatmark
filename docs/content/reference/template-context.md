@@ -31,8 +31,11 @@ code_highlight:
 math_highlight:
     enabled: true
 
-# languages used in the site
-langs: [en, bs ...] 
+# site languages, including the current language
+langs:
+  - code: en
+    label: English
+    url: /current-page.html
 
 # categories, folders in content/
 categories: 
@@ -52,7 +55,9 @@ data:
 
 ```
 
-The `langs`, `categories` and `data` are dynamic.
+The `langs`, `categories` and `data` are dynamic. Each language URL points to the file at the same relative content path,
+or to that language's home page when the translation does not exist. `categories` contains only categories whose index
+page exists in the current language.
 
 
 

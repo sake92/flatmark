@@ -23,6 +23,12 @@ The `content/` root folder contains the pages for your default language.
 To add another language, create a subfolder named `bs/` 
 (or any other name for your second language) inside the `content/` folder.
 The files structure is mirrored, so the files should be called the same in both languages.
+Flatmark treats files at the same relative path as translations of one another.
+The language switcher links to the matching translation when it exists and otherwise to that language's home page.
+
+Categories follow the same convention. A category is shown in a language only when that language has the category's
+`index.md` (or `index.html`) file. This means that a site can translate only some pages or categories without generating
+links to missing localized routes.
 
 This is how it should look like this:
 ```
@@ -48,4 +54,3 @@ in GitHub for reference.
 
 
 > Example site: https://sake.ba/
-

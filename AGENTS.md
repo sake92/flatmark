@@ -40,9 +40,10 @@ cli  ──depends-on──>  core ──depends-on──>  ssr
 ## Testing
 
 - **Framework:** MUnit
-- **Tests exist ONLY in `ssr/test/`** — there are no tests in `cli/` or `core/`.
+- Tests live in `ssr/test/` and `core/test/`.
 - SSR tests render content through a headless browser (Selenium/Chrome) — they are **integration tests**, not unit tests.
-- Run: `./mill -i __.test` or target a single suite with `ssr.test.testOnly <FQCN>`.
+- Core tests exercise site generation with content that does not require browser-backed rendering.
+- Run: `./mill -i __.test` or target a suite with `./mill -i <module>.test.testOnly <FQCN>`.
 
 ## Key constraints
 
