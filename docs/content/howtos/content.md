@@ -1,36 +1,37 @@
 ---
-title: Content How Tos
-description: How to do things with Flatmark content
+title: Create an ordered tutorial series
+description: Render a manually ordered list of pages with Jinja
 ---
 
 # {{page.title}}
 
+Use an explicit Jinja list when a series must follow a fixed order instead of Flatmark's pagination sort order.
 
-## How to make a series of tutorials?
+In the series index page, define each entry and render the list:
 
-The default pagination might not fit your use case.
-For example, you might want to have a series of tutorials, 
-which are ordered in a fixed way (not by publish date or title..).
-
-For this, you can use Jinja variables to define a list of tutorials.
-Then use a for loop to render them:
-
-{# we need {% raw %} for first pass (content) 
-and {{ '{%' }} for second (layout) #}
+{# The outer raw block protects Jinja intended for the documented site. #}
 ```markdown
-Tutorials:
 {% raw %}
 {{ '{%' }} set tutorials = [
-    { "label": "My tutorial 1", "url": "/tutorials/tutorial1.html" },
-    { "label": "My tutorial 2", "url": "/tutorials/tutorial2.html" }
+    { "label": "Install the application", "url": "/tutorials/install.html" },
+    { "label": "Create a project", "url": "/tutorials/create-project.html" },
+    { "label": "Deploy the project", "url": "/tutorials/deploy.html" }
 ] %}
-{% endraw  %}
 
-{% raw %}
-{{ '{%' }} for tut in tutorials %}
-- [{{ '{{' }} tut.label }}]({{ '{{' }} tut.url }})
+{{ '{%' }} for tutorial in tutorials %}
+- [{{ '{{' }} tutorial.label }}]({{ '{{' }} tutorial.url }})
 {{ '{%' }} endfor %}
-{% endraw  %}
+{% endraw %}
 ```
 
+Set `pagination.enabled` to `false` in the page's front matter so the index is emitted as one page:
 
+```yaml
+---
+title: Tutorials
+pagination:
+  enabled: false
+---
+```
+
+The rendered links retain the order of the Jinja list.

@@ -1,6 +1,6 @@
 ---
-title: How Tos
-description: Flatmark How Tos
+title: How-to guides
+description: Goal-oriented guides for working with Flatmark
 pagination:
   enabled: false
 ---
@@ -8,12 +8,15 @@ pagination:
 
 # {{page.title}}
 
+Use these guides when you already have a Flatmark site and need to complete a specific task.
+
 
 
 {%
 set howtos = [
-    { "label": "Content", "url": "/howtos/content.html" },
-    { "label": "Gotchas", "url": "/howtos/gotchas.html" }
+    { "label": "Create an ordered tutorial series", "url": "/howtos/content.html" },
+    { "label": "Enable site search", "url": "/howtos/search.html" },
+    { "label": "Troubleshoot templates and tables of contents", "url": "/howtos/gotchas.html" }
 ]
 %}
 
