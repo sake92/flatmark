@@ -1,34 +1,63 @@
 ---
 title: Themes
-description: Flatmark Themes Reference
+description: Flatmark theme source and override reference
 ---
 
-# Themes
+# {{page.title}}
 
-By default, Flatmark uses the `default` theme, downloaded from [flatmark-themes repository](https://github.com/sake92/flatmark-themes).  
-It is based on [PicoCSS](https://picocss.com/docs/conditional).
+Themes provide layouts, includes, translations, and static assets. Theme loading is controlled by the `theme` object in
+`_config.yaml`.
 
-You can use a different theme by setting it in the `_config.yaml` file:
+## Configuration
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `theme.enabled` | boolean | `true` | Enables theme resolution and loading. |
+| `theme.source` | string | Flatmark default-theme URL | Local theme name or HTTP(S) Git repository URL. |
+
+## Local sources
+
+A source without a URL scheme names a folder below `_themes/`:
 
 ```yaml
 theme:
-  source: my_local_theme
-# or
-theme:
-  source: https://github.com/my_user/my_repo?branch=main&folder=my_folder
+  source: my-theme
 ```
 
-In the first case, the theme is taken from the local `_themes/my_local_theme` folder.  
+This resolves to `_themes/my-theme/`. A missing local theme folder fails the build.
 
-In the second case, it is downloaded from the GitHub repository,
-from a specific branch (default is `main`),
-and a specific folder (default is repo root `/`).
+## Remote sources
 
----
-The folders read from theme are: `static`, `_layouts`, `_includes`, `_i18n`
+An HTTP or HTTPS source identifies a Git repository. The URL supports these query parameters:
 
-You can override any file in those folders by mirroring them in your site folder.  
-For example, if you want to override the `page.html` layout, you can create a `_layouts/page.html` file in your site folder.
+| Parameter | Default | Description |
+|---|---|---|
+| `branch` | `main` | Branch passed to the initial shallow clone. |
+| `folder` | `.` | Theme folder within the repository. |
 
+```yaml
+theme:
+  source: https://github.com/example/site-themes?branch=stable&folder=minimal
+```
 
+Remote repositories are stored below `.flatmark-cache/themes/`. An existing checkout is reused unless the CLI receives
+`--update-theme`, which runs `git pull` in that checkout.
 
+Supported URL schemes are `http` and `https`.
+
+## Theme folders
+
+| Folder | Purpose |
+|---|---|
+| `_layouts/` | Page and index layouts. |
+| `_includes/` | Reusable Jinja templates. |
+| `_i18n/` | Translation resource bundles. |
+| `static/` | Assets copied to the generated site. |
+
+## Site overrides
+
+Site-level `_layouts/` and `_includes/` are searched before their theme counterparts. A site layout or include with the
+same relative path therefore overrides the theme file.
+
+Theme static assets are copied first and site `static/` assets second. A site asset replaces a theme asset at the same
+output path.

@@ -7,6 +7,9 @@ pagination:
 
 # {{page.title}}
 
+Follow these lessons in order if you are new to Flatmark. Start with a working site, then add language variants,
+structured data, and a local theme.
+
 {%
 set tutorials = [
     { "label": "Quickstart", "url": "/tutorials/quickstart.html" },
@@ -20,7 +23,6 @@ set tutorials = [
 {% for tut in tutorials %}
 - [{{ tut.label }}]({{ tut.url }})
 {% endfor %}
-
 
 
 

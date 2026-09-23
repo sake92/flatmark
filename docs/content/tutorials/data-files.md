@@ -1,51 +1,53 @@
 ---
-title: Data Files
-description: Flatmark Data Files tutorial
+title: Data files
+description: Render structured YAML data in a Flatmark page
 ---
 
 # {{page.title}}
 
-Data files are normal YAML files that you can use to store structured data for your site.
-You can use them in your pages and layouts to generate dynamic content.
+In this tutorial, you will add a YAML data file to the site from the [Quickstart](/tutorials/quickstart.html) and render
+its values as a list.
 
-## Setting up data files
+## Add the data
 
-Data files are stored in the `_data` folder inside your site folder.
-Create a file `authors.yaml` in the `_data` folder with the following content:
+Create an `_data` folder in the site root. Inside it, create `_data/authors.yaml`:
 
 ```yaml
-- name: Sakib
-  skills: [scala, java, python]
-- name: Senjin
-  skills: [scala, java, javascript]
+- name: Ada
+  skills: [mathematics, writing]
+- name: Grace
+  skills: [compilers, leadership]
 ```
 
-## Using data files in pages
+Flatmark exposes a data file using its base name, so this file becomes `site.data.authors`.
 
-You can use data files in your pages by using the `site.data` variable.
+## Render the authors
 
-
-
-For example, you can create a file `content/authors.md` with the following content:
+Create `content/authors.md`:
 
 ```markdown
+---
+title: Authors
+---
+
+# Authors
+
 {% raw %}
-{{'{%'}} for author in site.data.authors %}
-- {{'{{'}} author.name }}, skills: {{'{{'}} author.skills|join(', ') }}
-{{'{%'}} endfor %}
+{{ '{%' }} for author in site.data.authors %}
+- **{{ '{{' }} author.name }}** — {{ '{{' }} author.skills|join(', ') }}
+{{ '{%' }} endfor %}
 {% endraw %}
 ```
 
-This `for` loop goes through the array defined in `authors.yaml` and generates a list of authors.
-It is the same as if you wrote:
+Start the development server:
 
-```markdown
-- Sakib, skills: scala, java, python
-- Senjin, skills: scala, java, javascript
+```shell
+flatmark serve
 ```
 
-You can take a look at 
-[the example](https://github.com/sake92/flatmark/tree/main/examples/data-file)
-in GitHub for reference.
+Open <http://localhost:5555/authors.html>. You will see both authors and their comma-separated skills.
 
+Change a value in `_data/authors.yaml` and save it. The rebuilt page will show the new value.
 
+The completed structure matches the
+[data-file example](https://github.com/sake92/flatmark/tree/main/examples/data-file).

@@ -1,56 +1,76 @@
 ---
-title: Multilingual Site
-description: Flatmark Multilingual Site tutorial
+title: Multilingual site
+description: Add a second language to a Flatmark site
 ---
 
 # {{page.title}}
 
-This tutorial builds on the [Quickstart](/tutorials/quickstart.html) tutorial.
-It shows how to create a multilingual site with Flatmark.
+In this tutorial, you will add a Bosnian translation to the site from the
+[Quickstart](/tutorials/quickstart.html).
 
-We need to add a bit of configuration to our site.
-Create a file named `_config.yaml` in the root of your site folder (`my_site/`) with the following content:
+## Set the default language
+
+Create `_config.yaml` in the site root:
 
 ```yaml
 lang: en
 ```
-This sets the default language of your site to English.
-You can set it to any language code you prefer, such as `fr` for French or `de` for German.
-For full reference of language codes and subcodes, see https://www.w3.org/International/articles/language-tags/
 
-The `content/` root folder contains the pages for your default language.
+Files directly inside `content/` now represent the English site.
 
-To add another language, create a subfolder named `bs/` 
-(or any other name for your second language) inside the `content/` folder.
-The files structure is mirrored, so the files should be called the same in both languages.
-Flatmark treats files at the same relative path as translations of one another.
-The language switcher links to the matching translation when it exists and otherwise to that language's home page.
+## Add the translated home page
 
-Categories follow the same convention. A category is shown in a language only when that language has the category's
-`index.md` (or `index.html`) file. This means that a site can translate only some pages or categories without generating
-links to missing localized routes.
+Create `content/bs/index.md`:
 
-This is how it should look like this:
+```markdown
+---
+title: Početna
+description: Moja prva Flatmark stranica
+---
+
+# Zdravo, Flatmark!
+
+Ova stranica je generisana iz Markdown dokumenta.
 ```
-my_site/
+
+The site has this structure:
+
+```text
+my-site/
+├── _config.yaml
 └── content/
     ├── index.md
-    ├── about/
-    │   └── index.md
     └── bs/
-        ├── index.md
-        └── about/
-            └── index.md
+        └── index.md
 ```
 
-The `bs/` files will be served at `http://localhost:5555/bs/` URL.
+## Preview both languages
 
-When you `flatmark serve` the site and open it,
-you should see a language switcher in the header on the top right.
+Run:
 
-You can take a look at 
-[the example](https://github.com/sake92/flatmark/tree/main/examples/multilang)
-in GitHub for reference.
+```shell
+flatmark serve
+```
 
+Open <http://localhost:5555> for the English page and <http://localhost:5555/bs/> for the Bosnian page. The default
+theme displays a language switcher linking the two versions.
 
-> Example site: https://sake.ba/
+## Add matching pages
+
+Create `content/about.md`:
+
+```markdown
+# About
+```
+
+Then create its translation at `content/bs/about.md`:
+
+```markdown
+# O nama
+```
+
+Open <http://localhost:5555/about.html> and use the language switcher. It links to `/bs/about.html` because Flatmark
+matches translations by their path relative to the default-language or language-code folder.
+
+The completed structure matches the
+[multilingual example](https://github.com/sake92/flatmark/tree/main/examples/multilang).

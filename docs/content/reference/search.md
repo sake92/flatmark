@@ -1,39 +1,31 @@
 ---
-title: Search
-description: Flatmark Search Reference
+title: Search index
+description: Flatmark generated search-index reference
 ---
 
 # {{page.title}}
 
-After it processes all of the content, Flatmark will create a search index file 
-named `_site/search/entries.json`.
+When `search.enabled` is `true`, Flatmark writes `_site/search/entries.json` after rendering all content and index pages.
 
-It looks like this:
+The file contains a JSON array with one object per rendered page:
 
 ```json
 [
   {
-    "text": "Text of the page",
-    "title": "Title of the page",
-    "url": "/path/to/page.html"
-  },
-  ...
+    "title": "Page title",
+    "url": "/path/to/page.html",
+    "text": "Rendered page text"
+  }
 ]
 ```
 
----
+| Field | Type | Description |
+|---|---|---|
+| `title` | string | Value of the page's `title` front-matter key, or `Untitled`. |
+| `url` | string | Generated page URL, including `base_url` when configured. |
+| `text` | string | Plain text extracted from the rendered content before the layout is applied. |
 
-The next step is to create a search results page.
-You need to create a file `content/search/results.md` with the following content:
+Flatmark generates the index but does not define a query protocol. Search interfaces load and filter the JSON in the
+browser. The default theme supplies a `search-results.html` layout for this purpose.
 
-```markdown
-layout: search-results.html
-```
-
-
-The default theme will do the rest.
-Note that `search.enabled` must be set to `true` in the `_config.yaml` file (default is `true`).
-
-
-
-
+See [Enable site search](/howtos/search.html) for setup instructions.

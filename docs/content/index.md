@@ -1,109 +1,38 @@
 ---
-title: Home
-description: Home page
+title: Flatmark documentation
+description: Build static websites from Markdown, Jinja templates, and static assets
 pagination:
   enabled: false
 ---
 
 # Flatmark
 
-Flatmark strives to be the *most static* ⚡ site generator with sensible defaults.  
+Flatmark turns a folder of Markdown, templates, and static assets into a static website. Code highlighting, math, and
+diagrams are rendered during the build, leaving deployable HTML, CSS, images, and other static files in `_site/`.
 
-It is based on [Jinja](https://jinja.palletsprojects.com/en/stable/templates) for templating and uses [CommonMark](https://commonmark.org/) for markdown rendering.
+## Start here
 
-Most of rendering is done statically: code highlighting, math snippets, diagrams, etc.  
-The only thing you usually need to add for those is CSS.
+New to Flatmark? Follow the [Quickstart](/tutorials/quickstart.html) to create and serve a small site.
 
-## Markdown
-Syntax is based on [commonmark standard](https://commonmark.org/help/) with some extensions:
-- GitHub-style [tables](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/organizing-information-with-tables#creating-a-table)
-- strikethrough with double tilde: `~~text~~`
-- autolink, turns plain text links into links, no need for markdown angle brackets, just write `https://example.com`
-- footnotes, use `[^1]` to create a footnote and `[1]: footnote text` to define it
-- ins, use `++text++` to mark text as inserted (underlined)
-- task list items, use `- [ ]` for unchecked and `- [x]` for checked items
-- image attributes, use `{width=100%}` to set image width, `{height=50px}` for height etc.
-- heading anchor, automatically adds `id`s to headings (`<h1>`, `<h2>`, etc.)
+Already working on a site? Choose the documentation that matches your task:
 
-You can [learn markdown in 60 seconds](https://commonmark.org/help//).
+- [Tutorials](/tutorials/) — learn Flatmark by building a site step by step.
+- [How-to guides](/howtos/) — complete a specific authoring or configuration task.
+- [Reference](/reference/) — look up CLI options, configuration keys, file conventions, and template variables.
+- [Explanation](/explanation/) — understand Flatmark's static-rendering model and its trade-offs.
 
-### Syntax Highlighting
+## What Flatmark provides
 
-To use code syntax highlighting, use the code block syntax with the language specified:
+- CommonMark with tables, footnotes, task lists, and other authoring extensions
+- build-time syntax highlighting, KaTeX, Mermaid, and Graphviz rendering
+- Jinja layouts, includes, data files, pagination, and theme overrides
+- multilingual routes with translation-aware template context
+- generated search indexes
+- a local server with file watching and live reload
 
-````markdown
-```scala
-val x = 5
-```
-````
+## Installation
 
-Result:
-```scala
-val x = 5
-```
+Download the installer for macOS, Linux, or Windows from the
+[Flatmark releases page](https://github.com/sake92/flatmark/releases) and install it for your platform.
 
-Syntax highlighting is done via [highlight.js](https://highlightjs.org/).
-
-### Math
-
-To use math blocks, use the `math` code block syntax:
-````markdown
-```math
-x = 5
-```
-````
-
-Result:
-```math
-x = 5
-```
-
-For more details, see [KaTeX](https://katex.org/).
-
-### Mermaid Diagrams
-
-To create Mermaid diagrams, use the `diagram:mermaid` code block syntax:
-
-````markdown
-```diagram:mermaid
-sequenceDiagram
-        actor Alice
-        actor Bob
-        Alice->>Bob: Hi Bob
-        Bob->>Alice: Hi Alice
-```
-````
-
-Result:
-```diagram:mermaid
-sequenceDiagram
-        actor Alice
-        actor Bob
-        Alice->>Bob: Hi Bob
-        Bob->>Alice: Hi Alice
-```
-
-For more details, see [Mermaid documentation](https://mermaid-js.github.io/mermaid/#/).
-
-### Graphviz Diagrams
-
-To create Graphviz diagrams, use the `diagram:graphviz` code block syntax:
-
-````markdown
-```diagram:graphviz
-digraph G {Hello->World}
-```
-````
-
-
-Result:
-```diagram:graphviz
-digraph G {Hello->World}
-```
-
-For more details, see [Graphviz documentation](https://graphviz.org/documentation/).
-
-
-
-
-
+The first build may download the default theme and a compatible headless Chrome runtime.

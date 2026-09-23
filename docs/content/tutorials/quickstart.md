@@ -1,60 +1,77 @@
 ---
 title: Quickstart
-description: Flatmark Quickstart tutorial
+description: Build and serve your first Flatmark site
 ---
 
 # {{page.title}}
 
-## Installation
-Go to the [releases page](https://github.com/sake92/flatmark/releases).
-Download the installer for your platform and install it.
+In this tutorial, you will create a one-page site, preview it with live reload, and produce a deployable build.
 
-> There are no dependencies you need to install. It works on macOS, Linux and Windows.
+Before starting, install Flatmark by following the instructions in the
+[project README](https://github.com/sake92/flatmark#quick-start). Confirm the installation:
 
-When you type `flatmark --version` it should print the version of Flatmark:
 ```shell
-user$ flatmark --version
-Flatmark CLI 1.2.3
+flatmark --version
 ```
 
+The command prints the installed Flatmark version.
 
-## Create a new site
+## Create the site
 
-Make a new folder for your site, e.g. `my_site`.
-Then create a new folder in it, called `content`.
-Finally, inside `content`, create a new file called `index.md` with the following content:
+Create a folder named `my-site`, then create a `content` folder inside it:
+
+```shell
+mkdir -p my-site/content
+cd my-site
+```
+
+Create `content/index.md` with this content:
 
 ```markdown
-# Welcome to Flatmark!
+---
+title: Home
+description: My first Flatmark site
+---
+
+# Hello, Flatmark!
+
+This page was generated from Markdown.
 ```
 
-The structure of your site should look like this:
+Your site now has this structure:
 
-```
-my_site/
+```text
+my-site/
 └── content/
     └── index.md
 ```
 
-You can take a look at 
-[the example](https://github.com/sake92/flatmark/tree/main/examples/minimal)
-in GitHub for reference.
+## Preview the site
 
-## Build and serve the site
-
-Now you can run the Flatmark CLI to generate and serve your site locally.
-Open a terminal, navigate to your `my_site` folder, and run the following command:
+Start the development server from the `my-site` folder:
 
 ```shell
-user$ flatmark serve
+flatmark serve
 ```
 
-Then open your browser and go to http://localhost:5555.  
-You should see your site with the content of `index.md`.
+The first run may download the default theme and a compatible headless Chrome runtime. When the server reports that it
+has started, open <http://localhost:5555>. You will see the heading and paragraph from `content/index.md`.
 
-> When you change a file, the site will automatically rebuild and browser will reload it.
+Change the heading in `content/index.md` and save the file. Flatmark rebuilds the site and reloads the page in your
+browser.
 
-The generated site files will be in the `my_site/_site` folder.
+Stop the server with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
+## Create a production build
 
+Run:
 
+```shell
+flatmark build
+```
+
+Flatmark writes the generated site to `_site/`. The folder contains static files and can be deployed to any static
+hosting service.
+
+You now have a complete Flatmark build. Continue with the [multilingual site tutorial](/tutorials/multilang.html), or
+look up the available commands in the [CLI reference](/reference/cli.html).
