@@ -32,6 +32,18 @@ distributions:
         platform: 'osx-aarch_64'
       - path: release-artifacts/flatmark-{{projectVersionNumber}}.0.msi
         platform: 'windows-x86_64'
+    brew:
+      active: RELEASE
+      formulaName: flatmark
+      cask:
+        enabled: true
+        name: flatmark
+        displayName: Flatmark
+        pkgName: flatmark-1.0.0.pkg
 
-
-
+packagers:
+  brew:
+    active: NEVER
+    repository:
+      owner: sake92
+      name: homebrew-tap
