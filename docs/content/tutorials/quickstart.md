@@ -7,8 +7,17 @@ description: Build and serve your first Flatmark site
 
 In this tutorial, you will create a one-page site, preview it with live reload, and produce a deployable build.
 
-Before starting, install Flatmark by following the instructions in the
-[project README](https://github.com/sake92/flatmark#quick-start). Confirm the installation:
+## Installation
+
+On macOS, install Flatmark from the Homebrew tap:
+
+```shell
+brew tap sake92/tap
+brew install --cask flatmark
+```
+
+On Linux and Windows, go to the [releases page](https://github.com/sake92/flatmark/releases),
+download the installer for your platform, and install it.
 
 ```shell
 flatmark --version
