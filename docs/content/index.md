@@ -32,7 +32,14 @@ Already working on a site? Choose the documentation that matches your task:
 
 ## Installation
 
-Download the installer for macOS, Linux, or Windows from the
-[Flatmark releases page](https://github.com/sake92/flatmark/releases) and install it for your platform.
+On Debian or Ubuntu, download and install the `.deb` package:
+
+```shell
+curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+sudo apt install ./flatmark.deb
+```
+
+For macOS, other Linux distributions, and Windows, download the installer for your platform from the
+[Flatmark releases page](https://github.com/sake92/flatmark/releases).
 
 The first build may download the default theme and a compatible headless Chrome runtime.

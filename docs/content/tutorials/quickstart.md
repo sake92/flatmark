@@ -16,8 +16,15 @@ brew tap sake92/tap
 brew install --cask flatmark
 ```
 
-On Linux and Windows, go to the [releases page](https://github.com/sake92/flatmark/releases),
-download the installer for your platform, and install it.
+On Debian or Ubuntu, download and install the `.deb` package:
+
+```shell
+curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+sudo apt install ./flatmark.deb
+```
+
+For other Linux distributions and Windows, go to the [releases page](https://github.com/sake92/flatmark/releases),
+download the installer for your platform, and install it. Confirm the installation:
 
 ```shell
 flatmark --version

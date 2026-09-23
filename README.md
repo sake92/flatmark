@@ -11,8 +11,15 @@ search indexing, Sass compilation, and a development server with live reload.
 
 ## Quick start
 
-Download the installer for macOS, Linux, or Windows from the
-[latest release](https://github.com/sake92/flatmark/releases/latest) and install it for your platform.
+For Debian or Ubuntu, download and install the `.deb` package:
+
+```shell
+curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+sudo apt install ./flatmark.deb
+```
+
+For macOS, other Linux distributions, and Windows, download the installer for your platform from the
+[latest release](https://github.com/sake92/flatmark/releases/latest).
 
 Create a site containing one Markdown page:
 
