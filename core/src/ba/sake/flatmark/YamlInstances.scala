@@ -19,19 +19,26 @@ object YamlInstances {
   given YamlEncoder[LocalDateTime] = dt => ScalarNode(dt.toString)
 
   given YamlDecoder[TimeZone] = YamlDecoder { case s @ ScalarNode(value, _) =>
-    Try(TimeZone.getTimeZone(value)).toEither.left
+    Try {
+      if !TimeZone.getAvailableIDs.contains(value) then throw IllegalArgumentException(s"Unknown timezone: ${value}")
+      TimeZone.getTimeZone(value)
+    }.toEither.left
       .map(ConstructError.from(_, "TimeZone", s))
   }
 
   given YamlEncoder[TimeZone] = dt => ScalarNode(dt.toString)
 
   given YamlDecoder[Locale] = YamlDecoder { case s @ ScalarNode(value, _) =>
-    Try(Locale.forLanguageTag(value)).toEither.left
+    Try {
+      val locale = Locale.forLanguageTag(value)
+      if locale.getLanguage.isEmpty then throw IllegalArgumentException(s"Invalid language tag: ${value}")
+      locale
+    }.toEither.left
       .map(ConstructError.from(_, "Language", s))
   }
 
   given YamlEncoder[Locale] = dt => ScalarNode(dt.toString)
-  
+
   given YamlEncoder[Node] = dt => dt
 
   given YamlDecoder[Node] = YamlDecoder { case n =>

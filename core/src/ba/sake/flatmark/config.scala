@@ -10,11 +10,6 @@ import YamlInstances.given
  * These classes are used to parse the YAML front matter in Markdown files and the site configuration.
  */
 
-case class TemplateConfig(
-    site: SiteConfig, // _config.yaml
-    page: PageConfig // page yaml front matter
-) derives YamlCodec
-
 // use all snake case props!
 case class SiteConfig(
     name: String = "My Site",

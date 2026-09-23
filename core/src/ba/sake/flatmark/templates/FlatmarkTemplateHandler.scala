@@ -9,9 +9,12 @@ import com.hubspot.jinjava.Jinjava
 import com.hubspot.jinjava.loader.{CascadingResourceLocator, FileLocator}
 import ba.sake.flatmark.{FlatmarkException, FrontMatterUtils}
 
-class FlatmarkTemplateHandler(flatmarkClassLoader: ClassLoader, 
-                              siteRootFolder: os.Path, themeFolder: Option[os.Path],
-                             markdownRenderer: FlatmarkMarkdownRenderer) {
+class FlatmarkTemplateHandler(
+    flatmarkClassLoader: ClassLoader,
+    siteRootFolder: os.Path,
+    themeFolder: Option[os.Path],
+    markdownRenderer: FlatmarkMarkdownRenderer
+) {
 
   private val logger = LoggerFactory.getLogger(getClass.getName)
 

@@ -143,7 +143,7 @@ case class PaginatorContext(
     getUrl: Int => String
 ) {
   private val totalPages =
-    if pageSize == 0 then 1 // Avoid division by zero
+    if !enabled || pageSize == 0 then 1
     else (totalItems - 1) / pageSize + 1 // Calculate total pages based on total items and page size
   private val hasNext: Boolean = currentPage < totalPages
   private val hasPrev: Boolean = currentPage > 1
