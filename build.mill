@@ -35,6 +35,8 @@ object cli extends Module {
     def jpackageOptions = Seq(
       "--app-version",
       "1.0.0", // macos has to be 1.x.y+ ,will bump to 1.10.0 for example when stable release
+      "--mac-package-identifier",
+      "ba.sake.flatmark",
       "--resource-dir",
       (cli.moduleDir / "resources" / "jpackage" / "macos").wrapped.toString
     )

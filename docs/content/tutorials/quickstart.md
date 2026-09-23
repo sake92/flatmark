@@ -6,8 +6,16 @@ description: Flatmark Quickstart tutorial
 # {{page.title}}
 
 ## Installation
-Go to the [releases page](https://github.com/sake92/flatmark/releases).
-Download the installer for your platform and install it.
+
+On macOS, install Flatmark from the Homebrew tap:
+
+```shell
+brew tap sake92/tap
+brew install --cask flatmark
+```
+
+On Linux and Windows, go to the [releases page](https://github.com/sake92/flatmark/releases),
+download the installer for your platform, and install it.
 
 > There are no dependencies you need to install. It works on macOS, Linux and Windows.
 
@@ -55,6 +63,4 @@ You should see your site with the content of `index.md`.
 > When you change a file, the site will automatically rebuild and browser will reload it.
 
 The generated site files will be in the `my_site/_site` folder.
-
-
 
