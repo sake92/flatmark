@@ -15,7 +15,12 @@ Current design of the project:
 - `ssr-bundles` contains nodejs+bun logic for bundling the JS code needed for SSR, like syntax highlighting and diagram rendering
 - `ssr` contains the server-side rendering logic, renders HTML pages with syntax highlighting and diagrams
   - the `core` is using `ssr` routes to render snippets of code and diagrams
-- `core` contains the core logic of the application, like parsing markdown, templates, rendering diagrams via Selenium etc.
+- `core` contains the site-generation pipeline:
+  - `SiteConfigLoader` and `SiteSourceLoader` validate configuration and source files at the boundary
+  - `SitePlanner` derives routes, languages, categories, sorting, and pagination without writing output
+  - `PageRenderer` renders planned pages through Jinja, Markdown, and Jsoup
+  - `AssetPublisher` publishes static assets and compiles Sass
+  - completed builds replace `_site` transactionally; failed builds leave the previous site intact
 - `cli` contains the command line interface for the application
 - `swebserver` contains the static files webserver with live reload
 
@@ -29,5 +34,4 @@ Current design of the project:
 - minimum app size
 
 Need to be careful with reflection, dynamic class loading, etc.
-
 

@@ -4,7 +4,7 @@ import java.security.MessageDigest
 import java.util.Base64
 
 object HashUtils {
-  
+
   def generate(str: String): String = {
     val bytesOfMessage = str.getBytes("UTF-8")
     val md = MessageDigest.getInstance("MD5")

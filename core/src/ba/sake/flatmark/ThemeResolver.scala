@@ -38,7 +38,7 @@ object ThemeResolver {
         if os.exists(themeRepoFolder) then {
           if updateTheme then
             logger.info(s"Updating theme from ${themeSource}...")
-            os.call(("git", "pull"), cwd = themeRepoFolder)
+            os.call(("git", "pull"), cwd = themeRepoFolder, timeout = 120000)
             logger.info(s"Pulled latest theme")
           else logger.debug(s"Theme is already downloaded. Skipping update.")
         } else {
@@ -48,7 +48,8 @@ object ThemeResolver {
           os.makeDir.all(themesCacheFolder)
           os.call(
             ("git", "clone", "--depth", "1", "--branch", qp.branch, httpCloneUrl, themeHash),
-            cwd = themesCacheFolder
+            cwd = themesCacheFolder,
+            timeout = 120000
           )
           logger.info(s"Cloned theme")
         }

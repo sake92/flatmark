@@ -20,9 +20,8 @@ import org.commonmark.renderer.html.HtmlNodeRendererContext
 import org.commonmark.renderer.html.HtmlWriter
 import ba.sake.flatmark.CachingFlatmarkSsr
 
-
 object InlineMathExtension {
-  def create(ssr: CachingFlatmarkSsr): InlineMathExtension = 
+  def create(ssr: CachingFlatmarkSsr): InlineMathExtension =
     new InlineMathExtension(ssr)
 }
 
@@ -31,8 +30,9 @@ class InlineMathExtension(ssr: CachingFlatmarkSsr) extends Parser.ParserExtensio
     parserBuilder.customDelimiterProcessor(new InlineMathDelimiterProcessor())
 
   override def extend(rendererBuilder: HtmlRenderer.Builder): Unit =
-    rendererBuilder.nodeRendererFactory((context: HtmlNodeRendererContext) => 
-        new InlineMathHtmlNodeRenderer(context, ssr))
+    rendererBuilder.nodeRendererFactory((context: HtmlNodeRendererContext) =>
+      new InlineMathHtmlNodeRenderer(context, ssr)
+    )
 }
 
 class InlineMathNode extends CustomNode with Delimited {
@@ -68,7 +68,6 @@ class InlineMathDelimiterProcessor extends DelimiterProcessor {
     }
 }
 
-
 class InlineMathHtmlNodeRenderer(context: HtmlNodeRendererContext, ssr: CachingFlatmarkSsr) extends NodeRenderer {
   private val html = context.getWriter
 
@@ -89,7 +88,7 @@ class InlineMathHtmlNodeRenderer(context: HtmlNodeRendererContext, ssr: CachingF
   private def collectLiteralText(node: Node, sb: java.lang.StringBuilder): Unit = {
     node match {
       case text: Text => sb.append(text.getLiteral)
-      case _ => () // do nothing for other node types
+      case _          => () // do nothing for other node types
     }
     var child = node.getFirstChild
     while (child != null) {

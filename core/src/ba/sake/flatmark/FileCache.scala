@@ -1,6 +1,5 @@
 package ba.sake.flatmark
 
-
 class FileCache(cacheFolder: os.Path, useCache: Boolean) {
 
   def cached(prefix: String, cacheKeyParts: String*)(code: => String): String = {

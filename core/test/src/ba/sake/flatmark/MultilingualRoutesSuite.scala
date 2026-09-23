@@ -1,6 +1,7 @@
 package ba.sake.flatmark
 
 import ba.sake.flatmark.ssr.WebDriverHolder
+import ba.sake.flatmark.generation.FlatmarkGenerator
 
 class MultilingualRoutesSuite extends munit.FunSuite {
 
