@@ -115,7 +115,7 @@ private[generation] object SitePlanner {
       .collect { case segments if segments.length > 1 && Iso2LanguageCodes(segments.head) => segments.head }
       .toSet
     val usedLanguages =
-      (siteConfig.lang.toLanguageTag +: translationLanguages.toSeq).distinct.sorted.map(Locale.forLanguageTag)
+      (siteConfig.lang.toLanguageTag :: translationLanguages.toList).distinct.sorted.map(Locale.forLanguageTag)
     val (indexFiles, contentFiles) = sources.files.partition(_.baseName == "index")
     new SitePlan(
       contentFiles,
@@ -139,9 +139,9 @@ private[generation] object SitePlanner {
     val isTranslation = relativePath.segments.length > 1 && Iso2LanguageCodes(relativePath.segments.head)
     val language = if isTranslation then Locale.forLanguageTag(relativePath.segments.head) else defaultLanguage
     val logicalSegments =
-      (if isTranslation then relativePath.segments.tail else relativePath.segments).init :+ file.baseName
+      (if isTranslation then relativePath.segments.tail else relativePath.segments).init.appended(file.baseName)
     val extension = pageConfig.ext.getOrElse("html")
-    val outputSegments = relativePath.segments.init :+ s"${file.baseName}.${extension}"
+    val outputSegments = relativePath.segments.init.appended(s"${file.baseName}.${extension}")
     val url =
       if file.baseName == "index" && extension == "html" then {
         val folderUrl = outputSegments.init.mkString("/")
