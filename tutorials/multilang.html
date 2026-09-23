@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Multilingual Site tutorial">
-  <title> Multilingual Site | Flatmark Docs </title>
+  <meta name="description" content="Add a second language to a Flatmark site">
+  <title> Multilingual site | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -28,8 +28,9 @@
     </ul>
     <ul>
      <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
      <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
     </ul>
    </nav>
   </header>
@@ -40,7 +41,13 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#multilingual-site">Multilingual Site</a></li>
+        <li><a href="#multilingual-site">Multilingual site</a>
+         <ul>
+          <li><a href="#set-the-default-language">Set the default language</a></li>
+          <li><a href="#add-the-translated-home-page">Add the translated home page</a></li>
+          <li><a href="#preview-both-languages">Preview both languages</a></li>
+          <li><a href="#add-matching-pages">Add matching pages</a></li>
+         </ul></li>
        </ul>
       </div>
      </details>
@@ -49,32 +56,46 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="multilingual-site">Multilingual Site<a href="#multilingual-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>This tutorial builds on the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> tutorial. It shows how to create a multilingual site with Flatmark.</p>
-   <p>We need to add a bit of configuration to our site. Create a file named <code>_config.yaml</code> in the root of your site folder (<code>my_site/</code>) with the following content:</p>
+   <h1 id="multilingual-site">Multilingual site<a href="#multilingual-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>In this tutorial, you will add a Bosnian translation to the site from the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a>.</p>
+   <h2 id="set-the-default-language">Set the default language<a href="#set-the-default-language" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Create <code>_config.yaml</code> in the site root:</p>
    <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
 </code></pre>
-   <p>This sets the default language of your site to English. You can set it to any language code you prefer, such as <code>fr</code> for French or <code>de</code> for German. For full reference of language codes and subcodes, see <a href="https://www.w3.org/International/articles/language-tags/">https://www.w3.org/International/articles/language-tags/</a></p>
-   <p>The <code>content/</code> root folder contains the pages for your default language.</p>
-   <p>To add another language, create a subfolder named <code>bs/</code> (or any other name for your second language) inside the <code>content/</code> folder. The files structure is mirrored, so the files should be called the same in both languages. Flatmark treats files at the same relative path as translations of one another. The language switcher links to the matching translation when it exists and otherwise to that language's home page.</p>
-   <p>Categories follow the same convention. A category is shown in a language only when that language has the category's <code>index.md</code> (or <code>index.html</code>) file. This means that a site can translate only some pages or categories without generating links to missing localized routes.</p>
-   <p>This is how it should look like this:</p>
-   <pre><code class="language- hljs language-nix" data-highlighted="yes">my_site<span class="hljs-symbol">/</span>
-└── content<span class="hljs-symbol">/</span>
-    ├── index.md
-    ├── about<span class="hljs-symbol">/</span>
-    │   └── index.md
-    └── bs<span class="hljs-symbol">/</span>
-        ├── index.md
-        └── about<span class="hljs-symbol">/</span>
-            └── index.md
+   <p>Files directly inside <code>content/</code> now represent the English site.</p>
+   <h2 id="add-the-translated-home-page">Add the translated home page<a href="#add-the-translated-home-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Create <code>content/bs/index.md</code>:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">---
+title: Početna
+<span class="hljs-section">description: Moja prva Flatmark stranica
+---</span>
+
+<span class="hljs-section"># Zdravo, Flatmark!</span>
+
+Ova stranica je generisana iz Markdown dokumenta.
 </code></pre>
-   <p>The <code>bs/</code> files will be served at <code>http://localhost:5555/bs/</code> URL.</p>
-   <p>When you <code>flatmark serve</code> the site and open it, you should see a language switcher in the header on the top right.</p>
-   <p>You can take a look at <a href="https://github.com/sake92/flatmark/tree/main/examples/multilang">the example</a> in GitHub for reference.</p>
-   <blockquote>
-    <p>Example site: <a href="https://sake.ba/">https://sake.ba/</a></p>
-   </blockquote>
+   <p>The site has this structure:</p>
+   <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">my-site/
+├── _config.yaml
+└── content/
+    ├── index.md
+    └── bs/
+        └── index.md
+</code></pre>
+   <h2 id="preview-both-languages">Preview both languages<a href="#preview-both-languages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Run:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes">flatmark serve
+</code></pre>
+   <p>Open <a href="http://localhost:5555">http://localhost:5555</a> for the English page and <a href="http://localhost:5555/bs/">http://localhost:5555/bs/</a> for the Bosnian page. The default theme displays a language switcher linking the two versions.</p>
+   <h2 id="add-matching-pages">Add matching pages<a href="#add-matching-pages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Create <code>content/about.md</code>:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># About</span>
+</code></pre>
+   <p>Then create its translation at <code>content/bs/about.md</code>:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># O nama</span>
+</code></pre>
+   <p>Open <a href="http://localhost:5555/about.html">http://localhost:5555/about.html</a> and use the language switcher. It links to <code>/bs/about.html</code> because Flatmark matches translations by their path relative to the default-language or language-code folder.</p>
+   <p>The completed structure matches the <a href="https://github.com/sake92/flatmark/tree/main/examples/multilang">multilingual example</a>.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

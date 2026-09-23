@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Flatmark command-line reference">
+  <title> CLI | Flatmark Docs </title>
+  <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
+ </head>
+ <body>
+  <header class="pico container">
+   <nav>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
+    </ul>
+    <ul>
+     <li>
+      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
+       <input name="q" type="search" placeholder="Search">
+      </form>
+     </li>
+    </ul>
+    <ul>
+     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
+     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
+    </ul>
+   </nav>
+  </header>
+  <main class="pico container">
+   <div class="grid">
+    <div>
+     <details>
+      <summary>Table of Contents</summary>
+      <div>
+       <ul>
+        <li><a href="#cli">CLI</a>
+         <ul>
+          <li><a href="#syntax">Syntax</a></li>
+          <li><a href="#commands">Commands</a></li>
+          <li><a href="#options">Options</a></li>
+          <li><a href="#environment-variables">Environment variables</a></li>
+          <li><a href="#exit-behavior">Exit behavior</a></li>
+         </ul></li>
+       </ul>
+      </div>
+     </details>
+     <hr>
+    </div>
+    <div></div>
+    <div></div>
+   </div>
+   <h1 id="cli">CLI<a href="#cli" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="syntax">Syntax<a href="#syntax" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">flatmark [command] [options]
+</code></pre>
+   <p>The default command is <code>build</code>.</p>
+   <h2 id="commands">Commands<a href="#commands" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Command</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>build</code></td>
+      <td>Generate the site and exit.</td>
+     </tr>
+     <tr>
+      <td><code>serve</code></td>
+      <td>Generate the site, serve <code>_site/</code>, watch source files, and reload connected browsers after changes.</td>
+     </tr>
+     <tr>
+      <td><code>version</code></td>
+      <td>Print the version and exit.</td>
+     </tr>
+    </tbody>
+   </table>
+   <p>Unknown commands exit with status 1.</p>
+   <h2 id="options">Options<a href="#options" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Option</th>
+      <th align="right">Default</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>-v</code>, <code>--version</code></td>
+      <td align="right">off</td>
+      <td>Print the version and exit.</td>
+     </tr>
+     <tr>
+      <td><code>-i</code>, <code>--input</code></td>
+      <td align="right"><code>.</code></td>
+      <td>Site root folder.</td>
+     </tr>
+     <tr>
+      <td><code>-h</code>, <code>--host</code></td>
+      <td align="right"><code>localhost</code></td>
+      <td>Host interface used by <code>serve</code>.</td>
+     </tr>
+     <tr>
+      <td><code>-p</code>, <code>--port</code></td>
+      <td align="right"><code>5555</code></td>
+      <td>HTTP port used by <code>serve</code>.</td>
+     </tr>
+     <tr>
+      <td><code>-l</code>, <code>--log-level</code></td>
+      <td align="right"><code>info</code></td>
+      <td>Log level: <code>debug</code>, <code>info</code>, or <code>error</code>.</td>
+     </tr>
+     <tr>
+      <td><code>--no-cache</code></td>
+      <td align="right">off</td>
+      <td>Skip cached server-side rendering results.</td>
+     </tr>
+     <tr>
+      <td><code>--update-theme</code></td>
+      <td align="right">off</td>
+      <td>Pull the configured remote theme when it is already cached.</td>
+     </tr>
+    </tbody>
+   </table>
+   <p><code>--host</code> and <code>--port</code> have no effect on the generated site produced by <code>build</code>.</p>
+   <h2 id="environment-variables">Environment variables<a href="#environment-variables" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Variable</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>FLATMARK_BASE_URL</code></td>
+      <td>Supplies <code>base_url</code> when <code>_config.yaml</code> does not define it.</td>
+     </tr>
+    </tbody>
+   </table>
+   <h2 id="exit-behavior">Exit behavior<a href="#exit-behavior" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p><code>build</code> exits with status 1 when generation fails. <code>serve</code> remains active until interrupted and stops its HTTP and server-side-rendering servers during shutdown.</p>
+  </main>
+  <footer class="pico container">Flatmark Docs</footer>
+ </body>
+</html>

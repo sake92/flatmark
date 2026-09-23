@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Tutorials">
-  <title> Tutorials | Flatmark Docs </title>
+  <meta name="description" content="Add the generated search index and default search results page">
+  <title> Enable site search | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -41,7 +41,7 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#tutorials">Tutorials</a></li>
+        <li><a href="#enable-site-search">Enable site search</a></li>
        </ul>
       </div>
      </details>
@@ -50,22 +50,22 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="tutorials">Tutorials<a href="#tutorials" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Follow these lessons in order if you are new to Flatmark. Start with a working site, then add language variants, structured data, and a local theme.</p>
-   <ul>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/tutorials/multilang.html">Multilingual Site</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/tutorials/data-files.html">Data Files</a></p>
-    </li>
-    <li>
-     <p><a href="https://sake92.github.io/flatmark/tutorials/custom_local_theme.html">Custom Local Theme</a></p>
-    </li>
-   </ul>
+   <h1 id="enable-site-search">Enable site search<a href="#enable-site-search" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>Enable search in <code>_config.yaml</code>:</p>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">search:</span>
+  <span class="hljs-attr">enabled:</span> <span class="hljs-literal">true</span>
+</code></pre>
+   <p>Create <code>content/search/results.md</code>:</p>
+   <pre><code class="language-markdown hljs" data-highlighted="yes">---
+title: Search results
+<span class="hljs-section">layout: search-results.html
+---</span>
+</code></pre>
+   <p>Build the site:</p>
+   <pre><code class="language-shell hljs" data-highlighted="yes">flatmark build
+</code></pre>
+   <p>Flatmark writes the index to <code>_site/search/entries.json</code>. The default theme's <code>search-results.html</code> layout reads that index and displays matching pages.</p>
+   <p>If a custom theme does not provide <code>search-results.html</code>, add an equivalent layout to the site's <code>_layouts/</code> folder. See the <a href="https://sake92.github.io/flatmark/reference/search.html">search index reference</a> for the generated JSON format.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

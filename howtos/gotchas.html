@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Gotchas">
-  <title> Gotchas | Flatmark Docs </title>
+  <meta name="description" content="Resolve common Flatmark template limitations">
+  <title> Troubleshoot templates and tables of contents | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -28,8 +28,9 @@
     </ul>
     <ul>
      <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
      <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
     </ul>
    </nav>
   </header>
@@ -40,10 +41,10 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#gotchas">Gotchas</a>
+        <li><a href="#troubleshoot-templates-and-tables-of-contents">Troubleshoot templates and tables of contents</a>
          <ul>
-          <li><a href="#cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template</a></li>
-          <li><a href="#cant-use-toc-in-a-page">Can't use TOC in a page</a></li>
+          <li><a href="#content-disappears-from-a-template-that-uses-extends">Content disappears from a template that uses extends</a></li>
+          <li><a href="#a-table-of-contents-is-empty-in-a-content-page">A table of contents is empty in a content page</a></li>
          </ul></li>
        </ul>
       </div>
@@ -53,29 +54,27 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="gotchas">Gotchas<a href="#gotchas" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <h2 id="cant-add-content-to-a-template-that-extends-another-template">Can't add content to a template that extends another template<a href="#cant-add-content-to-a-template-that-extends-another-template" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>When you extend a template:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">
+   <h1 id="troubleshoot-templates-and-tables-of-contents">Troubleshoot templates and tables of contents<a href="#troubleshoot-templates-and-tables-of-contents" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <h2 id="content-disappears-from-a-template-that-uses-extends">Content disappears from a template that uses <code>extends</code><a href="#content-disappears-from-a-template-that-uses-extends" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>When a Jinja template extends another template, put all child content inside blocks declared by the parent template. Content outside those blocks is not rendered.</p>
+   <p>If <code>_layouts/base.html</code> declares this block:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes">
+{% block content %}{% endblock %}
+
+</code></pre>
+   <p>Override that same block in the child template:</p>
+   <pre><code class="language-html hljs language-xml" data-highlighted="yes">
 {% extends "base.html" %}
 
-{% block title %}
-<span class="hljs-code">    {{page.title}}
+{% block content %}
+  {{ page.content }}
 {% endblock %}
-</span>
----
-cant add this!!!
 
-{% block hack %}
-<span class="hljs-code">    cant add this either!!!
-{% endblock %}
-</span>
 </code></pre>
-   <p>note that <strong>you can only override blocks that are defined in the base template</strong>,
-    <br>
-    you cannot create new blocks or add content.</p>
-   <h2 id="cant-use-toc-in-a-page">Can't use TOC in a page<a href="#cant-use-toc-in-a-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>You must use it inside a template. This is a technical limitation, because we take the header ids from markdown-generated HTML.</p>
+   <p>Do not add undeclared blocks to the child; the parent has no location in which to render them.</p>
+   <h2 id="a-table-of-contents-is-empty-in-a-content-page">A table of contents is empty in a content page<a href="#a-table-of-contents-is-empty-in-a-content-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Render <code>page.toc</code> from a layout or include, not directly from a Markdown content file. Flatmark creates the table of contents after it renders the Markdown headings, so the value is available during layout rendering.</p>
+   <p>Place the table-of-contents markup in an include such as <code>_includes/toc.html</code>, then include it from the page layout. See the <a href="https://sake92.github.io/flatmark/reference/template-context.html#page-toc-items"><code>page.toc</code> reference</a> for its fields.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

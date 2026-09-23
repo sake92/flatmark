@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Themes Reference">
+  <meta name="description" content="Flatmark theme source and override reference">
   <title> Themes | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
@@ -28,8 +28,9 @@
     </ul>
     <ul>
      <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
      <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
     </ul>
    </nav>
   </header>
@@ -40,7 +41,14 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#themes">Themes</a></li>
+        <li><a href="#themes">Themes</a>
+         <ul>
+          <li><a href="#configuration">Configuration</a></li>
+          <li><a href="#local-sources">Local sources</a></li>
+          <li><a href="#remote-sources">Remote sources</a></li>
+          <li><a href="#theme-folders">Theme folders</a></li>
+          <li><a href="#site-overrides">Site overrides</a></li>
+         </ul></li>
        </ul>
       </div>
      </details>
@@ -50,23 +58,96 @@
     <div></div>
    </div>
    <h1 id="themes">Themes<a href="#themes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>By default, Flatmark uses the <code>default</code> theme, downloaded from <a href="https://github.com/sake92/flatmark-themes">flatmark-themes repository</a>.
-    <br>
-    It is based on <a href="https://picocss.com/docs/conditional">PicoCSS</a>.</p>
-   <p>You can use a different theme by setting it in the <code>_config.yaml</code> file:</p>
+   <p>Themes provide layouts, includes, translations, and static assets. Theme loading is controlled by the <code>theme</code> object in <code>_config.yaml</code>.</p>
+   <h2 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Key</th>
+      <th>Type</th>
+      <th>Default</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>theme.enabled</code></td>
+      <td>boolean</td>
+      <td><code>true</code></td>
+      <td>Enables theme resolution and loading.</td>
+     </tr>
+     <tr>
+      <td><code>theme.source</code></td>
+      <td>string</td>
+      <td>Flatmark default-theme URL</td>
+      <td>Local theme name or HTTP(S) Git repository URL.</td>
+     </tr>
+    </tbody>
+   </table>
+   <h2 id="local-sources">Local sources<a href="#local-sources" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>A source without a URL scheme names a folder below <code>_themes/</code>:</p>
    <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span>
-  <span class="hljs-attr">source:</span> <span class="hljs-string">my_local_theme</span>
-<span class="hljs-comment"># or</span>
-<span class="hljs-attr">theme:</span>
-  <span class="hljs-attr">source:</span> <span class="hljs-string">https://github.com/my_user/my_repo?branch=main&amp;folder=my_folder</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">my-theme</span>
 </code></pre>
-   <p>In the first case, the theme is taken from the local <code>_themes/my_local_theme</code> folder.</p>
-   <p>In the second case, it is downloaded from the GitHub repository, from a specific branch (default is <code>main</code>), and a specific folder (default is repo root <code>/</code>).</p>
-   <hr>
-   <p>The folders read from theme are: <code>static</code>, <code>_layouts</code>, <code>_includes</code>, <code>_i18n</code></p>
-   <p>You can override any file in those folders by mirroring them in your site folder.
-    <br>
-    For example, if you want to override the <code>page.html</code> layout, you can create a <code>_layouts/page.html</code> file in your site folder.</p>
+   <p>This resolves to <code>_themes/my-theme/</code>. A missing local theme folder fails the build.</p>
+   <h2 id="remote-sources">Remote sources<a href="#remote-sources" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>An HTTP or HTTPS source identifies a Git repository. The URL supports these query parameters:</p>
+   <table>
+    <thead>
+     <tr>
+      <th>Parameter</th>
+      <th>Default</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>branch</code></td>
+      <td><code>main</code></td>
+      <td>Branch passed to the initial shallow clone.</td>
+     </tr>
+     <tr>
+      <td><code>folder</code></td>
+      <td><code>.</code></td>
+      <td>Theme folder within the repository.</td>
+     </tr>
+    </tbody>
+   </table>
+   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">theme:</span>
+  <span class="hljs-attr">source:</span> <span class="hljs-string">https://github.com/example/site-themes?branch=stable&amp;folder=minimal</span>
+</code></pre>
+   <p>Remote repositories are stored below <code>.flatmark-cache/themes/</code>. An existing checkout is reused unless the CLI receives <code>--update-theme</code>, which runs <code>git pull</code> in that checkout.</p>
+   <p>Supported URL schemes are <code>http</code> and <code>https</code>.</p>
+   <h2 id="theme-folders">Theme folders<a href="#theme-folders" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <table>
+    <thead>
+     <tr>
+      <th>Folder</th>
+      <th>Purpose</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>_layouts/</code></td>
+      <td>Page and index layouts.</td>
+     </tr>
+     <tr>
+      <td><code>_includes/</code></td>
+      <td>Reusable Jinja templates.</td>
+     </tr>
+     <tr>
+      <td><code>_i18n/</code></td>
+      <td>Translation resource bundles.</td>
+     </tr>
+     <tr>
+      <td><code>static/</code></td>
+      <td>Assets copied to the generated site.</td>
+     </tr>
+    </tbody>
+   </table>
+   <h2 id="site-overrides">Site overrides<a href="#site-overrides" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+   <p>Site-level <code>_layouts/</code> and <code>_includes/</code> are searched before their theme counterparts. A site layout or include with the same relative path therefore overrides the theme file.</p>
+   <p>Theme static assets are copied first and site <code>static/</code> assets second. A site asset replaces a theme asset at the same output path.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>

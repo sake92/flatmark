@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="Flatmark Search Reference">
-  <title> Search | Flatmark Docs </title>
+  <meta name="description" content="Flatmark generated search-index reference">
+  <title> Search index | Flatmark Docs </title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
@@ -28,8 +28,9 @@
     </ul>
     <ul>
      <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How Tos</a></li>
+     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
      <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
+     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
     </ul>
    </nav>
   </header>
@@ -40,7 +41,7 @@
       <summary>Table of Contents</summary>
       <div>
        <ul>
-        <li><a href="#search">Search</a></li>
+        <li><a href="#search-index">Search index</a></li>
        </ul>
       </div>
      </details>
@@ -49,23 +50,45 @@
     <div></div>
     <div></div>
    </div>
-   <h1 id="search">Search<a href="#search" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>After it processes all of the content, Flatmark will create a search index file named <code>_site/search/entries.json</code>.</p>
-   <p>It looks like this:</p>
+   <h1 id="search-index">Search index<a href="#search-index" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+   <p>When <code>search.enabled</code> is <code>true</code>, Flatmark writes <code>_site/search/entries.json</code> after rendering all content and index pages.</p>
+   <p>The file contains a JSON array with one object per rendered page:</p>
    <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
   <span class="hljs-punctuation">{</span>
-    <span class="hljs-attr">"text"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Text of the page"</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Title of the page"</span><span class="hljs-punctuation">,</span>
-    <span class="hljs-attr">"url"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/page.html"</span>
-  <span class="hljs-punctuation">}</span><span class="hljs-punctuation">,</span>
-  ...
+    <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Page title"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"url"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/page.html"</span><span class="hljs-punctuation">,</span>
+    <span class="hljs-attr">"text"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Rendered page text"</span>
+  <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">]</span>
 </code></pre>
-   <hr>
-   <p>The next step is to create a search results page. You need to create a file <code>content/search/results.md</code> with the following content:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">layout: search-results.html
-</code></pre>
-   <p>The default theme will do the rest. Note that <code>search.enabled</code> must be set to <code>true</code> in the <code>_config.yaml</code> file (default is <code>true</code>).</p>
+   <table>
+    <thead>
+     <tr>
+      <th>Field</th>
+      <th>Type</th>
+      <th>Description</th>
+     </tr>
+    </thead>
+    <tbody>
+     <tr>
+      <td><code>title</code></td>
+      <td>string</td>
+      <td>Value of the page's <code>title</code> front-matter key, or <code>Untitled</code>.</td>
+     </tr>
+     <tr>
+      <td><code>url</code></td>
+      <td>string</td>
+      <td>Generated page URL, including <code>base_url</code> when configured.</td>
+     </tr>
+     <tr>
+      <td><code>text</code></td>
+      <td>string</td>
+      <td>Plain text extracted from the rendered content before the layout is applied.</td>
+     </tr>
+    </tbody>
+   </table>
+   <p>Flatmark generates the index but does not define a query protocol. Search interfaces load and filter the JSON in the browser. The default theme supplies a <code>search-results.html</code> layout for this purpose.</p>
+   <p>See <a href="https://sake92.github.io/flatmark/howtos/search.html">Enable site search</a> for setup instructions.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
  </body>
