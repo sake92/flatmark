@@ -1,6 +1,6 @@
 ---
 title: Enable site search
-description: Add the generated search index and default search results page
+description: Enable the generated search index and results page
 ---
 
 # {{page.title}}
@@ -12,23 +12,16 @@ search:
   enabled: true
 ```
 
-Create `content/search/results.md`:
-
-```markdown
----
-title: Search results
-layout: search-results.html
----
-```
-
 Build the site:
 
 ```shell
 flatmark build
 ```
 
-Flatmark writes the index to `_site/search/entries.json`. The default theme's `search-results.html` layout reads that
-index and displays matching pages.
+Flatmark writes the index to `_site/search/entries.json`. When the theme provides `search-results.html`, Flatmark also
+generates `_site/search/results.html` automatically. The default theme provides this layout and a search form.
 
-If a custom theme does not provide `search-results.html`, add an equivalent layout to the site's `_layouts/` folder.
+To customize the results page, create `content/search/results.md` with `layout: search-results.html` in its front matter.
+That page takes precedence over the automatic page. A custom theme can provide the layout in its `_layouts/` folder, or
+the site can provide one in its own `_layouts/` folder.
 See the [search index reference](/reference/search.html) for the generated JSON format.

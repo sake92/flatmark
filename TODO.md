@@ -1,55 +1,31 @@
+# TODO
 
-# docs
-- pagination
-- template context variables
-- theme authoring
-- sass
-- cli reference
-- categories
-- tags (not implemented yet)
+Ordered roughly by usefulness and urgency, with smaller changes first when impact is similar.
 
-# content
+## Next
 
-- highlight active category link
-- translation_url filter
-- tabbed content e.g. windows/linux/mac
-- RSS+Atom feeds
-  - one global feed
-  - per language 
-  - per category
-- page image for preview
-- nifty features like:
-  - code blocks with line numbers
-  - code blocks with copy button
-  - code blocks with language selection
-  - code blocks with download button
-  - https://welpo.github.io/tabi/blog/shortcodes/
+1. Add `flatmark check` for broken internal links and missing images. (Medium)
+2. Add `flatmark init` to scaffold a new site. (Medium)
+3. Add a copy button to rendered code blocks. (Small)
+4. Show unpublished and future-dated posts in `flatmark serve`, with a visible warning. (Medium)
+5. Support a page image for social previews. (Medium)
+6. Expand the Sass docs with installation, `_sass/` input, and generated CSS examples. (Small)
+7. Open the site in a browser when `flatmark serve` starts. (Small)
+8. Show a visible development-server label on pages served by `flatmark serve`. (Small)
 
-- sass support
+## Later
 
-# flatmark init
-- command to scaffold a new site
+9. Add a `translation_url` template filter for linking to a specified language. `site.langs[].url` already covers language links for the current page. (Small)
+10. Complete tag support: assign tags to pages, expose tagged pages to templates, and document usage. Configuration currently only exposes tag labels and descriptions. (Medium)
+11. Add RSS and Atom feeds: one site-wide feed, then per-language and per-category feeds. (Large)
+12. Add tabbed content for platform-specific instructions, such as Windows, Linux, and macOS. (Medium)
+13. Check heading-level jumps in `flatmark check`. (Small)
+14. Add line numbers to code blocks. (Medium)
+15. Add a download button to code blocks. (Medium)
+16. Add language selection to code blocks. (Medium)
+17. Explore shortcodes and other content features, using [tabi's shortcodes](https://welpo.github.io/tabi/blog/shortcodes/) as inspiration. (Large)
+18. Import sites from WordPress, Jekyll, and other platforms. (Large)
 
-# flatmark check
-- command to check the site for errors:
-  - broken links
-  - missing images
-  - skipping headings 
+## Theme ideas
 
-
-## flatmark serve (swebserver)
-- show a label down below with a warning that this is a dev server
-- render even the posts that are not published, and future-date posts! (and show a nice warning)
-- automatically open the browser
-
-
-## Migrating from other platforms
-- import from wordpress, jekyll itd
-
-## themes
-Try copying the themes from:
-- https://jekyll-themes.com/
-- https://github.com/sharu725/online-cv/tree/master
-- https://jamstackthemes.dev/
-
-
+- Explore themes from <https://jekyll-themes.com/>, <https://github.com/sharu725/online-cv/tree/master>, and <https://jamstackthemes.dev/>.

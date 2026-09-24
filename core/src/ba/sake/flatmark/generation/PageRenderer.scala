@@ -22,6 +22,23 @@ private[generation] final class PageRenderer(
   private val UrlAttributes = Seq("href", "src", "cite", "action", "formaction", "data", "poster", "manifest")
   private val contextFactory = TemplateContextFactory(siteConfig, dataYamls)
 
+  def renderSearchPage(categoryContexts: ListMap[String, CategoryContext]): Unit = {
+    val path = os.RelPath("search/results.html")
+    val context = contextFactory.create(
+      Seq(siteConfig.lang -> "/search/results.html"),
+      siteConfig.lang,
+      PageConfig(layout = Some("search-results.html"), title = "Search"),
+      "search-results.html",
+      _ => path,
+      _ => s"${siteConfig.base_url.getOrElse("")}/search/results.html",
+      None,
+      1,
+      0,
+      categoryContexts
+    )
+    os.write.over(outputFolder / path, renderLayout(context, siteConfig.lang), createFolders = true)
+  }
+
   def render(
       file: os.Path,
       pageConfig: PageConfig,
@@ -121,25 +138,29 @@ private[generation] final class PageRenderer(
       page = contentContext.page.copy(content = contentHtml, text = contentDocument.text(), toc = toc)
     )
 
-    val finalHtml = {
-      val document = Jsoup.parse(templateHandler.render(layoutContext.page.layout, layoutContext.toJavaContext, locale))
-      layoutContext.site.baseUrl.foreach { baseUrl =>
-        UrlAttributes.foreach { attribute =>
-          document.select(s"""[${attribute}^="/"]""").forEach { element =>
-            element.attr(attribute, baseUrl + element.attr(attribute))
-          }
-        }
-      }
-      document.select("h1,h2,h3,h4,h5,h6").forEach { element =>
-        val id = element.attr("id").trim
-        if id.nonEmpty then element.append(s"""<a href="#${id}" class="flatmark-anchor" aria-label="Anchor"> 🔗</a>""")
-      }
-      document.toString
-    }
-
-    os.write.over(outputFolder / layoutContext.page.rootRelPath, finalHtml, createFolders = true)
+    os.write.over(
+      outputFolder / layoutContext.page.rootRelPath,
+      renderLayout(layoutContext, locale),
+      createFolders = true
+    )
     logger.debug(s"Rendered templated file: ${file}")
     layoutContext
+  }
+
+  private def renderLayout(context: TemplateContext, locale: Locale): String = {
+    val document = Jsoup.parse(templateHandler.render(context.page.layout, context.toJavaContext, locale))
+    context.site.baseUrl.foreach { baseUrl =>
+      UrlAttributes.foreach { attribute =>
+        document.select(s"""[${attribute}^="/"]""").forEach { element =>
+          element.attr(attribute, baseUrl + element.attr(attribute))
+        }
+      }
+    }
+    document.select("h1,h2,h3,h4,h5,h6").forEach { element =>
+      val id = element.attr("id").trim
+      if id.nonEmpty then element.append(s"""<a href="#${id}" class="flatmark-anchor" aria-label="Anchor"> 🔗</a>""")
+    }
+    document.toString
   }
 
   private def outputPath(relativePath: os.RelPath, baseName: String, extension: String): os.RelPath =

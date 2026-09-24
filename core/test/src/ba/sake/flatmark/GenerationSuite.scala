@@ -98,6 +98,25 @@ class GenerationSuite extends munit.FunSuite {
     assert(generate(siteRoot))
   }
 
+  test("search creates a results page from its layout and respects a site page override") {
+    val siteRoot = site("theme:\n  enabled: false\nsearch:\n  enabled: true\n")
+    writeLayouts(siteRoot)
+    os.write(siteRoot / "_layouts/search-results.html", "<html><body>Default {{ page.title }}</body></html>")
+    os.write(siteRoot / "content/index.md", "# Home", createFolders = true)
+
+    assert(generate(siteRoot))
+    assert(os.read(siteRoot / "_site/search/results.html").contains("Default Search"))
+    assert(os.exists(siteRoot / "_site/search/entries.json"))
+
+    os.write(
+      siteRoot / "content/search/results.md",
+      "---\ntitle: Custom search\nlayout: search-results.html\n---\n# Search",
+      createFolders = true
+    )
+    assert(generate(siteRoot))
+    assert(os.read(siteRoot / "_site/search/results.html").contains("Default Custom search"))
+  }
+
   private def site(config: String = "theme:\n  enabled: false\nsearch:\n  enabled: false\n"): os.Path = {
     val root = os.temp.dir(prefix = "flatmark-generation-")
     os.write(root / "_config.yaml", config)

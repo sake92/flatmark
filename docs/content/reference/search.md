@@ -26,6 +26,7 @@ The file contains a JSON array with one object per rendered page:
 | `text` | string | Plain text extracted from the rendered content before the layout is applied. |
 
 Flatmark generates the index but does not define a query protocol. Search interfaces load and filter the JSON in the
-browser. The default theme supplies a `search-results.html` layout for this purpose.
+browser. If a `search-results.html` layout exists in the site or theme, Flatmark generates `/search/results.html` unless
+the site already supplies that output path. The default theme supplies the layout.
 
 See [Enable site search](/howtos/search.html) for setup instructions.

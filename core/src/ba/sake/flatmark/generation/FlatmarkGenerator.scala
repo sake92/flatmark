@@ -97,6 +97,12 @@ final class FlatmarkGenerator(ssrServerUrl: String, webDriverHolder: WebDriverHo
 
         assets.publishSiteStatic()
         if siteConfig.search.enabled then {
+          val searchLayout = "_layouts/search-results.html"
+          val hasSearchLayout = os.exists(siteRootFolder / os.RelPath(searchLayout)) ||
+            themeFolder.exists(folder => os.exists(folder / os.RelPath(searchLayout)))
+          if hasSearchLayout && !os.exists(outputFolder / "search/results.html") then
+            renderer.renderSearchPage(plan.categoryContexts(siteConfig.lang))
+
           val entries = (contentResults ++ indexResults).map { result =>
             SearchEntry(title = result.page.title, url = result.page.url, text = result.page.text)
           }
