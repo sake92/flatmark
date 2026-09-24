@@ -5,41 +5,125 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Flatmark site folders and routing conventions">
-  <title> File layout | Flatmark Docs </title>
+  <title>File layout | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="file-layout">File layout<a href="#file-layout" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <h2 id="site-root">Site root<a href="#site-root" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <table>
+      <thead>
+       <tr>
+        <th>Path</th>
+        <th>Purpose</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>_config.yaml</code></td>
+        <td>Global site configuration.</td>
+       </tr>
+       <tr>
+        <td><code>content/</code></td>
+        <td>Markdown and HTML source pages.</td>
+       </tr>
+       <tr>
+        <td><code>static/</code></td>
+        <td>Files copied unchanged to <code>_site/</code>.</td>
+       </tr>
+       <tr>
+        <td><code>_data/</code></td>
+        <td>Top-level YAML data files exposed through <code>site.data</code>.</td>
+       </tr>
+       <tr>
+        <td><code>_layouts/</code></td>
+        <td>Site layout overrides.</td>
+       </tr>
+       <tr>
+        <td><code>_includes/</code></td>
+        <td>Site include overrides.</td>
+       </tr>
+       <tr>
+        <td><code>_i18n/</code></td>
+        <td>Resource bundles used by Jinja.</td>
+       </tr>
+       <tr>
+        <td><code>_sass/</code></td>
+        <td>Sass sources compiled to <code>_site/styles/</code>; requires a <code>sass</code> executable.</td>
+       </tr>
+       <tr>
+        <td><code>_themes/</code></td>
+        <td>Local themes.</td>
+       </tr>
+       <tr>
+        <td><code>_site/</code></td>
+        <td>Generated site output.</td>
+       </tr>
+       <tr>
+        <td><code>.flatmark-cache/</code></td>
+        <td>Downloaded themes, rendered-fragment cache, and transactional build data.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p><code>_site/</code> and <code>.flatmark-cache/</code> are generated and disposable. A failed build preserves the previous successful <code>_site/</code>.</p>
+     <h2 id="content-and-routes">Content and routes<a href="#content-and-routes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>The path below <code>content/</code> determines the generated file path:</p>
+     <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">content/index.md          -&gt; _site/index.html          -&gt; /
+content/about.md          -&gt; _site/about.html          -&gt; /about.html
+content/blog/index.md     -&gt; _site/blog/index.html     -&gt; /blog
+content/blog/first.md     -&gt; _site/blog/first.html     -&gt; /blog/first.html
+</code></pre>
+     <p>The <code>ext</code> page setting replaces the default <code>html</code> extension. Directory-style URLs apply only to <code>index</code> pages whose extension is <code>html</code>.</p>
+     <p>Files or folders below <code>content/</code> whose name starts with <code>_</code> or <code>.</code> are skipped. Supported source extensions are <code>.md</code> and extensions ending in <code>.html</code>.</p>
+     <h2 id="index-pages-and-categories">Index pages and categories<a href="#index-pages-and-categories" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Files named <code>index.md</code> or <code>index.html</code> use <code>index.html</code> as their default layout and receive a <code>paginator</code> context. Other content files use <code>page.html</code> by default.</p>
+     <p>A first-level folder acts as a category when the same key is declared in <code>_config.yaml</code>. Its index receives the category's non-index content items. See <a href="https://sake92.github.io/flatmark/reference/template-context.html">Template context</a> for the available values.</p>
+     <h2 id="translations">Translations<a href="#translations" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>A first-level folder named with an ISO 639-1 two-letter language code is treated as a translation root:</p>
+     <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">content/
+├── index.md
+├── about.md
+└── bs/
+    ├── index.md
+    └── about.md
+</code></pre>
+     <p>The relative path identifies matching translations. A missing translation links to that language's home page.</p>
+     <h2 id="theme-overlay">Theme overlay<a href="#theme-overlay" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Flatmark loads theme files from <code>static/</code>, <code>_layouts/</code>, <code>_includes/</code>, and <code>_i18n/</code>. A site file at the corresponding path takes precedence for layouts and includes; site static files are copied after theme static files and replace files at matching paths.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#file-layout">File layout</a>
          <ul>
@@ -50,95 +134,16 @@
           <li><a href="#theme-overlay">Theme overlay</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="file-layout">File layout<a href="#file-layout" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <h2 id="site-root">Site root<a href="#site-root" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <table>
-    <thead>
-     <tr>
-      <th>Path</th>
-      <th>Purpose</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>_config.yaml</code></td>
-      <td>Global site configuration.</td>
-     </tr>
-     <tr>
-      <td><code>content/</code></td>
-      <td>Markdown and HTML source pages.</td>
-     </tr>
-     <tr>
-      <td><code>static/</code></td>
-      <td>Files copied unchanged to <code>_site/</code>.</td>
-     </tr>
-     <tr>
-      <td><code>_data/</code></td>
-      <td>Top-level YAML data files exposed through <code>site.data</code>.</td>
-     </tr>
-     <tr>
-      <td><code>_layouts/</code></td>
-      <td>Site layout overrides.</td>
-     </tr>
-     <tr>
-      <td><code>_includes/</code></td>
-      <td>Site include overrides.</td>
-     </tr>
-     <tr>
-      <td><code>_i18n/</code></td>
-      <td>Resource bundles used by Jinja.</td>
-     </tr>
-     <tr>
-      <td><code>_sass/</code></td>
-      <td>Sass sources compiled to <code>_site/styles/</code>; requires a <code>sass</code> executable.</td>
-     </tr>
-     <tr>
-      <td><code>_themes/</code></td>
-      <td>Local themes.</td>
-     </tr>
-     <tr>
-      <td><code>_site/</code></td>
-      <td>Generated site output.</td>
-     </tr>
-     <tr>
-      <td><code>.flatmark-cache/</code></td>
-      <td>Downloaded themes, rendered-fragment cache, and transactional build data.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p><code>_site/</code> and <code>.flatmark-cache/</code> are generated and disposable. A failed build preserves the previous successful <code>_site/</code>.</p>
-   <h2 id="content-and-routes">Content and routes<a href="#content-and-routes" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>The path below <code>content/</code> determines the generated file path:</p>
-   <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">content/index.md          -&gt; _site/index.html          -&gt; /
-content/about.md          -&gt; _site/about.html          -&gt; /about.html
-content/blog/index.md     -&gt; _site/blog/index.html     -&gt; /blog
-content/blog/first.md     -&gt; _site/blog/first.html     -&gt; /blog/first.html
-</code></pre>
-   <p>The <code>ext</code> page setting replaces the default <code>html</code> extension. Directory-style URLs apply only to <code>index</code> pages whose extension is <code>html</code>.</p>
-   <p>Files or folders below <code>content/</code> whose name starts with <code>_</code> or <code>.</code> are skipped. Supported source extensions are <code>.md</code> and extensions ending in <code>.html</code>.</p>
-   <h2 id="index-pages-and-categories">Index pages and categories<a href="#index-pages-and-categories" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Files named <code>index.md</code> or <code>index.html</code> use <code>index.html</code> as their default layout and receive a <code>paginator</code> context. Other content files use <code>page.html</code> by default.</p>
-   <p>A first-level folder acts as a category when the same key is declared in <code>_config.yaml</code>. Its index receives the category's non-index content items. See <a href="https://sake92.github.io/flatmark/reference/template-context.html">Template context</a> for the available values.</p>
-   <h2 id="translations">Translations<a href="#translations" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>A first-level folder named with an ISO 639-1 two-letter language code is treated as a translation root:</p>
-   <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">content/
-├── index.md
-├── about.md
-└── bs/
-    ├── index.md
-    └── about.md
-</code></pre>
-   <p>The relative path identifies matching translations. A missing translation links to that language's home page.</p>
-   <h2 id="theme-overlay">Theme overlay<a href="#theme-overlay" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Flatmark loads theme files from <code>static/</code>, <code>_layouts/</code>, <code>_includes/</code>, and <code>_i18n/</code>. A site file at the corresponding path takes precedence for layouts and includes; site static files are copied after theme static files and replace files at matching paths.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

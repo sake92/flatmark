@@ -5,148 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Flatmark site and page configuration reference">
-  <title> Configuration | Flatmark Docs </title>
+  <title>Configuration | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
-       <ul>
-        <li><a href="#configuration">Configuration</a>
-         <ul>
-          <li><a href="#site-configuration">Site configuration</a>
-           <ul>
-            <li><a href="#theme">Theme</a></li>
-            <li><a href="#feature-switches">Feature switches</a></li>
-            <li><a href="#categories-and-tags">Categories and tags</a></li>
-            <li><a href="#base-url-environment-fallback">Base URL environment fallback</a></li>
-           </ul></li>
-          <li><a href="#page-configuration">Page configuration</a>
-           <ul>
-            <li><a href="#pagination">Pagination</a></li>
-           </ul></li>
-         </ul></li>
-       </ul>
-      </div>
-     </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
-   </div>
-   <h1 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Flatmark configuration keys use <code>snake_case</code>.</p>
-   <h2 id="site-configuration">Site configuration<a href="#site-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Site configuration is read from <code>_config.yaml</code> in the site root. Every key is optional.</p>
-   <table>
-    <thead>
-     <tr>
-      <th>Key</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>name</code></td>
-      <td>string</td>
-      <td><code>My Site</code></td>
-      <td>Site name exposed as <code>site.name</code>.</td>
-     </tr>
-     <tr>
-      <td><code>description</code></td>
-      <td>string</td>
-      <td>empty</td>
-      <td>Site description exposed as <code>site.description</code>.</td>
-     </tr>
-     <tr>
-      <td><code>base_url</code></td>
-      <td>string or null</td>
-      <td>null</td>
-      <td>URL prefix added to root-relative links and generated page URLs.</td>
-     </tr>
-     <tr>
-      <td><code>lang</code></td>
-      <td>language tag</td>
-      <td><code>en</code></td>
-      <td>Default content language.</td>
-     </tr>
-     <tr>
-      <td><code>timezone</code></td>
-      <td>time-zone ID</td>
-      <td>system default</td>
-      <td>Zone applied to page <code>publish_date</code> values.</td>
-     </tr>
-     <tr>
-      <td><code>theme</code></td>
-      <td>object</td>
-      <td>see below</td>
-      <td>Theme source and enablement.</td>
-     </tr>
-     <tr>
-      <td><code>search</code></td>
-      <td>object</td>
-      <td>see below</td>
-      <td>Search-index generation.</td>
-     </tr>
-     <tr>
-      <td><code>categories</code></td>
-      <td>mapping</td>
-      <td>empty</td>
-      <td>Category keys and their labels.</td>
-     </tr>
-     <tr>
-      <td><code>tags</code></td>
-      <td>mapping</td>
-      <td>empty</td>
-      <td>Tag keys exposed to templates.</td>
-     </tr>
-     <tr>
-      <td><code>code_highlight</code></td>
-      <td>object</td>
-      <td>see below</td>
-      <td>Code highlighting during the build.</td>
-     </tr>
-     <tr>
-      <td><code>math_highlight</code></td>
-      <td>object</td>
-      <td>see below</td>
-      <td>Math rendering during the build.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>Example:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">site</span>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="configuration">Configuration<a href="#configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Flatmark configuration keys use <code>snake_case</code>.</p>
+     <h2 id="site-configuration">Site configuration<a href="#site-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Site configuration is read from <code>_config.yaml</code> in the site root. Every key is optional.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>name</code></td>
+        <td>string</td>
+        <td><code>My Site</code></td>
+        <td>Site name exposed as <code>site.name</code>.</td>
+       </tr>
+       <tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>empty</td>
+        <td>Site description exposed as <code>site.description</code>.</td>
+       </tr>
+       <tr>
+        <td><code>base_url</code></td>
+        <td>string or null</td>
+        <td>null</td>
+        <td>URL prefix added to root-relative links and generated page URLs.</td>
+       </tr>
+       <tr>
+        <td><code>lang</code></td>
+        <td>language tag</td>
+        <td><code>en</code></td>
+        <td>Default content language.</td>
+       </tr>
+       <tr>
+        <td><code>timezone</code></td>
+        <td>time-zone ID</td>
+        <td>system default</td>
+        <td>Zone applied to page <code>publish_date</code> values.</td>
+       </tr>
+       <tr>
+        <td><code>theme</code></td>
+        <td>object</td>
+        <td>see below</td>
+        <td>Theme source and enablement.</td>
+       </tr>
+       <tr>
+        <td><code>search</code></td>
+        <td>object</td>
+        <td>see below</td>
+        <td>Search-index generation.</td>
+       </tr>
+       <tr>
+        <td><code>categories</code></td>
+        <td>mapping</td>
+        <td>empty</td>
+        <td>Category keys and their labels.</td>
+       </tr>
+       <tr>
+        <td><code>tags</code></td>
+        <td>mapping</td>
+        <td>empty</td>
+        <td>Tag keys exposed to templates.</td>
+       </tr>
+       <tr>
+        <td><code>code_highlight</code></td>
+        <td>object</td>
+        <td>see below</td>
+        <td>Code highlighting during the build.</td>
+       </tr>
+       <tr>
+        <td><code>math_highlight</code></td>
+        <td>object</td>
+        <td>see below</td>
+        <td>Math rendering during the build.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Example:</p>
+     <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">name:</span> <span class="hljs-string">My</span> <span class="hljs-string">site</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">Notes</span> <span class="hljs-string">and</span> <span class="hljs-string">articles</span>
 <span class="hljs-attr">base_url:</span> <span class="hljs-string">https://example.com/docs</span>
 <span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
@@ -173,125 +148,125 @@
     <span class="hljs-attr">label:</span> <span class="hljs-string">Scala</span>
     <span class="hljs-attr">description:</span> <span class="hljs-string">Articles</span> <span class="hljs-string">about</span> <span class="hljs-string">Scala</span>
 </code></pre>
-   <h3 id="theme">Theme<a href="#theme" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <table>
-    <thead>
-     <tr>
-      <th>Key</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>theme.enabled</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Enables theme loading.</td>
-     </tr>
-     <tr>
-      <td><code>theme.source</code></td>
-      <td>string</td>
-      <td>Flatmark's default remote theme</td>
-      <td>Local theme name or HTTP(S) Git repository URL.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>See the <a href="https://sake92.github.io/flatmark/reference/themes.html">themes reference</a> for source URL parameters and override behavior.</p>
-   <h3 id="feature-switches">Feature switches<a href="#feature-switches" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <table>
-    <thead>
-     <tr>
-      <th>Key</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>search.enabled</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Generates <code>_site/search/entries.json</code>.</td>
-     </tr>
-     <tr>
-      <td><code>code_highlight.enabled</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Exposed as <code>site.code_highlight.enabled</code> for themes.</td>
-     </tr>
-     <tr>
-      <td><code>math_highlight.enabled</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Exposed as <code>site.math_highlight.enabled</code> for themes.</td>
-     </tr>
-    </tbody>
-   </table>
-   <h3 id="categories-and-tags">Categories and tags<a href="#categories-and-tags" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p>Each entry in <code>categories</code> and <code>tags</code> has a required <code>label</code> and an optional <code>description</code>, which defaults to an empty string. A category appears in a language's template context only when that language contains the category's <code>index.md</code> or <code>index.html</code>.</p>
-   <h3 id="base-url-environment-fallback">Base URL environment fallback<a href="#base-url-environment-fallback" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p><code>FLATMARK_BASE_URL</code> supplies <code>base_url</code> when the key is absent from <code>_config.yaml</code>. A configured <code>base_url</code> takes precedence. Trailing <code>/</code> characters are removed from the resolved value.</p>
-   <h2 id="page-configuration">Page configuration<a href="#page-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Page configuration is YAML front matter at the beginning of a Markdown or HTML content file. The opening and closing <code>---</code> delimiters are required when front matter is present.</p>
-   <table>
-    <thead>
-     <tr>
-      <th>Key</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>layout</code></td>
-      <td>string or null</td>
-      <td><code>index.html</code> for index pages; <code>page.html</code> otherwise</td>
-      <td>Layout template name.</td>
-     </tr>
-     <tr>
-      <td><code>title</code></td>
-      <td>string</td>
-      <td><code>Untitled</code></td>
-      <td>Page title.</td>
-     </tr>
-     <tr>
-      <td><code>description</code></td>
-      <td>string</td>
-      <td>empty</td>
-      <td>Page description.</td>
-     </tr>
-     <tr>
-      <td><code>publish_date</code></td>
-      <td>local date-time or null</td>
-      <td>null</td>
-      <td>Date and time interpreted in the site time zone.</td>
-     </tr>
-     <tr>
-      <td><code>ext</code></td>
-      <td>string or null</td>
-      <td><code>html</code></td>
-      <td>Generated filename extension. Must be one path segment.</td>
-     </tr>
-     <tr>
-      <td><code>pagination</code></td>
-      <td>object</td>
-      <td>see below</td>
-      <td>Pagination behavior for index pages.</td>
-     </tr>
-     <tr>
-      <td><code>theme_props</code></td>
-      <td>string mapping</td>
-      <td>empty</td>
-      <td>Theme-specific values exposed as <code>page.theme_props</code>.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>Example:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
+     <h3 id="theme">Theme<a href="#theme" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <table>
+      <thead>
+       <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>theme.enabled</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Enables theme loading.</td>
+       </tr>
+       <tr>
+        <td><code>theme.source</code></td>
+        <td>string</td>
+        <td>Flatmark's default remote theme</td>
+        <td>Local theme name or HTTP(S) Git repository URL.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>See the <a href="https://sake92.github.io/flatmark/reference/themes.html">themes reference</a> for source URL parameters and override behavior.</p>
+     <h3 id="feature-switches">Feature switches<a href="#feature-switches" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <table>
+      <thead>
+       <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>search.enabled</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Generates <code>_site/search/entries.json</code>.</td>
+       </tr>
+       <tr>
+        <td><code>code_highlight.enabled</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Exposed as <code>site.code_highlight.enabled</code> for themes.</td>
+       </tr>
+       <tr>
+        <td><code>math_highlight.enabled</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Exposed as <code>site.math_highlight.enabled</code> for themes.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h3 id="categories-and-tags">Categories and tags<a href="#categories-and-tags" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Each entry in <code>categories</code> and <code>tags</code> has a required <code>label</code> and an optional <code>description</code>, which defaults to an empty string. A category appears in a language's template context only when that language contains the category's <code>index.md</code> or <code>index.html</code>.</p>
+     <h3 id="base-url-environment-fallback">Base URL environment fallback<a href="#base-url-environment-fallback" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p><code>FLATMARK_BASE_URL</code> supplies <code>base_url</code> when the key is absent from <code>_config.yaml</code>. A configured <code>base_url</code> takes precedence. Trailing <code>/</code> characters are removed from the resolved value.</p>
+     <h2 id="page-configuration">Page configuration<a href="#page-configuration" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Page configuration is YAML front matter at the beginning of a Markdown or HTML content file. The opening and closing <code>---</code> delimiters are required when front matter is present.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>layout</code></td>
+        <td>string or null</td>
+        <td><code>index.html</code> for index pages; <code>page.html</code> otherwise</td>
+        <td>Layout template name.</td>
+       </tr>
+       <tr>
+        <td><code>title</code></td>
+        <td>string</td>
+        <td><code>Untitled</code></td>
+        <td>Page title.</td>
+       </tr>
+       <tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>empty</td>
+        <td>Page description.</td>
+       </tr>
+       <tr>
+        <td><code>publish_date</code></td>
+        <td>local date-time or null</td>
+        <td>null</td>
+        <td>Date and time interpreted in the site time zone.</td>
+       </tr>
+       <tr>
+        <td><code>ext</code></td>
+        <td>string or null</td>
+        <td><code>html</code></td>
+        <td>Generated filename extension. Must be one path segment.</td>
+       </tr>
+       <tr>
+        <td><code>pagination</code></td>
+        <td>object</td>
+        <td>see below</td>
+        <td>Pagination behavior for index pages.</td>
+       </tr>
+       <tr>
+        <td><code>theme_props</code></td>
+        <td>string mapping</td>
+        <td>empty</td>
+        <td>Theme-specific values exposed as <code>page.theme_props</code>.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Example:</p>
+     <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-meta">---</span>
 <span class="hljs-attr">title:</span> <span class="hljs-string">Recent</span> <span class="hljs-string">posts</span>
 <span class="hljs-attr">description:</span> <span class="hljs-string">The</span> <span class="hljs-string">latest</span> <span class="hljs-string">articles</span>
 <span class="hljs-attr">publish_date:</span> <span class="hljs-number">2025-01-01 </span><span class="hljs-number">11</span><span class="hljs-string">:11</span>
@@ -305,38 +280,68 @@
   <span class="hljs-attr">show_author:</span> <span class="hljs-string">"true"</span>
 <span class="hljs-meta">---
 </span></code></pre>
-   <h3 id="pagination">Pagination<a href="#pagination" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <table>
-    <thead>
-     <tr>
-      <th>Key</th>
-      <th>Type</th>
-      <th>Default</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>pagination.enabled</code></td>
-      <td>boolean</td>
-      <td><code>true</code></td>
-      <td>Splits a non-empty index into multiple pages.</td>
-     </tr>
-     <tr>
-      <td><code>pagination.per_page</code></td>
-      <td>positive integer</td>
-      <td><code>10</code></td>
-      <td>Maximum items on each page.</td>
-     </tr>
-     <tr>
-      <td><code>pagination.sort_by</code></td>
-      <td>string</td>
-      <td><code>-publish_date</code></td>
-      <td>Sort order: <code>publish_date</code>, <code>-publish_date</code>, <code>title</code>, or <code>-title</code>.</td>
-     </tr>
-    </tbody>
-   </table>
+     <h3 id="pagination">Pagination<a href="#pagination" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <table>
+      <thead>
+       <tr>
+        <th>Key</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>pagination.enabled</code></td>
+        <td>boolean</td>
+        <td><code>true</code></td>
+        <td>Splits a non-empty index into multiple pages.</td>
+       </tr>
+       <tr>
+        <td><code>pagination.per_page</code></td>
+        <td>positive integer</td>
+        <td><code>10</code></td>
+        <td>Maximum items on each page.</td>
+       </tr>
+       <tr>
+        <td><code>pagination.sort_by</code></td>
+        <td>string</td>
+        <td><code>-publish_date</code></td>
+        <td>Sort order: <code>publish_date</code>, <code>-publish_date</code>, <code>title</code>, or <code>-title</code>.</td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#configuration">Configuration</a>
+         <ul>
+          <li><a href="#site-configuration">Site configuration</a>
+           <ul>
+            <li><a href="#theme">Theme</a></li>
+            <li><a href="#feature-switches">Feature switches</a></li>
+            <li><a href="#categories-and-tags">Categories and tags</a></li>
+            <li><a href="#base-url-environment-fallback">Base URL environment fallback</a></li>
+           </ul></li>
+          <li><a href="#page-configuration">Page configuration</a>
+           <ul>
+            <li><a href="#pagination">Pagination</a></li>
+           </ul></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

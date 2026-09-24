@@ -5,41 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="How build-time browser rendering shapes Flatmark sites">
-  <title> Why Flatmark renders dynamic-looking content statically | Flatmark Docs </title>
+  <title>Why Flatmark renders dynamic-looking content statically | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="why-flatmark-renders-dynamic-looking-content-statically">Why Flatmark renders dynamic-looking content statically<a href="#why-flatmark-renders-dynamic-looking-content-statically" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Static site generators usually turn Markdown into HTML while leaving richer features—syntax highlighting, equations, or diagrams—to JavaScript in the reader's browser. Flatmark moves that work into the build instead.</p>
+     <p>This choice extends the meaning of “static.” A Flatmark deployment consists of files that a basic web server or object store can return as-is. Code is already highlighted, KaTeX has already rendered the equations, and Mermaid or Graphviz has already produced SVG. The reader does not need those rendering libraries to execute successfully.</p>
+     <h2 id="a-browser-as-a-build-tool">A browser as a build tool<a href="#a-browser-as-a-build-tool" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Those libraries are designed for a browser environment, so Flatmark runs a private local rendering service and drives headless Chrome with Selenium during generation. Markdown fenced blocks are sent to the appropriate renderer and the returned HTML or SVG is inserted into the page.</p>
+     <p>Using a browser at build time favors fidelity over a smaller toolchain. Flatmark can use the browser-oriented libraries directly, but a build may need to provision a compatible Chrome runtime and is heavier than a plain Markdown-to-HTML conversion.</p>
+     <h2 id="caching-changes-the-cost">Caching changes the cost<a href="#caching-changes-the-cost" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Rendered fragments are keyed and stored in <code>.flatmark-cache/cached-results/</code>. Unchanged code, math, and diagrams can reuse those results on later builds. The first build pays the setup and rendering cost; subsequent builds usually do less browser work.</p>
+     <p>The cache is disposable. Removing it or using <code>--no-cache</code> changes build performance, not the meaning of the generated site.</p>
+     <h2 id="themes-are-build-inputs">Themes are build inputs<a href="#themes-are-build-inputs" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>The same static-first idea applies to themes. Flatmark resolves a local theme or downloads a Git-hosted theme, then combines its layouts, includes, translations, and static assets with site-specific overrides. The result is copied or rendered into <code>_site/</code>; the theme repository is not required at deployment time.</p>
+     <p>This makes a theme part of the build's inputs rather than a runtime dependency. Remote themes are cached, and <code>--update-theme</code> explicitly refreshes an existing cached checkout.</p>
+     <h2 id="transactional-output">Transactional output<a href="#transactional-output" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>A generated site should remain deployable even when a rebuild fails. Flatmark renders into a staging location and only replaces <code>_site/</code> after generation succeeds. If Markdown, configuration, a template, or browser rendering fails, the previous successful output remains available.</p>
+     <p>Together, build-time rendering, cached inputs, and transactional publication concentrate complexity in the authoring environment. The deployed site stays deliberately simple.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#why-flatmark-renders-dynamic-looking-content-statically">Why Flatmark renders dynamic-looking content statically</a>
          <ul>
@@ -49,29 +67,16 @@
           <li><a href="#transactional-output">Transactional output</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="why-flatmark-renders-dynamic-looking-content-statically">Why Flatmark renders dynamic-looking content statically<a href="#why-flatmark-renders-dynamic-looking-content-statically" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Static site generators usually turn Markdown into HTML while leaving richer features—syntax highlighting, equations, or diagrams—to JavaScript in the reader's browser. Flatmark moves that work into the build instead.</p>
-   <p>This choice extends the meaning of “static.” A Flatmark deployment consists of files that a basic web server or object store can return as-is. Code is already highlighted, KaTeX has already rendered the equations, and Mermaid or Graphviz has already produced SVG. The reader does not need those rendering libraries to execute successfully.</p>
-   <h2 id="a-browser-as-a-build-tool">A browser as a build tool<a href="#a-browser-as-a-build-tool" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Those libraries are designed for a browser environment, so Flatmark runs a private local rendering service and drives headless Chrome with Selenium during generation. Markdown fenced blocks are sent to the appropriate renderer and the returned HTML or SVG is inserted into the page.</p>
-   <p>Using a browser at build time favors fidelity over a smaller toolchain. Flatmark can use the browser-oriented libraries directly, but a build may need to provision a compatible Chrome runtime and is heavier than a plain Markdown-to-HTML conversion.</p>
-   <h2 id="caching-changes-the-cost">Caching changes the cost<a href="#caching-changes-the-cost" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Rendered fragments are keyed and stored in <code>.flatmark-cache/cached-results/</code>. Unchanged code, math, and diagrams can reuse those results on later builds. The first build pays the setup and rendering cost; subsequent builds usually do less browser work.</p>
-   <p>The cache is disposable. Removing it or using <code>--no-cache</code> changes build performance, not the meaning of the generated site.</p>
-   <h2 id="themes-are-build-inputs">Themes are build inputs<a href="#themes-are-build-inputs" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>The same static-first idea applies to themes. Flatmark resolves a local theme or downloads a Git-hosted theme, then combines its layouts, includes, translations, and static assets with site-specific overrides. The result is copied or rendered into <code>_site/</code>; the theme repository is not required at deployment time.</p>
-   <p>This makes a theme part of the build's inputs rather than a runtime dependency. Remote themes are cached, and <code>--update-theme</code> explicitly refreshes an existing cached checkout.</p>
-   <h2 id="transactional-output">Transactional output<a href="#transactional-output" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>A generated site should remain deployable even when a rebuild fails. Flatmark renders into a staging location and only replaces <code>_site/</code> after generation succeeds. If Markdown, configuration, a template, or browser rendering fails, the previous successful output remains available.</p>
-   <p>Together, build-time rendering, cached inputs, and transactional publication concentrate complexity in the authoring environment. The deployed site stays deliberately simple.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

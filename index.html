@@ -5,41 +5,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Build static websites from Markdown, Jinja templates, and static assets">
-  <title> Flatmark documentation | Flatmark Docs </title>
+  <title>Flatmark documentation | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="flatmark">Flatmark<a href="#flatmark" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Flatmark turns a folder of Markdown, templates, and static assets into a static website. Code highlighting, math, and diagrams are rendered during the build, leaving deployable HTML, CSS, images, and other static files in <code>_site/</code>.</p>
+     <h2 id="start-here">Start here<a href="#start-here" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>New to Flatmark? Follow the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> to create and serve a small site.</p>
+     <p>Already working on a site? Choose the documentation that matches your task:</p>
+     <ul>
+      <li><a href="https://sake92.github.io/flatmark/tutorials/">Tutorials</a> — learn Flatmark by building a site step by step.</li>
+      <li><a href="https://sake92.github.io/flatmark/howtos/">How-to guides</a> — complete a specific authoring or configuration task.</li>
+      <li><a href="https://sake92.github.io/flatmark/reference/">Reference</a> — look up CLI options, configuration keys, file conventions, and template variables.</li>
+      <li><a href="https://sake92.github.io/flatmark/explanation/">Explanation</a> — understand Flatmark's static-rendering model and its trade-offs.</li>
+     </ul>
+     <h2 id="what-flatmark-provides">What Flatmark provides<a href="#what-flatmark-provides" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <ul>
+      <li>CommonMark with tables, footnotes, task lists, and other authoring extensions</li>
+      <li>build-time syntax highlighting, KaTeX, Mermaid, and Graphviz rendering</li>
+      <li>Jinja layouts, includes, data files, pagination, and theme overrides</li>
+      <li>multilingual routes with translation-aware template context</li>
+      <li>generated search indexes</li>
+      <li>a local server with file watching and live reload</li>
+     </ul>
+     <h2 id="installation">Installation<a href="#installation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>On Debian or Ubuntu, download and install the <code>.deb</code> package:</p>
+     <pre><code class="language-shell hljs" data-highlighted="yes">curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+sudo apt install ./flatmark.deb
+</code></pre>
+     <p>For macOS, other Linux distributions, and Windows, download the installer for your platform from the <a href="https://github.com/sake92/flatmark/releases">Flatmark releases page</a>.</p>
+     <p>The first build may download the default theme and a compatible headless Chrome runtime.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#flatmark">Flatmark</a>
          <ul>
@@ -48,41 +78,16 @@
           <li><a href="#installation">Installation</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="flatmark">Flatmark<a href="#flatmark" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Flatmark turns a folder of Markdown, templates, and static assets into a static website. Code highlighting, math, and diagrams are rendered during the build, leaving deployable HTML, CSS, images, and other static files in <code>_site/</code>.</p>
-   <h2 id="start-here">Start here<a href="#start-here" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>New to Flatmark? Follow the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> to create and serve a small site.</p>
-   <p>Already working on a site? Choose the documentation that matches your task:</p>
-   <ul>
-    <li><a href="https://sake92.github.io/flatmark/tutorials/">Tutorials</a> — learn Flatmark by building a site step by step.</li>
-    <li><a href="https://sake92.github.io/flatmark/howtos/">How-to guides</a> — complete a specific authoring or configuration task.</li>
-    <li><a href="https://sake92.github.io/flatmark/reference/">Reference</a> — look up CLI options, configuration keys, file conventions, and template variables.</li>
-    <li><a href="https://sake92.github.io/flatmark/explanation/">Explanation</a> — understand Flatmark's static-rendering model and its trade-offs.</li>
-   </ul>
-   <h2 id="what-flatmark-provides">What Flatmark provides<a href="#what-flatmark-provides" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <ul>
-    <li>CommonMark with tables, footnotes, task lists, and other authoring extensions</li>
-    <li>build-time syntax highlighting, KaTeX, Mermaid, and Graphviz rendering</li>
-    <li>Jinja layouts, includes, data files, pagination, and theme overrides</li>
-    <li>multilingual routes with translation-aware template context</li>
-    <li>generated search indexes</li>
-    <li>a local server with file watching and live reload</li>
-   </ul>
-   <h2 id="installation">Installation<a href="#installation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>On Debian or Ubuntu, download and install the <code>.deb</code> package:</p>
-   <pre><code class="language-shell hljs" data-highlighted="yes">curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
-sudo apt install ./flatmark.deb
-</code></pre>
-   <p>For macOS, other Linux distributions, and Windows, download the installer for your platform from the <a href="https://github.com/sake92/flatmark/releases">Flatmark releases page</a>.</p>
-   <p>The first build may download the default theme and a compatible headless Chrome runtime.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

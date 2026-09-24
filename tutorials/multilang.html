@@ -5,41 +5,84 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Add a second language to a Flatmark site">
-  <title> Multilingual site | Flatmark Docs </title>
+  <title>Multilingual site | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="multilingual-site">Multilingual site<a href="#multilingual-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>In this tutorial, you will add a Bosnian translation to the site from the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a>.</p>
+     <h2 id="set-the-default-language">Set the default language<a href="#set-the-default-language" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create <code>_config.yaml</code> in the site root:</p>
+     <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
+</code></pre>
+     <p>Files directly inside <code>content/</code> now represent the English site.</p>
+     <h2 id="add-the-translated-home-page">Add the translated home page<a href="#add-the-translated-home-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create <code>content/bs/index.md</code>:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes">---
+title: Početna
+<span class="hljs-section">description: Moja prva Flatmark stranica
+---</span>
+
+<span class="hljs-section"># Zdravo, Flatmark!</span>
+
+Ova stranica je generisana iz Markdown dokumenta.
+</code></pre>
+     <p>The site has this structure:</p>
+     <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">my-site/
+├── _config.yaml
+└── content/
+    ├── index.md
+    └── bs/
+        └── index.md
+</code></pre>
+     <h2 id="preview-both-languages">Preview both languages<a href="#preview-both-languages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Run:</p>
+     <pre><code class="language-shell hljs" data-highlighted="yes">flatmark serve
+</code></pre>
+     <p>Open <a href="http://localhost:5555">http://localhost:5555</a> for the English page and <a href="http://localhost:5555/bs/">http://localhost:5555/bs/</a> for the Bosnian page. The default theme displays a language switcher linking the two versions.</p>
+     <h2 id="add-matching-pages">Add matching pages<a href="#add-matching-pages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create <code>content/about.md</code>:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># About</span>
+</code></pre>
+     <p>Then create its translation at <code>content/bs/about.md</code>:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># O nama</span>
+</code></pre>
+     <p>Open <a href="http://localhost:5555/about.html">http://localhost:5555/about.html</a> and use the language switcher. It links to <code>/bs/about.html</code> because Flatmark matches translations by their path relative to the default-language or language-code folder.</p>
+     <p>The completed structure matches the <a href="https://github.com/sake92/flatmark/tree/main/examples/multilang">multilingual example</a>.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#multilingual-site">Multilingual site</a>
          <ul>
@@ -49,54 +92,16 @@
           <li><a href="#add-matching-pages">Add matching pages</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="multilingual-site">Multilingual site<a href="#multilingual-site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>In this tutorial, you will add a Bosnian translation to the site from the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a>.</p>
-   <h2 id="set-the-default-language">Set the default language<a href="#set-the-default-language" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Create <code>_config.yaml</code> in the site root:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-attr">lang:</span> <span class="hljs-string">en</span>
-</code></pre>
-   <p>Files directly inside <code>content/</code> now represent the English site.</p>
-   <h2 id="add-the-translated-home-page">Add the translated home page<a href="#add-the-translated-home-page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Create <code>content/bs/index.md</code>:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">---
-title: Početna
-<span class="hljs-section">description: Moja prva Flatmark stranica
----</span>
-
-<span class="hljs-section"># Zdravo, Flatmark!</span>
-
-Ova stranica je generisana iz Markdown dokumenta.
-</code></pre>
-   <p>The site has this structure:</p>
-   <pre><code class="language-text hljs language-plaintext" data-highlighted="yes">my-site/
-├── _config.yaml
-└── content/
-    ├── index.md
-    └── bs/
-        └── index.md
-</code></pre>
-   <h2 id="preview-both-languages">Preview both languages<a href="#preview-both-languages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Run:</p>
-   <pre><code class="language-shell hljs" data-highlighted="yes">flatmark serve
-</code></pre>
-   <p>Open <a href="http://localhost:5555">http://localhost:5555</a> for the English page and <a href="http://localhost:5555/bs/">http://localhost:5555/bs/</a> for the Bosnian page. The default theme displays a language switcher linking the two versions.</p>
-   <h2 id="add-matching-pages">Add matching pages<a href="#add-matching-pages" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Create <code>content/about.md</code>:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># About</span>
-</code></pre>
-   <p>Then create its translation at <code>content/bs/about.md</code>:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-section"># O nama</span>
-</code></pre>
-   <p>Open <a href="http://localhost:5555/about.html">http://localhost:5555/about.html</a> and use the language switcher. It links to <code>/bs/about.html</code> because Flatmark matches translations by their path relative to the default-language or language-code folder.</p>
-   <p>The completed structure matches the <a href="https://github.com/sake92/flatmark/tree/main/examples/multilang">multilingual example</a>.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

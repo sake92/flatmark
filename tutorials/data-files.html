@@ -5,68 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Render structured YAML data in a Flatmark page">
-  <title> Data files | Flatmark Docs </title>
+  <title>Data files | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
-       <ul>
-        <li><a href="#data-files">Data files</a>
-         <ul>
-          <li><a href="#add-the-data">Add the data</a></li>
-          <li><a href="#render-the-authors">Render the authors</a></li>
-         </ul></li>
-       </ul>
-      </div>
-     </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
-   </div>
-   <h1 id="data-files">Data files<a href="#data-files" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>In this tutorial, you will add a YAML data file to the site from the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> and render its values as a list.</p>
-   <h2 id="add-the-data">Add the data<a href="#add-the-data" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Create an <code>_data</code> folder in the site root. Inside it, create <code>_data/authors.yaml</code>:</p>
-   <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Ada</span>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="data-files">Data files<a href="#data-files" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>In this tutorial, you will add a YAML data file to the site from the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> and render its values as a list.</p>
+     <h2 id="add-the-data">Add the data<a href="#add-the-data" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create an <code>_data</code> folder in the site root. Inside it, create <code>_data/authors.yaml</code>:</p>
+     <pre><code class="language-yaml hljs" data-highlighted="yes"><span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Ada</span>
   <span class="hljs-attr">skills:</span> [<span class="hljs-string">mathematics</span>, <span class="hljs-string">writing</span>]
 <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Grace</span>
   <span class="hljs-attr">skills:</span> [<span class="hljs-string">compilers</span>, <span class="hljs-string">leadership</span>]
 </code></pre>
-   <p>Flatmark exposes a data file using its base name, so this file becomes <code>site.data.authors</code>.</p>
-   <h2 id="render-the-authors">Render the authors<a href="#render-the-authors" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Create <code>content/authors.md</code>:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">---
+     <p>Flatmark exposes a data file using its base name, so this file becomes <code>site.data.authors</code>.</p>
+     <h2 id="render-the-authors">Render the authors<a href="#render-the-authors" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Create <code>content/authors.md</code>:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes">---
 <span class="hljs-section">title: Authors
 ---</span>
 
@@ -78,13 +62,34 @@
 {% endfor %}
 
 </code></pre>
-   <p>Start the development server:</p>
-   <pre><code class="language-shell hljs" data-highlighted="yes">flatmark serve
+     <p>Start the development server:</p>
+     <pre><code class="language-shell hljs" data-highlighted="yes">flatmark serve
 </code></pre>
-   <p>Open <a href="http://localhost:5555/authors.html">http://localhost:5555/authors.html</a>. You will see both authors and their comma-separated skills.</p>
-   <p>Change a value in <code>_data/authors.yaml</code> and save it. The rebuilt page will show the new value.</p>
-   <p>The completed structure matches the <a href="https://github.com/sake92/flatmark/tree/main/examples/data-file">data-file example</a>.</p>
+     <p>Open <a href="http://localhost:5555/authors.html">http://localhost:5555/authors.html</a>. You will see both authors and their comma-separated skills.</p>
+     <p>Change a value in <code>_data/authors.yaml</code> and save it. The rebuilt page will show the new value.</p>
+     <p>The completed structure matches the <a href="https://github.com/sake92/flatmark/tree/main/examples/data-file">data-file example</a>.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#data-files">Data files</a>
+         <ul>
+          <li><a href="#add-the-data">Add the data</a></li>
+          <li><a href="#render-the-authors">Render the authors</a></li>
+         </ul></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

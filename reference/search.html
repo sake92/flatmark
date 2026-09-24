@@ -5,55 +5,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Flatmark generated search-index reference">
-  <title> Search index | Flatmark Docs </title>
+  <title>Search index | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
-       <ul>
-        <li><a href="#search-index">Search index</a></li>
-       </ul>
-      </div>
-     </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
-   </div>
-   <h1 id="search-index">Search index<a href="#search-index" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>When <code>search.enabled</code> is <code>true</code>, Flatmark writes <code>_site/search/entries.json</code> after rendering all content and index pages.</p>
-   <p>The file contains a JSON array with one object per rendered page:</p>
-   <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="search-index">Search index<a href="#search-index" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>When <code>search.enabled</code> is <code>true</code>, Flatmark writes <code>_site/search/entries.json</code> after rendering all content and index pages.</p>
+     <p>The file contains a JSON array with one object per rendered page:</p>
+     <pre><code class="language-json hljs" data-highlighted="yes"><span class="hljs-punctuation">[</span>
   <span class="hljs-punctuation">{</span>
     <span class="hljs-attr">"title"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"Page title"</span><span class="hljs-punctuation">,</span>
     <span class="hljs-attr">"url"</span><span class="hljs-punctuation">:</span> <span class="hljs-string">"/path/to/page.html"</span><span class="hljs-punctuation">,</span>
@@ -61,35 +49,52 @@
   <span class="hljs-punctuation">}</span>
 <span class="hljs-punctuation">]</span>
 </code></pre>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>title</code></td>
-      <td>string</td>
-      <td>Value of the page's <code>title</code> front-matter key, or <code>Untitled</code>.</td>
-     </tr>
-     <tr>
-      <td><code>url</code></td>
-      <td>string</td>
-      <td>Generated page URL, including <code>base_url</code> when configured.</td>
-     </tr>
-     <tr>
-      <td><code>text</code></td>
-      <td>string</td>
-      <td>Plain text extracted from the rendered content before the layout is applied.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>Flatmark generates the index but does not define a query protocol. Search interfaces load and filter the JSON in the browser. The default theme supplies a <code>search-results.html</code> layout for this purpose.</p>
-   <p>See <a href="https://sake92.github.io/flatmark/howtos/search.html">Enable site search</a> for setup instructions.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>title</code></td>
+        <td>string</td>
+        <td>Value of the page's <code>title</code> front-matter key, or <code>Untitled</code>.</td>
+       </tr>
+       <tr>
+        <td><code>url</code></td>
+        <td>string</td>
+        <td>Generated page URL, including <code>base_url</code> when configured.</td>
+       </tr>
+       <tr>
+        <td><code>text</code></td>
+        <td>string</td>
+        <td>Plain text extracted from the rendered content before the layout is applied.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Flatmark generates the index but does not define a query protocol. Search interfaces load and filter the JSON in the browser. If a <code>search-results.html</code> layout exists in the site or theme, Flatmark generates <code>/search/results.html</code> unless the site already supplies that output path. The default theme supplies the layout.</p>
+     <p>See <a href="https://sake92.github.io/flatmark/howtos/search.html">Enable site search</a> for setup instructions.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
+       <ul>
+        <li><a href="#search-index">Search index</a></li>
+       </ul>
+      </nav>
+     </details>
+    </aside>
+   </div>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

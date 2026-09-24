@@ -5,41 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Flatmark Markdown extensions and build-time rendering reference">
-  <title> Markdown and rendering | Flatmark Docs </title>
+  <title>Markdown and rendering | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="markdown-and-rendering">Markdown and rendering<a href="#markdown-and-rendering" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Flatmark parses <a href="https://commonmark.org/">CommonMark</a> and enables the extensions below.</p>
+     <h2 id="markdown-extensions">Markdown extensions<a href="#markdown-extensions" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <table>
+      <thead>
+       <tr>
+        <th>Feature</th>
+        <th>Syntax</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td>Tables</td>
+        <td>GitHub-style pipe tables.</td>
+       </tr>
+       <tr>
+        <td>Strikethrough</td>
+        <td><code>~~removed~~</code></td>
+       </tr>
+       <tr>
+        <td>Autolinks</td>
+        <td>Plain HTTP and HTTPS URLs.</td>
+       </tr>
+       <tr>
+        <td>Footnotes</td>
+        <td>Reference with <code>[^1]</code>; definition with <code>[^1]: Text</code>.</td>
+       </tr>
+       <tr>
+        <td>Inserted text</td>
+        <td><code>++inserted++</code></td>
+       </tr>
+       <tr>
+        <td>Task-list items</td>
+        <td><code>- [ ] Open</code> and <code>- [x] Complete</code></td>
+       </tr>
+       <tr>
+        <td>Image attributes</td>
+        <td><code>![Alt](image.png){width=100% height=50px}</code></td>
+       </tr>
+       <tr>
+        <td>Heading anchors</td>
+        <td><code>id</code> attributes generated from heading text.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>Flatmark appends a permalink with class <code>flatmark-anchor</code> to headings that have an <code>id</code>.</p>
+     <h2 id="fenced-code-blocks">Fenced code blocks<a href="#fenced-code-blocks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>A fenced code block with a language identifier is syntax-highlighted during the build:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```scala
+val greeting = "Hello"
+```</span>
+</code></pre>
+     <p>Highlighting uses highlight.js and emits HTML rather than browser-side highlighting code.</p>
+     <h2 id="math">Math<a href="#math" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Inline math uses single dollar delimiters:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes">The area is $A = \pi r^2$.
+</code></pre>
+     <p>Block math uses a fenced block with the <code>math</code> identifier:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```math
+A = \pi r^2
+```</span>
+</code></pre>
+     <p>Math is rendered with KaTeX during the build.</p>
+     <h2 id="mermaid">Mermaid<a href="#mermaid" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Use the <code>diagram:mermaid</code> identifier:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:mermaid
+flowchart LR
+    Markdown --&gt; HTML
+```</span>
+</code></pre>
+     <h2 id="graphviz">Graphviz<a href="#graphviz" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p>Use the <code>diagram:graphviz</code> identifier:</p>
+     <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:graphviz
+digraph G { Markdown -&gt; HTML }
+```</span>
+</code></pre>
+     <p>Mermaid and Graphviz diagrams are emitted as SVG. Highlighting, math, and diagram results are cached under <code>.flatmark-cache/cached-results/</code> unless the CLI is run with <code>--no-cache</code>.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#markdown-and-rendering">Markdown and rendering</a>
          <ul>
@@ -50,91 +130,16 @@
           <li><a href="#graphviz">Graphviz</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="markdown-and-rendering">Markdown and rendering<a href="#markdown-and-rendering" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Flatmark parses <a href="https://commonmark.org/">CommonMark</a> and enables the extensions below.</p>
-   <h2 id="markdown-extensions">Markdown extensions<a href="#markdown-extensions" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <table>
-    <thead>
-     <tr>
-      <th>Feature</th>
-      <th>Syntax</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td>Tables</td>
-      <td>GitHub-style pipe tables.</td>
-     </tr>
-     <tr>
-      <td>Strikethrough</td>
-      <td><code>~~removed~~</code></td>
-     </tr>
-     <tr>
-      <td>Autolinks</td>
-      <td>Plain HTTP and HTTPS URLs.</td>
-     </tr>
-     <tr>
-      <td>Footnotes</td>
-      <td>Reference with <code>[^1]</code>; definition with <code>[^1]: Text</code>.</td>
-     </tr>
-     <tr>
-      <td>Inserted text</td>
-      <td><code>++inserted++</code></td>
-     </tr>
-     <tr>
-      <td>Task-list items</td>
-      <td><code>- [ ] Open</code> and <code>- [x] Complete</code></td>
-     </tr>
-     <tr>
-      <td>Image attributes</td>
-      <td><code>![Alt](image.png){width=100% height=50px}</code></td>
-     </tr>
-     <tr>
-      <td>Heading anchors</td>
-      <td><code>id</code> attributes generated from heading text.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>Flatmark appends a permalink with class <code>flatmark-anchor</code> to headings that have an <code>id</code>.</p>
-   <h2 id="fenced-code-blocks">Fenced code blocks<a href="#fenced-code-blocks" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>A fenced code block with a language identifier is syntax-highlighted during the build:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```scala
-val greeting = "Hello"
-```</span>
-</code></pre>
-   <p>Highlighting uses highlight.js and emits HTML rather than browser-side highlighting code.</p>
-   <h2 id="math">Math<a href="#math" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Inline math uses single dollar delimiters:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes">The area is $A = \pi r^2$.
-</code></pre>
-   <p>Block math uses a fenced block with the <code>math</code> identifier:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```math
-A = \pi r^2
-```</span>
-</code></pre>
-   <p>Math is rendered with KaTeX during the build.</p>
-   <h2 id="mermaid">Mermaid<a href="#mermaid" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Use the <code>diagram:mermaid</code> identifier:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:mermaid
-flowchart LR
-    Markdown --&gt; HTML
-```</span>
-</code></pre>
-   <h2 id="graphviz">Graphviz<a href="#graphviz" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p>Use the <code>diagram:graphviz</code> identifier:</p>
-   <pre><code class="language-markdown hljs" data-highlighted="yes"><span class="hljs-code">```diagram:graphviz
-digraph G { Markdown -&gt; HTML }
-```</span>
-</code></pre>
-   <p>Mermaid and Graphviz diagrams are emitted as SVG. Highlighting, math, and diagram results are cached under <code>.flatmark-cache/cached-results/</code> unless the CLI is run with <code>--no-cache</code>.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>

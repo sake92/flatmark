@@ -5,41 +5,336 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Variables available to Flatmark Jinja templates">
-  <title> Template context | Flatmark Docs </title>
+  <title>Template context | Flatmark Docs</title>
   <link rel="shortcut icon" href="https://sake92.github.io/flatmark/images/favicon.png" type="image/png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-dark.min.css" media="(prefers-color-scheme: dark)" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/a11y-light.min.css" media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.conditional.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container">
-   <nav>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/">Home</a></li>
-    </ul>
-    <ul>
-     <li>
-      <form action="https://sake92.github.io/flatmark/search/results.html" method="GET">
-       <input name="q" type="search" placeholder="Search">
-      </form>
-     </li>
-    </ul>
-    <ul>
-     <li><a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a></li>
-     <li><a href="https://sake92.github.io/flatmark/howtos">How-to guides</a></li>
-     <li><a href="https://sake92.github.io/flatmark/reference">Reference</a></li>
-     <li><a href="https://sake92.github.io/flatmark/explanation">Explanation</a></li>
-    </ul>
+  <header class="pico container fm-header">
+   <nav class="fm-nav" aria-label="Main navigation">
+    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div class="fm-nav-links">
+     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+    </div>
+    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+     <input name="q" type="search" placeholder="Search" aria-label="Search this site">
+    </form>
    </nav>
   </header>
-  <main class="pico container">
-   <div class="grid">
-    <div>
-     <details>
-      <summary>Table of Contents</summary>
-      <div>
+  <script>
+for (const link of document.querySelectorAll('.fm-category-link')) {
+    const path = new URL(link.href).pathname.replace(/\/$/, '');
+    const current = window.location.pathname;
+    if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
+}
+</script>
+  <main class="pico container fm-main">
+   <div class="fm-layout">
+    <div class="fm-content">
+     <h1 id="template-context">Template context<a href="#template-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
+     <p>Flatmark supplies three top-level objects to Jinja templates: <code>site</code>, <code>page</code>, and <code>paginator</code>.</p>
+     <h2 id="site"><code>site</code><a href="#site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>name</code></td>
+        <td>string</td>
+        <td>Site name from <code>_config.yaml</code>.</td>
+       </tr>
+       <tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>Site description from <code>_config.yaml</code>.</td>
+       </tr>
+       <tr>
+        <td><code>base_url</code></td>
+        <td>string or null</td>
+        <td>Configured base URL.</td>
+       </tr>
+       <tr>
+        <td><code>langs</code></td>
+        <td>list</td>
+        <td>Languages available for the current logical page.</td>
+       </tr>
+       <tr>
+        <td><code>search.enabled</code></td>
+        <td>boolean</td>
+        <td>Search-index feature switch.</td>
+       </tr>
+       <tr>
+        <td><code>categories</code></td>
+        <td>mapping</td>
+        <td>Categories available in the current language.</td>
+       </tr>
+       <tr>
+        <td><code>tags</code></td>
+        <td>mapping</td>
+        <td>Configured tags.</td>
+       </tr>
+       <tr>
+        <td><code>code_highlight.enabled</code></td>
+        <td>boolean</td>
+        <td>Code-highlighting feature switch.</td>
+       </tr>
+       <tr>
+        <td><code>math_highlight.enabled</code></td>
+        <td>boolean</td>
+        <td>Math-rendering feature switch.</td>
+       </tr>
+       <tr>
+        <td><code>data</code></td>
+        <td>mapping</td>
+        <td>YAML documents loaded from <code>_data/</code>.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h3 id="sitelangs-items"><code>site.langs</code> items<a href="#sitelangs-items" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>code</code></td>
+        <td>string</td>
+        <td>BCP 47 language tag.</td>
+       </tr>
+       <tr>
+        <td><code>label</code></td>
+        <td>string</td>
+        <td>Language name displayed in that language.</td>
+       </tr>
+       <tr>
+        <td><code>url</code></td>
+        <td>string</td>
+        <td>Matching translation URL, or the language home URL when no translation exists.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h3 id="sitecategories-entries"><code>site.categories</code> entries<a href="#sitecategories-entries" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Each configured category is keyed by its folder name.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>label</code></td>
+        <td>string</td>
+        <td>Configured label.</td>
+       </tr>
+       <tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>Configured description.</td>
+       </tr>
+       <tr>
+        <td><code>items</code></td>
+        <td>list of page objects</td>
+        <td>Non-index pages in the category and current language. Empty while ordinary content pages are rendered.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p>A category is present only when its <code>index.md</code> or <code>index.html</code> exists for the current language.</p>
+     <h3 id="sitetags-entries"><code>site.tags</code> entries<a href="#sitetags-entries" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Each configured tag has <code>label</code> and <code>description</code> string fields.</p>
+     <h3 id="sitedata"><code>site.data</code><a href="#sitedata" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <p>Every top-level <code>.yaml</code> file in <code>_data/</code> becomes a field named after the file. For example, <code>_data/authors.yaml</code> is available as <code>site.data.authors</code>. Nested YAML mappings and sequences retain their structure.</p>
+     <h2 id="page"><code>page</code><a href="#page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>layout</code></td>
+        <td>string</td>
+        <td>Selected layout template.</td>
+       </tr>
+       <tr>
+        <td><code>title</code></td>
+        <td>string</td>
+        <td>Page title.</td>
+       </tr>
+       <tr>
+        <td><code>description</code></td>
+        <td>string</td>
+        <td>Page description.</td>
+       </tr>
+       <tr>
+        <td><code>content</code></td>
+        <td>HTML string</td>
+        <td>Rendered page body. Populated when the layout is rendered.</td>
+       </tr>
+       <tr>
+        <td><code>lang</code></td>
+        <td>language object</td>
+        <td>Current language, with <code>code</code>, <code>label</code>, and <code>url</code>.</td>
+       </tr>
+       <tr>
+        <td><code>publish_date</code></td>
+        <td>zoned date-time or null</td>
+        <td>Publication date in the configured site time zone.</td>
+       </tr>
+       <tr>
+        <td><code>rootRelPath</code></td>
+        <td>string</td>
+        <td>Generated file path relative to <code>_site/</code>.</td>
+       </tr>
+       <tr>
+        <td><code>url</code></td>
+        <td>string</td>
+        <td>Generated URL, including <code>base_url</code> when configured.</td>
+       </tr>
+       <tr>
+        <td><code>theme_props</code></td>
+        <td>mapping</td>
+        <td>Theme-specific front-matter values.</td>
+       </tr>
+       <tr>
+        <td><code>toc</code></td>
+        <td>list</td>
+        <td>Heading hierarchy. Populated when the layout is rendered.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h3 id="pagetoc-items"><code>page.toc</code> items<a href="#pagetoc-items" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>level</code></td>
+        <td>integer</td>
+        <td>HTML heading level from 1 through 6.</td>
+       </tr>
+       <tr>
+        <td><code>title</code></td>
+        <td>string</td>
+        <td>Heading text.</td>
+       </tr>
+       <tr>
+        <td><code>url</code></td>
+        <td>string</td>
+        <td>Fragment URL beginning with <code>#</code>.</td>
+       </tr>
+       <tr>
+        <td><code>children</code></td>
+        <td>list</td>
+        <td>Nested heading items.</td>
+       </tr>
+      </tbody>
+     </table>
+     <h2 id="paginator"><code>paginator</code><a href="#paginator" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
+     <p><code>paginator</code> is populated for <code>index.md</code> and <code>index.html</code> pages. It is an empty mapping on other pages.</p>
+     <table>
+      <thead>
+       <tr>
+        <th>Field</th>
+        <th>Type</th>
+        <th>Description</th>
+       </tr>
+      </thead>
+      <tbody>
+       <tr>
+        <td><code>enabled</code></td>
+        <td>boolean</td>
+        <td>Whether pagination is enabled in front matter.</td>
+       </tr>
+       <tr>
+        <td><code>items</code></td>
+        <td>list of page objects</td>
+        <td>Items assigned to the current page.</td>
+       </tr>
+       <tr>
+        <td><code>per_page</code></td>
+        <td>integer</td>
+        <td>Configured page size.</td>
+       </tr>
+       <tr>
+        <td><code>total_items</code></td>
+        <td>integer</td>
+        <td>Number of items across all pages.</td>
+       </tr>
+       <tr>
+        <td><code>total_pages</code></td>
+        <td>integer</td>
+        <td>Number of generated pages.</td>
+       </tr>
+       <tr>
+        <td><code>current</code></td>
+        <td>integer</td>
+        <td>Current one-based page number.</td>
+       </tr>
+       <tr>
+        <td><code>prev</code></td>
+        <td>integer</td>
+        <td>Previous page number.</td>
+       </tr>
+       <tr>
+        <td><code>next</code></td>
+        <td>integer</td>
+        <td>Next page number.</td>
+       </tr>
+       <tr>
+        <td><code>has_prev</code></td>
+        <td>boolean</td>
+        <td>Whether a previous page exists.</td>
+       </tr>
+       <tr>
+        <td><code>has_next</code></td>
+        <td>boolean</td>
+        <td>Whether a next page exists.</td>
+       </tr>
+       <tr>
+        <td><code>prev_url</code></td>
+        <td>string</td>
+        <td>URL calculated for the previous page number.</td>
+       </tr>
+       <tr>
+        <td><code>next_url</code></td>
+        <td>string</td>
+        <td>URL calculated for the next page number.</td>
+       </tr>
+      </tbody>
+     </table>
+     <p><code>prev_url</code> and <code>next_url</code> are always present; check <code>has_prev</code> or <code>has_next</code> before rendering their links.</p>
+    </div>
+    <aside class="fm-toc" aria-label="On this page">
+     <details class="fm-toc-details" open>
+      <summary>On this page</summary>
+      <nav aria-label="Table of contents">
        <ul>
         <li><a href="#template-context">Template context</a>
          <ul>
@@ -57,306 +352,16 @@
           <li><a href="#paginator">paginator</a></li>
          </ul></li>
        </ul>
-      </div>
+      </nav>
      </details>
-     <hr>
-    </div>
-    <div></div>
-    <div></div>
+    </aside>
    </div>
-   <h1 id="template-context">Template context<a href="#template-context" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
-   <p>Flatmark supplies three top-level objects to Jinja templates: <code>site</code>, <code>page</code>, and <code>paginator</code>.</p>
-   <h2 id="site"><code>site</code><a href="#site" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>name</code></td>
-      <td>string</td>
-      <td>Site name from <code>_config.yaml</code>.</td>
-     </tr>
-     <tr>
-      <td><code>description</code></td>
-      <td>string</td>
-      <td>Site description from <code>_config.yaml</code>.</td>
-     </tr>
-     <tr>
-      <td><code>base_url</code></td>
-      <td>string or null</td>
-      <td>Configured base URL.</td>
-     </tr>
-     <tr>
-      <td><code>langs</code></td>
-      <td>list</td>
-      <td>Languages available for the current logical page.</td>
-     </tr>
-     <tr>
-      <td><code>search.enabled</code></td>
-      <td>boolean</td>
-      <td>Search-index feature switch.</td>
-     </tr>
-     <tr>
-      <td><code>categories</code></td>
-      <td>mapping</td>
-      <td>Categories available in the current language.</td>
-     </tr>
-     <tr>
-      <td><code>tags</code></td>
-      <td>mapping</td>
-      <td>Configured tags.</td>
-     </tr>
-     <tr>
-      <td><code>code_highlight.enabled</code></td>
-      <td>boolean</td>
-      <td>Code-highlighting feature switch.</td>
-     </tr>
-     <tr>
-      <td><code>math_highlight.enabled</code></td>
-      <td>boolean</td>
-      <td>Math-rendering feature switch.</td>
-     </tr>
-     <tr>
-      <td><code>data</code></td>
-      <td>mapping</td>
-      <td>YAML documents loaded from <code>_data/</code>.</td>
-     </tr>
-    </tbody>
-   </table>
-   <h3 id="sitelangs-items"><code>site.langs</code> items<a href="#sitelangs-items" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>code</code></td>
-      <td>string</td>
-      <td>BCP 47 language tag.</td>
-     </tr>
-     <tr>
-      <td><code>label</code></td>
-      <td>string</td>
-      <td>Language name displayed in that language.</td>
-     </tr>
-     <tr>
-      <td><code>url</code></td>
-      <td>string</td>
-      <td>Matching translation URL, or the language home URL when no translation exists.</td>
-     </tr>
-    </tbody>
-   </table>
-   <h3 id="sitecategories-entries"><code>site.categories</code> entries<a href="#sitecategories-entries" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p>Each configured category is keyed by its folder name.</p>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>label</code></td>
-      <td>string</td>
-      <td>Configured label.</td>
-     </tr>
-     <tr>
-      <td><code>description</code></td>
-      <td>string</td>
-      <td>Configured description.</td>
-     </tr>
-     <tr>
-      <td><code>items</code></td>
-      <td>list of page objects</td>
-      <td>Non-index pages in the category and current language. Empty while ordinary content pages are rendered.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p>A category is present only when its <code>index.md</code> or <code>index.html</code> exists for the current language.</p>
-   <h3 id="sitetags-entries"><code>site.tags</code> entries<a href="#sitetags-entries" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p>Each configured tag has <code>label</code> and <code>description</code> string fields.</p>
-   <h3 id="sitedata"><code>site.data</code><a href="#sitedata" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <p>Every top-level <code>.yaml</code> file in <code>_data/</code> becomes a field named after the file. For example, <code>_data/authors.yaml</code> is available as <code>site.data.authors</code>. Nested YAML mappings and sequences retain their structure.</p>
-   <h2 id="page"><code>page</code><a href="#page" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>layout</code></td>
-      <td>string</td>
-      <td>Selected layout template.</td>
-     </tr>
-     <tr>
-      <td><code>title</code></td>
-      <td>string</td>
-      <td>Page title.</td>
-     </tr>
-     <tr>
-      <td><code>description</code></td>
-      <td>string</td>
-      <td>Page description.</td>
-     </tr>
-     <tr>
-      <td><code>content</code></td>
-      <td>HTML string</td>
-      <td>Rendered page body. Populated when the layout is rendered.</td>
-     </tr>
-     <tr>
-      <td><code>lang</code></td>
-      <td>language object</td>
-      <td>Current language, with <code>code</code>, <code>label</code>, and <code>url</code>.</td>
-     </tr>
-     <tr>
-      <td><code>publish_date</code></td>
-      <td>zoned date-time or null</td>
-      <td>Publication date in the configured site time zone.</td>
-     </tr>
-     <tr>
-      <td><code>rootRelPath</code></td>
-      <td>string</td>
-      <td>Generated file path relative to <code>_site/</code>.</td>
-     </tr>
-     <tr>
-      <td><code>url</code></td>
-      <td>string</td>
-      <td>Generated URL, including <code>base_url</code> when configured.</td>
-     </tr>
-     <tr>
-      <td><code>theme_props</code></td>
-      <td>mapping</td>
-      <td>Theme-specific front-matter values.</td>
-     </tr>
-     <tr>
-      <td><code>toc</code></td>
-      <td>list</td>
-      <td>Heading hierarchy. Populated when the layout is rendered.</td>
-     </tr>
-    </tbody>
-   </table>
-   <h3 id="pagetoc-items"><code>page.toc</code> items<a href="#pagetoc-items" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h3>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>level</code></td>
-      <td>integer</td>
-      <td>HTML heading level from 1 through 6.</td>
-     </tr>
-     <tr>
-      <td><code>title</code></td>
-      <td>string</td>
-      <td>Heading text.</td>
-     </tr>
-     <tr>
-      <td><code>url</code></td>
-      <td>string</td>
-      <td>Fragment URL beginning with <code>#</code>.</td>
-     </tr>
-     <tr>
-      <td><code>children</code></td>
-      <td>list</td>
-      <td>Nested heading items.</td>
-     </tr>
-    </tbody>
-   </table>
-   <h2 id="paginator"><code>paginator</code><a href="#paginator" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
-   <p><code>paginator</code> is populated for <code>index.md</code> and <code>index.html</code> pages. It is an empty mapping on other pages.</p>
-   <table>
-    <thead>
-     <tr>
-      <th>Field</th>
-      <th>Type</th>
-      <th>Description</th>
-     </tr>
-    </thead>
-    <tbody>
-     <tr>
-      <td><code>enabled</code></td>
-      <td>boolean</td>
-      <td>Whether pagination is enabled in front matter.</td>
-     </tr>
-     <tr>
-      <td><code>items</code></td>
-      <td>list of page objects</td>
-      <td>Items assigned to the current page.</td>
-     </tr>
-     <tr>
-      <td><code>per_page</code></td>
-      <td>integer</td>
-      <td>Configured page size.</td>
-     </tr>
-     <tr>
-      <td><code>total_items</code></td>
-      <td>integer</td>
-      <td>Number of items across all pages.</td>
-     </tr>
-     <tr>
-      <td><code>total_pages</code></td>
-      <td>integer</td>
-      <td>Number of generated pages.</td>
-     </tr>
-     <tr>
-      <td><code>current</code></td>
-      <td>integer</td>
-      <td>Current one-based page number.</td>
-     </tr>
-     <tr>
-      <td><code>prev</code></td>
-      <td>integer</td>
-      <td>Previous page number.</td>
-     </tr>
-     <tr>
-      <td><code>next</code></td>
-      <td>integer</td>
-      <td>Next page number.</td>
-     </tr>
-     <tr>
-      <td><code>has_prev</code></td>
-      <td>boolean</td>
-      <td>Whether a previous page exists.</td>
-     </tr>
-     <tr>
-      <td><code>has_next</code></td>
-      <td>boolean</td>
-      <td>Whether a next page exists.</td>
-     </tr>
-     <tr>
-      <td><code>prev_url</code></td>
-      <td>string</td>
-      <td>URL calculated for the previous page number.</td>
-     </tr>
-     <tr>
-      <td><code>next_url</code></td>
-      <td>string</td>
-      <td>URL calculated for the next page number.</td>
-     </tr>
-    </tbody>
-   </table>
-   <p><code>prev_url</code> and <code>next_url</code> are always present; check <code>has_prev</code> or <code>has_next</code> before rendering their links.</p>
   </main>
   <footer class="pico container">Flatmark Docs</footer>
+  <script>
+if (window.matchMedia('(max-width: 850px)').matches) {
+    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+}
+</script>
  </body>
 </html>
