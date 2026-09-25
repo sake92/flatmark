@@ -17,27 +17,27 @@
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container fm-header">
-   <nav class="fm-nav" aria-label="Main navigation">
-    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
-    <div class="fm-nav-links">
-     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div>
+     <a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a href="https://sake92.github.io/flatmark/reference">Reference</a> <a href="https://sake92.github.io/flatmark/explanation">Explanation</a>
     </div>
-    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+    <form action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
      <input name="q" type="search" placeholder="Search" aria-label="Search this site">
     </form>
    </nav>
   </header>
   <script>
-for (const link of document.querySelectorAll('.fm-category-link')) {
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     const path = new URL(link.href).pathname.replace(/\/$/, '');
     const current = window.location.pathname;
     if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
 }
 </script>
-  <main class="pico container fm-main">
-   <div class="fm-layout">
-    <div class="fm-content">
+  <main class="pico container">
+   <div>
+    <div class="content">
      <h1 id="why-flatmark-renders-dynamic-looking-content-statically">Why Flatmark renders dynamic-looking content statically<a href="#why-flatmark-renders-dynamic-looking-content-statically" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>Static site generators usually turn Markdown into HTML while leaving richer features—syntax highlighting, equations, or diagrams—to JavaScript in the reader's browser. Flatmark moves that work into the build instead.</p>
      <p>This choice extends the meaning of “static.” A Flatmark deployment consists of files that a basic web server or object store can return as-is. Code is already highlighted, KaTeX has already rendered the equations, and Mermaid or Graphviz has already produced SVG. The reader does not need those rendering libraries to execute successfully.</p>
@@ -54,8 +54,8 @@ for (const link of document.querySelectorAll('.fm-category-link')) {
      <p>A generated site should remain deployable even when a rebuild fails. Flatmark renders into a staging location and only replaces <code>_site/</code> after generation succeeds. If Markdown, configuration, a template, or browser rendering fails, the previous successful output remains available.</p>
      <p>Together, build-time rendering, cached inputs, and transactional publication concentrate complexity in the authoring environment. The deployed site stays deliberately simple.</p>
     </div>
-    <aside class="fm-toc" aria-label="On this page">
-     <details class="fm-toc-details" open>
+    <aside aria-label="On this page">
+     <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
@@ -75,8 +75,9 @@ for (const link of document.querySelectorAll('.fm-category-link')) {
   <footer class="pico container">Flatmark Docs</footer>
   <script>
 if (window.matchMedia('(max-width: 850px)').matches) {
-    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
 }
 </script>
+  <script src="https://sake92.github.io/flatmark/scripts/code-copy.js"></script>
  </body>
 </html>

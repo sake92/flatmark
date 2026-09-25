@@ -17,27 +17,27 @@
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container fm-header">
-   <nav class="fm-nav" aria-label="Main navigation">
-    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
-    <div class="fm-nav-links">
-     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div>
+     <a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a href="https://sake92.github.io/flatmark/reference">Reference</a> <a href="https://sake92.github.io/flatmark/explanation">Explanation</a>
     </div>
-    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+    <form action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
      <input name="q" type="search" placeholder="Search" aria-label="Search this site">
     </form>
    </nav>
   </header>
   <script>
-for (const link of document.querySelectorAll('.fm-category-link')) {
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     const path = new URL(link.href).pathname.replace(/\/$/, '');
     const current = window.location.pathname;
     if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
 }
 </script>
-  <main class="pico container fm-main">
-   <div class="fm-layout">
-    <div class="fm-content">
+  <main class="pico container">
+   <div>
+    <div class="content">
      <h1 id="custom-local-theme">Custom local theme<a href="#custom-local-theme" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>In this tutorial, you will replace the default theme in the <a href="https://sake92.github.io/flatmark/tutorials/quickstart.html">Quickstart</a> site with a small local theme.</p>
      <h2 id="create-the-theme-structure">Create the theme structure<a href="#create-the-theme-structure" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
@@ -93,8 +93,8 @@ for (const link of document.querySelectorAll('.fm-category-link')) {
      <p>Open <a href="http://localhost:5555">http://localhost:5555</a>. The home page is now rendered through the local theme. Add <code>content/about.md</code> and open <code>/about.html</code> to confirm that the <code>page.html</code> layout works too.</p>
      <p>See the <a href="https://sake92.github.io/flatmark/reference/themes.html">themes reference</a> for supported theme folders, remote sources, and site-level overrides.</p>
     </div>
-    <aside class="fm-toc" aria-label="On this page">
-     <details class="fm-toc-details" open>
+    <aside aria-label="On this page">
+     <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
@@ -114,8 +114,9 @@ for (const link of document.querySelectorAll('.fm-category-link')) {
   <footer class="pico container">Flatmark Docs</footer>
   <script>
 if (window.matchMedia('(max-width: 850px)').matches) {
-    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
 }
 </script>
+  <script src="https://sake92.github.io/flatmark/scripts/code-copy.js"></script>
  </body>
 </html>

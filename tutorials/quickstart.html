@@ -17,27 +17,27 @@
   <link rel="stylesheet" href="https://sake92.github.io/flatmark/styles/default.css">
  </head>
  <body>
-  <header class="pico container fm-header">
-   <nav class="fm-nav" aria-label="Main navigation">
-    <a class="fm-brand" href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
-    <div class="fm-nav-links">
-     <a class="fm-category-link" href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/reference">Reference</a> <a class="fm-category-link" href="https://sake92.github.io/flatmark/explanation">Explanation</a>
+  <header class="pico container">
+   <nav aria-label="Main navigation">
+    <a href="https://sake92.github.io/flatmark/">Flatmark Docs</a>
+    <div>
+     <a href="https://sake92.github.io/flatmark/tutorials">Tutorials</a> <a href="https://sake92.github.io/flatmark/howtos">How-to guides</a> <a href="https://sake92.github.io/flatmark/reference">Reference</a> <a href="https://sake92.github.io/flatmark/explanation">Explanation</a>
     </div>
-    <form class="fm-search-form" action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
+    <form action="https://sake92.github.io/flatmark/search/results.html" method="get" role="search">
      <input name="q" type="search" placeholder="Search" aria-label="Search this site">
     </form>
    </nav>
   </header>
   <script>
-for (const link of document.querySelectorAll('.fm-category-link')) {
+for (const link of document.querySelectorAll('body > header > nav > div > a')) {
     const path = new URL(link.href).pathname.replace(/\/$/, '');
     const current = window.location.pathname;
     if (current === path || current.startsWith(path + '/')) link.setAttribute('aria-current', 'page');
 }
 </script>
-  <main class="pico container fm-main">
-   <div class="fm-layout">
-    <div class="fm-content">
+  <main class="pico container">
+   <div>
+    <div class="content">
      <h1 id="quickstart">Quickstart<a href="#quickstart" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h1>
      <p>In this tutorial, you will create a one-page site, preview it with live reload, and produce a deployable build.</p>
      <h2 id="installation">Installation<a href="#installation" class="flatmark-anchor" aria-label="Anchor"> 🔗</a></h2>
@@ -87,8 +87,8 @@ This page was generated from Markdown.
      <p>Flatmark writes the generated site to <code>_site/</code>. The folder contains static files and can be deployed to any static hosting service.</p>
      <p>You now have a complete Flatmark build. Continue with the <a href="https://sake92.github.io/flatmark/tutorials/multilang.html">multilingual site tutorial</a>, or look up the available commands in the <a href="https://sake92.github.io/flatmark/reference/cli.html">CLI reference</a>.</p>
     </div>
-    <aside class="fm-toc" aria-label="On this page">
-     <details class="fm-toc-details" open>
+    <aside aria-label="On this page">
+     <details open>
       <summary>On this page</summary>
       <nav aria-label="Table of contents">
        <ul>
@@ -108,8 +108,9 @@ This page was generated from Markdown.
   <footer class="pico container">Flatmark Docs</footer>
   <script>
 if (window.matchMedia('(max-width: 850px)').matches) {
-    document.querySelectorAll('.fm-toc-details').forEach(details => { details.open = false; });
+    document.querySelectorAll('body > main > div > aside > details').forEach(details => { details.open = false; });
 }
 </script>
+  <script src="https://sake92.github.io/flatmark/scripts/code-copy.js"></script>
  </body>
 </html>
