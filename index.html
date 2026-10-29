@@ -63,7 +63,11 @@ for (const link of document.querySelectorAll('body > header > nav > div > a')) {
      <pre><code class="language-shell hljs" data-highlighted="yes">curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
 sudo apt install ./flatmark.deb
 </code></pre>
-     <p>For macOS, other Linux distributions, and Windows, download the installer for your platform from the <a href="https://github.com/sake92/flatmark/releases">Flatmark releases page</a>.</p>
+     <p>On macOS, install Flatmark from the Homebrew tap:</p>
+     <pre><code class="language-shell hljs" data-highlighted="yes">brew tap sake92/tap
+brew install --cask flatmark
+</code></pre>
+     <p>For other Linux distributions and Windows, download the installer for your platform from the <a href="https://github.com/sake92/flatmark/releases">Flatmark releases page</a>.</p>
      <p>The first build may download the default theme and a compatible headless Chrome runtime.</p>
     </div>
     <aside aria-label="On this page">
