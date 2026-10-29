@@ -18,7 +18,14 @@ curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.
 sudo apt install ./flatmark.deb
 ```
 
-For macOS, other Linux distributions, and Windows, download the installer for your platform from the
+On macOS, install Flatmark from the Homebrew tap:
+
+```shell
+brew tap sake92/tap
+brew install --cask flatmark
+```
+
+For other Linux distributions and Windows, download the installer for your platform from the
 [latest release](https://github.com/sake92/flatmark/releases/latest).
 
 Create a site containing one Markdown page:
