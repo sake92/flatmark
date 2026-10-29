@@ -16,10 +16,12 @@ brew tap sake92/tap
 brew install --cask flatmark
 ```
 
+This cask works only on macOS. On Linux, use the package for your distribution.
+
 On Debian or Ubuntu, download and install the `.deb` package:
 
 ```shell
-curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+curl -fL https://github.com/sake92/flatmark/releases/download/v0.3.0/flatmark_0.3.0_amd64.deb -o flatmark.deb
 sudo apt install ./flatmark.deb
 ```
 

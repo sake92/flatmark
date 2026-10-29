@@ -14,7 +14,7 @@ search indexing, Sass compilation, and a development server with live reload.
 For Debian or Ubuntu, download and install the `.deb` package:
 
 ```shell
-curl -fL https://github.com/sake92/flatmark/releases/download/v0.2.0/flatmark_0.2.0_amd64.deb -o flatmark.deb
+curl -fL https://github.com/sake92/flatmark/releases/download/v0.3.0/flatmark_0.3.0_amd64.deb -o flatmark.deb
 sudo apt install ./flatmark.deb
 ```
 
@@ -24,6 +24,8 @@ On macOS, install Flatmark from the Homebrew tap:
 brew tap sake92/tap
 brew install --cask flatmark
 ```
+
+The Homebrew cask installs a macOS package and works only on macOS. On Linux, use the package for your distribution.
 
 For other Linux distributions and Windows, download the installer for your platform from the
 [latest release](https://github.com/sake92/flatmark/releases/latest).
